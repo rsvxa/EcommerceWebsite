@@ -1,0 +1,195 @@
+// This is your Prisma schema file
+// Learn more: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Choose one datasource:
+// Option 1: MongoDB
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+// Option 2: PostgreSQL (comment MongoDB above and uncomment below)
+// datasource db {
+//   provider = "postgresql"
+//   url      = env("DATABASE_URL")
+// }
+
+enum Category {
+  CLOTHES
+  JEWELRY
+  SHOES
+  HATS
+  BAGS
+}
+
+enum SubCategory {
+  // Clothes subcategories
+  TSHIRTS
+  SHIRTS
+  DRESSES
+  JEANS
+  PANTS
+  SHORTS
+  JACKETS
+  COATS
+  SWEATERS
+  HOODIES
+  SKIRTS
+  BLAZERS
+  SUITS
+  ACTIVEWEAR
+  SWIMWEAR
+  UNDERWEAR
+  SLEEPWEAR
+  
+  // Jewelry subcategories
+  NECKLACES
+  EARRINGS
+  BRACELETS
+  RINGS
+  WATCHES
+  ANKLETS
+  BROOCHES
+  CUFFLINKS
+  PENDANTS
+  CHARMS
+  
+  // Shoes subcategories
+  SNEAKERS
+  BOOTS
+  SANDALS
+  HEELS
+  FLATS
+  LOAFERS
+  OXFORDS
+  SLIPPERS
+  ATHLETIC
+  CASUAL_SHOES
+  DRESS_SHOES
+  
+  // Hats subcategories
+  BASEBALL_CAPS
+  BEANIES
+  FEDORAS
+  BUCKET_HATS
+  BERETS
+  COWBOY_HATS
+  SUN_HATS
+  VISORS
+  PANAMA_HATS
+  WINTER_HATS
+  
+  // Bags subcategories
+  HANDBAGS
+  BACKPACKS
+  TOTES
+  CROSSBODY
+  CLUTCHES
+  SHOULDER_BAGS
+  WALLETS
+  DUFFEL_BAGS
+  BRIEFCASES
+  MESSENGER_BAGS
+  TRAVEL_BAGS
+}
+
+enum Size {
+  XS
+  S
+  M
+  L
+  XL
+  XXL
+  ONESIZE
+}
+
+model Product {
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId // For MongoDB
+  // id       String   @id @default(cuid()) // For PostgreSQL
+  name        String
+  description String
+  price       Float
+  images      String[] // Array of image URLs
+  category    Category
+  subCategory SubCategory?
+  stock       Int      @default(0)
+  featured    Boolean  @default(false)
+  variants    Variant[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([category])
+  @@index([featured])
+}
+
+model Variant {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId // For MongoDB
+  // id     String   @id @default(cuid()) // For PostgreSQL
+  productId String   @db.ObjectId // For MongoDB
+  // productId String // For PostgreSQL
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  size      Size
+  color     String   // e.g., "Black", "White", "Red"
+  colorHex  String?  // Optional hex value for display
+  sku       String   @unique
+  stock     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([productId])
+  @@index([sku])
+}
+
+model Order {
+  id            String      @id @default(auto()) @map("_id") @db.ObjectId // For MongoDB
+  // id         String      @id @default(cuid()) // For PostgreSQL
+  orderNumber   String      @unique
+  customerName  String
+  customerEmail String
+  items         OrderItem[]
+  totalAmount   Float
+  status        OrderStatus @default(PENDING)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([orderNumber])
+  @@index([customerEmail])
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+model OrderItem {
+  id         String  @id @default(auto()) @map("_id") @db.ObjectId // For MongoDB
+  // id      String  @id @default(cuid()) // For PostgreSQL
+  orderId    String  @db.ObjectId // For MongoDB
+  // orderId String  // For PostgreSQL
+  order      Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId  String  @db.ObjectId // For MongoDB
+  // productId String // For PostgreSQL
+  variantId  String? @db.ObjectId // For MongoDB
+  // variantId String? // For PostgreSQL
+  name       String
+  price      Float
+  quantity   Int
+  size       String?
+  color      String?
+
+  @@index([orderId])
+}
+
+// To use this schema:
+// 1. Set up your DATABASE_URL in .env file
+//    MongoDB: mongodb+srv://username:password@cluster.mongodb.net/dbname
+//    PostgreSQL: postgresql://username:password@localhost:5432/dbname
+// 2. Run: npx prisma generate
+// 3. Run: npx prisma db push (for quick setup) or npx prisma migrate dev (for migrations)
