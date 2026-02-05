@@ -76,7 +76,7 @@ export function HeroBanner() {
         <div className="container mx-auto px-6 md:px-12">
           <button 
             onClick={scrollToCategories}
-            className="px-12 py-5 bg-white rounded-md text-black text-xs font-bold uppercase tracking-[0.2em] hover:bg-black hover:text-white transition-all duration-500 shadow-2xl border border-transparent hover:border-white"
+            className="px-12 py-5 bg-white rounded-md text-black text-xs font-bold uppercase tracking-[0.2em] hover:bg-gray-600 hover:text-white transition-all duration-500 shadow-2xl border border-transparent hover:border-white"
           >
             Shop Now
           </button>

@@ -89,52 +89,10 @@ export function MegaMenu({ categories, onCategorySelect }: MegaMenuProps) {
           </NavigationMenuContent>
         </NavigationMenuItem>
 
-        {/* Featured Dropdown */}
-        <NavigationMenuItem>
-          <NavigationMenuTrigger className="h-10 text-sm font-large">
-            Featured
-          </NavigationMenuTrigger>
-          <NavigationMenuContent>
-            <ul className="grid w-[300px] gap-2 p-4">
-              <li>
-                <button
-                  onClick={() => onCategorySelect?.('MALE')}
-                  className="flex w-full items-center gap-3 rounded-md p-2 text-sm transition-colors hover:bg-gray-100 group"
-                >
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-50 text-blue-600 group-hover:bg-blue-100">
-                    <User className="h-4 w-4" />
-                  </div>
-                  <span className="font-medium">Male</span>
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => onCategorySelect?.('FEMALE')}
-                  className="flex w-full items-center gap-3 rounded-md p-2 text-sm transition-colors hover:bg-gray-100 group"
-                >
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-pink-50 text-pink-600 group-hover:bg-pink-100">
-                    <UserPlus className="h-4 w-4" />
-                  </div>
-                  <span className="font-medium">Female</span>
-                </button>
-              </li>
-              <li className="my-1 border-t border-gray-100" />
-              <li>
-                <button
-                  onClick={() => onCategorySelect?.('featured')}
-                  className="flex w-full items-center gap-3 rounded-md p-2 text-sm transition-colors hover:bg-gray-100 group text-gray-500"
-                >
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-yellow-50 text-yellow-600 group-hover:bg-yellow-100">
-                    <Sparkles className="h-4 w-4" />
-                  </div>
-                  <span>All Featured</span>
-                </button>
-              </li>
-            </ul>
-          </NavigationMenuContent>
-        </NavigationMenuItem>
-       
       </NavigationMenuList>
+        <div className=" font-bold w-full rounded gap-2 px-7 py-2 text-sm flex items-center justify-center">
+          Featured
+        </div>
     </NavigationMenu>
   );
 }

@@ -9,6 +9,11 @@ import { HeroBanner } from "@/app/components/home/HeroBanner";
 import { ProductList } from "@/app/components/products/ProductList";
 import { BlogSection } from "@/app/components/home/BlogSection";
 import Footer from "./components/footer/Footer";
+import { InstagramFeed } from './components/home/InstagramFeed';
+import { FeaturedCollections } from './components/home/FeaturedCollections';
+import { ShopTheLook } from './components/home/ShopTheLook';
+import { ScrollToTop } from './components/ui/ScrollToTop';
+import { SeasonSection } from './components/home/SeasonSection';
 
 const brandLogos = [
   { logo: 'https://upload.wikimedia.org/wikipedia/commons/a/a6/Logo_NIKE.svg', value: 'Nike' },
@@ -101,13 +106,23 @@ function App() {
       </section>
 
       <BlogSection />
+
+      <InstagramFeed />
+
+      <FeaturedCollections />
+
+      <ShopTheLook />
+
+      <SeasonSection />
+
+      {/* Brands Section */}
       
-      <div>
+      <div className="bg-white">
         <div id="categories-section" className="container mx-auto px-4 py-6">
           <h2 className="text-2xl font-bold">Shop by Brand</h2>
         </div>
       </div>
-      <div className="py-5 border-b border-gray-100">
+      <div className="bg-white py-5 border-b border-gray-100">
         <div className="container mx-auto px-4">
           <div className="flex flex-col items-center gap-2">
             <div className="flex flex-wrap justify-center gap-6">
@@ -133,7 +148,7 @@ function App() {
       </div>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
+      <main className="bg-white container mx-auto px-4 py-8">
         <div className="mb-8">
           <h2 className="text-2xl font-bold">
             {selectedCategory === 'featured'
@@ -149,7 +164,7 @@ function App() {
           </p>
         </div>
 
-        <div className="grid gap-8 lg:grid-cols-[220px_1fr]">
+        <div className="bg-white grid gap-8 lg:grid-cols-[220px_1fr]">
           <aside>
             <ProductFilters
               selectedCategory={selectedCategory}
@@ -169,6 +184,7 @@ function App() {
           </section>
         </div>22
       </main>
+      <ScrollToTop />
       <Footer />
       <Toaster position="top-right" />
     </div>
