@@ -90,7 +90,7 @@ export function MegaMenu({ categories, onCategorySelect }: MegaMenuProps) {
         </NavigationMenuItem>
 
       </NavigationMenuList>
-        <div className=" font-bold w-full rounded gap-2 px-7 py-2 text-sm flex items-center justify-center">
+        <div className=" font-bold w-full rounded gap-2 px-7 py-2 text-md flex items-center justify-center">
           Featured
         </div>
     </NavigationMenu>

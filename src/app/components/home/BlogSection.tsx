@@ -11,7 +11,6 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 
-// បញ្ជីអត្ថបទ Blog (ទុកតែមួយកន្លែងនេះបានហើយ)
 const BLOG_POSTS = [
   {
     id: 1,
@@ -59,7 +58,6 @@ export function BlogSection() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedGender, setSelectedGender] = useState("All");
 
-  // មុខងារ Filter អត្ថបទតាមភេទ
   const filteredPosts = selectedGender === "All" 
     ? BLOG_POSTS 
     : BLOG_POSTS.filter(post => post.category === selectedGender);
@@ -68,13 +66,11 @@ export function BlogSection() {
     <section className="py-16 bg-white border-t border-gray-200">
       <div className="container mx-auto px-4">
         
-        {/* Header & Category Filter Tabs */}
         <div className="flex flex-col md:flex-row justify-between items-center mb-10 gap-6">
           <div>
             <h2 className="text-3xl font-bold tracking-tight text-gray-900 uppercase">Fashion Blog</h2>
           </div>
 
-          {/* ប៊ូតុងជ្រើសរើសភេទ */}
           <div className="flex bg-gray-100 p-1 rounded-full">
             {["All", "Men", "Women"].map((gender) => (
               <button

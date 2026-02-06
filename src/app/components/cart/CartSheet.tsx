@@ -1,4 +1,7 @@
-import { ShoppingBag } from 'lucide-react';
+"use client";
+
+import React, { useState } from 'react';
+import { ShoppingBag, X, Trash2, Plus, Minus } from 'lucide-react';
 import { Button } from '@/app/components/ui/button';
 import {
   Sheet,
@@ -14,6 +17,7 @@ import { CartItem } from './CartItem';
 import { useCartStore } from '@/lib/store/cart-store';
 import { formatPrice } from '@/lib/utils/format';
 import { toast } from 'sonner';
+import { CheckoutModal } from './CheckoutModal';
 
 interface CartSheetProps {
   open: boolean;
@@ -21,16 +25,10 @@ interface CartSheetProps {
 }
 
 export function CartSheet({ open, onOpenChange }: CartSheetProps) {
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const { items, getTotalPrice, clearCart } = useCartStore();
   const totalPrice = getTotalPrice();
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
-
-  const handleCheckout = () => {
-    toast.success('Checkout initiated', {
-      description: 'This is a demo. In production, this would redirect to checkout.',
-    });
-    // In a real app, navigate to checkout page
-  };
 
   const handleClearCart = () => {
     clearCart();
@@ -39,97 +37,101 @@ export function CartSheet({ open, onOpenChange }: CartSheetProps) {
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="flex w-full flex-col sm:max-w-lg">
-        <SheetHeader>
-          <SheetTitle className="flex items-center gap-2">
-            <ShoppingBag className="h-5 w-5" />
-            Shopping Cart ({itemCount} {itemCount === 1 ? 'item' : 'items'})
+      <SheetContent className="flex w-full flex-col sm:max-w-2xl p-10 md:p-12 overflow-y-auto">
+        <SheetHeader className="pb-8">
+          <SheetTitle className="flex items-center gap-3 font-black uppercase tracking-tighter text-3xl">
+            <ShoppingBag className="h-8 w-8" />
+            Cart ({itemCount})
           </SheetTitle>
-          <SheetDescription>
-            Review your items and proceed to checkout.
+          <SheetDescription className="text-sm mt-2">
+            Review your items before proceeding to checkout.
           </SheetDescription>
         </SheetHeader>
 
         {items.length === 0 ? (
-          <div className="flex flex-1 flex-col items-center justify-center gap-4">
-            <div className="rounded-full bg-gray-100 p-6">
-              <ShoppingBag className="h-12 w-12 text-gray-400" />
+          <div className="flex flex-1 flex-col items-center justify-center gap-6">
+            <div className="rounded-full bg-zinc-50 p-10 border border-zinc-100">
+              <ShoppingBag className="h-16 w-16 text-zinc-300" />
             </div>
-            <div className="text-center">
-              <h3 className="font-semibold">Your cart is empty</h3>
-              <p className="mt-1 text-sm text-gray-600">
-                Add some products to get started
-              </p>
+            <div className="text-center space-y-2">
+              <h3 className="font-bold uppercase tracking-widest text-sm">Your cart is empty</h3>
+              <p className="text-xs text-zinc-400">Add some products to get started</p>
             </div>
-            <Button
-              onClick={() => onOpenChange(false)}
-              className="mt-4"
+            <Button 
+              onClick={() => onOpenChange(false)} 
+              className="mt-4 bg-black text-white px-8 py-6 rounded-xl font-bold uppercase tracking-widest text-[10px]"
             >
-              Continue Shopping
+              Start Shopping
             </Button>
           </div>
         ) : (
           <>
-            {/* Cart Items */}
-            <ScrollArea className="flex-1 -mx-6 px-6">
-              <div className="space-y-4">
+            {/* បង្កើន Space រវាង Item នីមួយៗ */}
+            <ScrollArea className="flex-1 -mx-2 px-2">
+              <div className="space-y-10 py-4">
                 {items.map((item, index) => (
-                  <CartItem key={`${item.product.id}-${item.selectedVariant?.id || index}`} item={item} />
+                  <div key={`${item.product.id}-${index}`} className="group">
+                    <CartItem item={item} />
+                  </div>
                 ))}
               </div>
             </ScrollArea>
 
-            {/* Footer */}
-            <div className="space-y-4">
-              <Separator />
-
-              {/* Subtotal */}
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Subtotal</span>
-                  <span className="font-medium">{formatPrice(totalPrice)}</span>
+            <div className="pt-10 space-y-8">
+              <Separator className="opacity-50" />
+              
+              <div className="space-y-4 px-2">
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-zinc-400 font-bold uppercase tracking-widest text-[10px]">Subtotal</span>
+                  <span className="font-bold">{formatPrice(totalPrice)}</span>
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Shipping</span>
-                  <span className="font-medium">Calculated at checkout</span>
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-zinc-400 font-bold uppercase tracking-widest text-[10px]">Shipping</span>
+                  <span className="text-zinc-400 italic text-[10px]">Calculated at checkout</span>
+                </div>
+                
+                <Separator className="my-6 opacity-30" />
+                
+                <div className="flex justify-between items-end">
+                  <div className="space-y-1">
+                    <p className="text-[10px] font-black uppercase text-zinc-400 tracking-widest">Total Amount</p>
+                    <p className="text-4xl font-black tracking-tighter">{formatPrice(totalPrice)}</p>
+                  </div>
                 </div>
               </div>
 
-              <Separator />
-
-              {/* Total */}
-              <div className="flex justify-between">
-                <span className="font-semibold">Total</span>
-                <span className="font-bold">{formatPrice(totalPrice)}</span>
-              </div>
-
-              {/* Action Buttons */}
-              <SheetFooter className="flex-col gap-2 sm:flex-col">
-                <Button
-                  onClick={handleCheckout}
-                  className="w-full bg-black hover:bg-gray-800"
-                  size="lg"
+              <div className="flex flex-col gap-4">
+                <button 
+                  onClick={() => setIsCheckoutOpen(true)}
+                  className="w-full bg-black text-white h-15 rounded-2xl font-bold uppercase tracking-[0.3em] text-[10px] hover:bg-zinc-800 transition-all shadow-xl active:scale-[0.98]"
                 >
                   Proceed to Checkout
-                </Button>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    onClick={() => onOpenChange(false)}
-                    className="flex-1"
+                </button>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => onOpenChange(false)} 
+                    className="h-14 rounded-xl font-bold uppercase tracking-widest text-[9px] border-zinc-200"
                   >
-                    Continue Shopping
+                    Continue
                   </Button>
                   <Button
-                    variant="outline"
+                    variant="ghost"
                     onClick={handleClearCart}
-                    className="flex-1 text-red-600 hover:bg-red-50 hover:text-red-700"
+                    className="h-14 rounded-xl font-bold uppercase tracking-widest text-[9px] text-red-500 hover:bg-red-50 hover:text-red-600"
                   >
-                    Clear Cart
+                    Clear All
                   </Button>
                 </div>
-              </SheetFooter>
+              </div>
             </div>
+
+            <CheckoutModal 
+              isOpen={isCheckoutOpen} 
+              onClose={() => setIsCheckoutOpen(false)} 
+              total={totalPrice} 
+            />
           </>
         )}
       </SheetContent>

@@ -149,7 +149,6 @@ export function Navbar({ onSearch, onCategorySelect }: NavbarProps) {
             {/* User Menu */}
             <div className="flex items-center gap-2">
               {isAuthenticated ? (
-                // ប្រសិនបើ Login រួចហើយ៖ បង្ហាញ Dropdown សម្រាប់ Logout
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="icon">
@@ -165,7 +164,6 @@ export function Navbar({ onSearch, onCategorySelect }: NavbarProps) {
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
-                // ប្រសិនបើមិនទាន់ Login៖ ចុចលើ Icon រូបមនុស្សឱ្យលោត Dialog ភ្លាម
                 <Button 
                   variant="ghost" 
                   size="icon" 
@@ -231,10 +229,8 @@ export function Navbar({ onSearch, onCategorySelect }: NavbarProps) {
         </div>
       </div>
 
-      {/* Cart Sheet */}
       <CartSheet open={isCartOpen} onOpenChange={setIsCartOpen} />
 
-      {/* Auth Dialog */}
       <AuthDialog open={isAuthDialogOpen} onOpenChange={setIsAuthDialogOpen} />
     </nav>
   );

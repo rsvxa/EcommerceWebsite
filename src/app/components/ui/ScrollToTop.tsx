@@ -36,7 +36,7 @@ export function ScrollToTop() {
   };
 
   return (
-    <div className="fixed bottom-8 right-8 z-[100]">
+    <div className="fixed bottom-8 right-8">
       {isVisible && (
         <motion.button
           initial={{ opacity: 0, scale: 0.5 }}
