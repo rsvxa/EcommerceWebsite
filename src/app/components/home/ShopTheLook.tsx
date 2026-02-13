@@ -12,9 +12,10 @@ export function ShopTheLook() {
   const t = translations[lang].shopLook;
 
   const LOOK_PRODUCTS = [
-    { id: 1, name: "Creamy White", price: "$249.00", top: "30%", left: "45%" },
-    { id: 2, name: "Trouser", price: "$120.00", top: "55%", left: "40%" },
-    { id: 3, name: "Nude/Tan bag", price: "$85.00", top: "75%", left: "65%" }
+    { id: 1, name: "Creamy White", price: "$24.00", top: "36%", left: "50%" },
+    { id: 2, name: "Trouser", price: "$63.00", top: "55%", left: "40%" },
+    { id: 3, name: "Nude/Tan bag", price: "$85.00", top: "78%", left: "65%" },
+    { id: 4, name: "Long Coat", price: "$125.00", top: "70%", left: "33%" }
   ];
 
   return (

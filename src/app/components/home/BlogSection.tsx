@@ -100,10 +100,10 @@ export function BlogSection() {
                 <button
                   key={cat.id}
                   onClick={() => setSelectedGender(cat.id)}
-                  className={`flex items-center gap-2 px-8 py-3 rounded-full text-[13px] font-black uppercase tracking-widest transition-all duration-500 ${
+                  className={`px-6 md:px-10 py-3 rounded-full text-[10px] font-black uppercase tracking-widest transition-all duration-500 ${
                     selectedGender === cat.id 
-                    ? "bg-zinc-900 text-white shadow-xl shadow-zinc-200" 
-                  : "text-zinc-400 hover:text-zinc-900 hover:bg-zinc-50"
+                    ? "bg-black text-white shadow-xl scale-105" 
+                    : "text-gray-400 hover:text-black"
                   }`}
                 >
                   {cat.label}
@@ -116,7 +116,7 @@ export function BlogSection() {
               className="group flex items-center gap-3 text-[13px] font-black uppercase tracking-[0.2em] text-zinc-400 hover:text-zinc-900 transition-all"
             >
               {t.viewAll} 
-              <span className="w-2 h-px bg-zinc-200 group-hover:w-0 group-hover:bg-zinc-900 transition-all" />
+              <span className="w-2 h-px group-hover:w-0 transition-all" />
               <ArrowRight size={16} />
             </button>
           </div>

@@ -1,120 +1,151 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { useLanguage } from "@/lib/store/use-language";
-import { User, Mail, ShieldCheck, Bell, Globe, Camera } from "lucide-react";
-import { Button } from "@/app/components/ui/button";
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import { useLanguage } from '@/lib/store/use-language';
+import { 
+  ShieldCheck, 
+  Lock, 
+  Smartphone, 
+  Fingerprint, 
+  Bell, 
+  Globe, 
+  Eye, 
+  ChevronRight, 
+  ToggleRight, 
+  ToggleLeft,
+  ArrowUpRight
+} from 'lucide-react';
 
-export default function SettingsPage() {
+export function SettingsPage() {
   const { lang } = useLanguage();
+  const [is2FAEnabled, setIs2FAEnabled] = useState(false);
+  const [isBiometricEnabled, setIsBiometricEnabled] = useState(true);
+  const [isIncognito, setIsIncognito] = useState(false);
+
+  const sections = [
+    {
+      title: lang === 'kh' ? 'សុវត្ថិភាពគណនី' : 'Security Vault',
+      icon: <Lock size={18} />,
+      items: [
+        { 
+          label: lang === 'kh' ? 'ការផ្ទៀងផ្ទាត់ ២ ជាន់ (2FA)' : 'Two-Factor Authentication', 
+          desc: lang === 'kh' ? 'បន្ថែមស្រទាប់សុវត្ថិភាពខ្ពស់' : 'Add an extra layer of protection',
+          isToggle: true,
+          enabled: is2FAEnabled,
+          onToggle: () => setIs2FAEnabled(!is2FAEnabled),
+          icon: <Smartphone size={20} />
+        },
+        { 
+          label: lang === 'kh' ? 'ការសម្គាល់ជីវមាត្រ' : 'Biometric Access', 
+          desc: 'Touch ID / Face ID',
+          isToggle: true,
+          enabled: isBiometricEnabled,
+          onToggle: () => setIsBiometricEnabled(!isBiometricEnabled),
+          icon: <Fingerprint size={20} />
+        }
+      ]
+    },
+    {
+      title: lang === 'kh' ? 'ការកំណត់ឯកជនភាព' : 'Privacy Control',
+      icon: <Eye size={18} />,
+      items: [
+        { 
+          label: lang === 'kh' ? 'របៀបមើលមិនឃើញ' : 'Incognito Browsing', 
+          desc: lang === 'kh' ? 'លាក់ប្រវត្តិការមើលទំនិញ' : 'Hide your browsing activity',
+          isToggle: true,
+          enabled: isIncognito,
+          onToggle: () => setIsIncognito(!isIncognito),
+          icon: <ShieldCheck size={20} />
+        }
+      ]
+    }
+  ];
 
   return (
-    <motion.div 
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      className="space-y-12 max-w-3xl pb-20"
-    >
-      {/* Profile Header with Avatar */}
-      <div className="flex flex-col sm:flex-row items-center gap-8 border-b border-zinc-100 pb-10">
-        <div className="relative group cursor-pointer">
-          <div className="h-24 w-24 rounded-[2.5rem] bg-zinc-100 overflow-hidden border-4 border-white shadow-2xl transition-transform group-hover:scale-105">
-            <img 
-              src="https://i.pravatar.cc/150?u=johndoe" 
-              alt="Profile" 
-              className="h-full w-full object-cover"
-            />
-          </div>
-          <div className="absolute -bottom-1 -right-1 h-8 w-8 bg-zinc-900 rounded-xl flex items-center justify-center text-white shadow-lg border-2 border-white group-hover:bg-blue-600 transition-colors">
-            <Camera size={14} />
-          </div>
-        </div>
-        
-        <div className="text-center sm:text-left space-y-1">
-          <p className="text-[10px] font-black uppercase tracking-[0.4em] text-blue-600">Premium Member</p>
-          <h2 className="text-3xl font-black uppercase tracking-tighter text-zinc-900">
-            {lang === 'kh' ? 'ការកំណត់គណនី' : 'Account Settings'}
-          </h2>
-          <p className="text-sm text-zinc-400 italic">Manage your digital presence and preferences.</p>
-        </div>
+    <div className="max-w-4xl mx-auto space-y-12">
+      {/* Settings Header */}
+      <div className="space-y-2">
+        <h2 className="text-3xl font-black uppercase tracking-tighter text-zinc-900 italic">
+          {lang === 'kh' ? 'ការកំណត់ប្រព័ន្ធ' : 'System Preferences'}
+        </h2>
+        <p className="text-zinc-400 text-xs font-medium tracking-widest uppercase">
+          {lang === 'kh' ? 'គ្រប់គ្រងពិភព ZWAY របស់អ្នក' : 'Tailor your ZWAY experience'}
+        </p>
       </div>
 
-      <form className="space-y-12">
-        {/* Personal Information Section */}
-        <section className="space-y-8">
-          <div className="flex items-center gap-3">
-            <User size={18} className="text-zinc-400" />
-            <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-zinc-900">Personal Information</h3>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
-            <div className="group space-y-2">
-              <label className="text-[9px] font-black uppercase tracking-widest text-zinc-400 transition-colors group-focus-within:text-zinc-900">
-                Full Name
-              </label>
-              <input 
-                type="text" 
-                className="w-full bg-transparent border-b border-zinc-200 py-3 text-sm font-bold focus:border-zinc-900 outline-none transition-all placeholder:text-zinc-300" 
-                defaultValue="John Doe" 
-              />
-            </div>
-            
-            <div className="group space-y-2">
-              <label className="text-[9px] font-black uppercase tracking-widest text-zinc-400 transition-colors group-focus-within:text-zinc-900">
-                Email Address
-              </label>
-              <div className="relative">
-                <input 
-                  type="email" 
-                  className="w-full bg-transparent border-b border-zinc-200 py-3 text-sm font-bold focus:border-zinc-900 outline-none transition-all" 
-                  defaultValue="john@example.com" 
-                />
-                <Mail size={14} className="absolute right-0 top-3 text-zinc-300" />
+      <div className="space-y-10">
+        {sections.map((section, idx) => (
+          <div key={idx} className="space-y-6">
+            {/* Section Label */}
+            <div className="flex items-center gap-3 px-2">
+              <div className="p-2 bg-zinc-900 text-white rounded-lg shadow-lg shadow-zinc-200">
+                {section.icon}
               </div>
+              <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-zinc-900">
+                {section.title}
+              </h3>
+            </div>
+
+            {/* Section Cards */}
+            <div className="bg-white rounded-[2.5rem] border border-zinc-100 overflow-hidden shadow-sm">
+              {section.items.map((item, i) => (
+                <div 
+                  key={i} 
+                  className={`flex items-center justify-between p-8 transition-colors hover:bg-zinc-50/50 ${
+                    i !== section.items.length - 1 ? 'border-b border-zinc-50' : ''
+                  }`}
+                >
+                  <div className="flex items-center gap-6">
+                    <div className="text-zinc-400">
+                      {item.icon}
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm font-black uppercase tracking-widest text-zinc-900">{item.label}</p>
+                      <p className="text-xs text-zinc-400 font-medium">{item.desc}</p>
+                    </div>
+                  </div>
+
+                  {item.isToggle ? (
+                    <button 
+                      onClick={item.onToggle}
+                      className={`transition-all duration-300 outline-none ${item.enabled ? 'text-zinc-900' : 'text-zinc-200'}`}
+                    >
+                      {item.enabled ? (
+                        <ToggleRight size={48} strokeWidth={1} className="drop-shadow-sm" />
+                      ) : (
+                        <ToggleLeft size={48} strokeWidth={1} />
+                      )}
+                    </button>
+                  ) : (
+                    <ChevronRight size={18} className="text-zinc-300" />
+                  )}
+                </div>
+              ))}
             </div>
           </div>
-        </section>
+        ))}
 
-        {/* Preferences & Security */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 pt-4">
-          <section className="space-y-6">
-            <div className="flex items-center gap-3">
-              <Globe size={18} className="text-zinc-400" />
-              <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-zinc-900">Preferences</h3>
+        {/* Danger Zone */}
+        <div className="pt-10 border-t border-zinc-100">
+          <motion.div 
+            whileHover={{ scale: 0.99 }}
+            className="p-8 rounded-[2.5rem] bg-red-50/40 border border-red-100 flex items-center justify-between group cursor-pointer hover:bg-red-50 transition-all"
+          >
+            <div className="space-y-1">
+              <p className="text-sm font-black uppercase tracking-widest text-red-600">
+                {lang === 'kh' ? 'លុបគណនី' : 'Deactivate Account'}
+              </p>
+              <p className="text-[10px] text-red-400 font-medium italic">
+                {lang === 'kh' ? 'លុបទិន្នន័យទាំងអស់ជាអចិន្ត្រៃយ៍' : 'Permanently remove all your data from our vault.'}
+              </p>
             </div>
-            <div className="space-y-4">
-               <div className="flex items-center justify-between p-4 rounded-2xl bg-zinc-50 border border-zinc-100">
-                  <div className="space-y-0.5">
-                    <p className="text-[10px] font-black uppercase tracking-tight">Newsletter</p>
-                    <p className="text-[10px] text-zinc-400">Receive seasonal lookbooks</p>
-                  </div>
-                  <div className="h-5 w-10 bg-zinc-900 rounded-full relative cursor-pointer shadow-inner">
-                    <div className="absolute right-1 top-1 h-3 w-3 bg-white rounded-full" />
-                  </div>
-               </div>
+            <div className="h-12 w-12 rounded-2xl bg-white border border-red-100 flex items-center justify-center text-red-300 group-hover:text-red-600 group-hover:border-red-200 transition-all">
+              <ArrowUpRight size={20} />
             </div>
-          </section>
-
-          <section className="space-y-6">
-            <div className="flex items-center gap-3">
-              <ShieldCheck size={18} className="text-zinc-400" />
-              <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-zinc-900">Security</h3>
-            </div>
-            <Button variant="outline" className="w-full h-14 rounded-2xl border-zinc-100 text-[10px] font-black uppercase tracking-widest hover:bg-zinc-900 hover:text-white transition-all">
-              Update Password
-            </Button>
-          </section>
+          </motion.div>
         </div>
-
-        {/* Save Bar - Desktop Fixed or Inline */}
-        <div className="flex items-center justify-end gap-4 pt-8 border-t border-zinc-100">
-          <button type="button" className="text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-zinc-900 transition-colors">
-            Discard
-          </button>
-          <button className="bg-zinc-900 text-white px-10 py-5 text-[10px] font-black uppercase tracking-[0.3em] rounded-2xl hover:bg-blue-600 hover:shadow-[0_20px_40px_rgba(37,99,235,0.2)] transition-all transform active:scale-95">
-            {lang === 'kh' ? 'រក្សាទុកការផ្លាស់ប្តូរ' : 'Save Changes'}
-          </button>
-        </div>
-      </form>
-    </motion.div>
+      </div>
+    </div>
   );
 }

@@ -67,7 +67,7 @@ export function MegaMenu({ categories, onCategorySelect }: MegaMenuProps) {
                 {/* Left Side: Category Links */}
                 <div className="md:col-span-8 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2">
                   <div className="col-span-full mb-4">
-                    <p className="text-[10px] font-black text-blue-600 uppercase tracking-[0.4em] mb-2">Explore</p>
+                    <p className="text-[10px] font-black text-black uppercase tracking-[0.4em] mb-2">Explore</p>
                     <h2 className="text-2xl font-black uppercase tracking-tighter">Collections</h2>
                   </div>
                   
@@ -144,7 +144,7 @@ export function MegaMenu({ categories, onCategorySelect }: MegaMenuProps) {
       </NavigationMenuList>
 
       {/* Featured Section Badge */}
-      <div className="flex items-center gap-2 ml-4 px-4 py-3.5 bg-gray-50 border border-gray-200 rounded-md">
+      <div className="flex items-center gap-2 ml-4 px-4 py-3.5 border border-gray-200 rounded-md">
          <div className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-ping" />
          <span className="text-[13px] font-bold uppercase tracking-[0.2em] text-black">
             {t.featured}

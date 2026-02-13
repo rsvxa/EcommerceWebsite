@@ -39,7 +39,6 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
 
     try {
       await login(email, password);
-      // បង្ហាញ Message ជោគជ័យតាមភាសា
       toast.success(lang === 'kh' ? 'ការចូលប្រើប្រាស់ជោគជ័យ' : 'Login successful');
       onOpenChange(false);
     } catch (error) {

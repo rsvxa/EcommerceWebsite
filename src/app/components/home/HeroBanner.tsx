@@ -109,7 +109,7 @@ export function HeroBanner() {
                     >
                       <button 
                         onClick={scrollToCategories}
-                        className="group relative flex items-center gap-4 bg-white text-black px-10 py-5 rounded-full overflow-hidden transition-all duration-500 hover:bg-gray-800 hover:text-white"
+                        className="group relative flex items-center gap-4 bg-white text-black px-10 py-5 rounded-xl overflow-hidden transition-all duration-500 hover:bg-gray-800 hover:text-white"
                       >
                         <span className="relative z-10 text-[15px] font-black uppercase tracking-[0.2em]">
                           {t.shopNow}

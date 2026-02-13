@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { Facebook, Instagram, Twitter, Mail, MapPin, Phone, ArrowUpRight, ShoppingBag } from 'lucide-react';
+import { Facebook, Instagram, Twitter, Mail, MapPin, Phone, ArrowUpRight, ShoppingBag, ArrowRight } from 'lucide-react';
 import { useLanguage } from '@/lib/store/use-language';
 import { translations } from '@/lib/i18n/translations';
 
@@ -16,17 +16,17 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="bg-zinc-950 text-white pt-24 pb-12 border-t border-zinc-900">
+    <footer className="bg-zinc-950 text-white pt-15 pb-9 border-t border-zinc-900">
       <div className="container mx-auto px-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-16 mb-20">
           
           {/* 1. Brand Identity - Span 4 */}
           <div className="lg:col-span-4 space-y-8">
             <div className="flex items-center gap-3 group cursor-pointer">
-              <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center transition-transform group-hover:-rotate-6">
+              <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center transition-transform">
                 <ShoppingBag className="text-black" size={20} />
               </div>
-              <h2 className="text-2xl font-black italic tracking-tighter uppercase">ZWAY</h2>
+              <h2 className="text-2xl font-black tracking-tighter">ZWAY Fashion</h2>
             </div>
             
             <p className="text-zinc-400 text-sm leading-relaxed max-w-sm font-medium">
@@ -52,7 +52,7 @@ export default function Footer() {
             <ul className="space-y-4">
               {[t.newArrivals, t.popular, t.blog, t.aboutUs].map((link) => (
                 <li key={link} className="group flex items-center gap-2 text-zinc-400 hover:text-white text-sm font-bold transition-colors cursor-pointer">
-                  <span className="w-0 h-px bg-white transition-all group-hover:w-4" />
+                  <ArrowRight size={16} className="opacity-0 -translate-y-1 translate-x-1 group-hover:opacity-100 group-hover:translate-y-0 group-hover:translate-x-0 transition-all"/>
                   {link}
                 </li>
               ))}
@@ -92,7 +92,7 @@ export default function Footer() {
                 </div>
                 <div className="space-y-1">
                   <p className="text-[10px] font-black text-zinc-500 uppercase">{lang === 'kh' ? 'ទូរសព្ទ' : 'Call center'}</p>
-                  <p className="text-sm font-bold text-zinc-300">+855 12 345 678</p>
+                  <p className="text-sm font-bold text-zinc-300">+855 969 127 603</p>
                 </div>
               </div>
             </div>
@@ -101,7 +101,7 @@ export default function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="pt-12 border-t border-zinc-900 flex flex-col md:flex-row justify-between items-center gap-6">
+        <div className="pt-8 border-t border-zinc-600 flex flex-col md:flex-row justify-between items-center gap-6">
           <p className="text-zinc-500 text-[10px] font-bold uppercase tracking-widest">
             © 2026 ZWAY Fashion Store. {t.rights}
           </p>
@@ -109,8 +109,8 @@ export default function Footer() {
           <div className="flex items-center gap-8">
             <p className="text-[10px] font-black text-zinc-600 uppercase tracking-tighter transition-colors hover:text-zinc-400 cursor-pointer">Privacy Policy</p>
             <p className="text-[10px] font-black text-zinc-600 uppercase tracking-tighter transition-colors hover:text-zinc-400 cursor-pointer">Terms of Service</p>
-            <div className="flex items-center gap-2 opacity-20 grayscale">
-              <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" className="h-3" />
+            <div className="flex items-center gap-2">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" className="h-4" />
               <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" className="h-5" />
             </div>
           </div>

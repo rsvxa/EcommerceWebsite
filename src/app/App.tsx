@@ -17,7 +17,6 @@ import { ScrollToTop } from './components/ui/ScrollToTop';
 import { SeasonSection } from './components/home/SeasonSection';
 import { useLanguage } from '@/lib/store/use-language';
 import { translations } from '@/lib/i18n/translations';
-import { Sparkles } from 'lucide-react';
 
 const brandLogos = [
   { logo: 'https://upload.wikimedia.org/wikipedia/commons/a/a6/Logo_NIKE.svg', value: 'Nike' },
@@ -60,7 +59,6 @@ function App() {
     setSelectedCategory(category);
     setSelectedSubCategory('');
     setSearchQuery('');
-    // Scroll ទៅកាន់កន្លែងផលិតផលដោយស្វ័យប្រវត្តិ
     document.getElementById('product-anchor')?.scrollIntoView({ behavior: 'smooth' });
   };
 
@@ -81,6 +79,7 @@ function App() {
   return (
     <div className="min-h-screen bg-white selection:bg-black selection:text-white">
       <Navbar onSearch={handleSearch} onCategorySelect={handleCategoryChange} />
+      
       
       <HeroBanner />
 
@@ -107,58 +106,73 @@ function App() {
 
       {/* 4. Brand Curation */}
         <div className="bg-white">
-        <div id="categories-section" className="container mx-auto px-4 py-6">
-          <h2 className="text-2xl font-bold">Shop by Brand</h2>
+          <div id="categories-section" className="container mx-auto px-4 py-6 text-center md:text-left">
+            <h2 className="text-3xl font-bold">{t.home.shopByBrand}</h2>
+          </div>
         </div>
-      </div>
-      <div className="bg-white py-5 border-b border-gray-100">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col items-center gap-2">
-            <div className="flex flex-wrap justify-center gap-6">
-              {brandLogos.map((brand) => (
-                <button
-                  key={brand.value}
-                  onClick={() => handleCategoryChange(brand.value)}
-                  className="group flex min-w-[130px] flex-col items-center justify-center gap-3 rounded-xl border border-gray-100 bg-white p-5 shadow-sm transition-all duration-300 hover:bg-gray-200 hover:shadow-md active:scale-95"
+
+        <div className="bg-white py-5 border-b border-gray-100">
+          <div className="container mx-auto px-4">
+            <div className="flex flex-col items-center gap-2">
+              <div className="flex flex-wrap justify-center gap-6">
+                {brandLogos.map((brand) => (
+                  <button
+                    key={brand.value}
+                    onClick={() => handleCategoryChange(brand.value)}
+                    className="group flex min-w-[130px] flex-col items-center justify-center gap-3 rounded-xl border border-gray-100 bg-white p-5 shadow-sm transition-all duration-300 hover:bg-gray-50 hover:shadow-md active:scale-95"
+                  >
+                    <div className="flex h-12 w-12 items-center justify-center">
+                      <img 
+                        src={brand.logo} 
+                        className="max-h-12 max-w-12 object-contain grayscale transition-all duration-300 group-hover:grayscale-0" 
+                        alt={brand.value}
+                      />
+                    </div>
+                  </button>
+                ))}
+                
+                <button 
+                  onClick={() => handleCategoryChange('')} 
+                  className="group flex min-w-[130px] items-center justify-center rounded-xl border border-dashed border-zinc-300 bg-zinc-50 p-5 text-[10px] font-black uppercase tracking-widest hover:bg-zinc-900 hover:text-white transition-all duration-300 active:scale-95"
                 >
-                  <div className="flex h-12 w-12 items-center justify-center">
-                    <img 
-                      src={brand.logo} 
-                      className="max-h-12 max-w-12 object-contain grayscale transition-all duration-300 group-hover:grayscale-0" 
-                    />
-                  </div>
-                  
+                  {t.home.allProductsBtn}
                 </button>
-              ))}
-              <button onClick={() => handleCategoryChange('')} className="group flex min-w-[130px] flex-col items-center justify-center gap-3 rounded-xl border border-gray-500 bg-gray-300 p-5 shadow-sm transition-all duration-300 hover:shadow-md active:scale-95">All Products...</button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* 5. Main Product Gallery */}
-      <main id="product-anchor" className="container mx-auto px-6 py-24">
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8 border-b border-zinc-100 pb-10">
-          <div className="space-y-4">
-            <h2 className="text-5xl font-black uppercase tracking-tighter text-zinc-900">
-              {selectedCategory === 'featured' ? t.products.featured : selectedCategory || t.products.allProducts}
-            </h2>
-            <div className="flex items-center gap-4">
-              <span className="h-[1px] w-12 bg-zinc-900" />
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">
-                {displayedProducts.length} {t.products.unit} Available
-              </p>
+        {/* 5. Main Product Gallery */}
+        <main id="product-anchor" className="container mx-auto px-6 py-24">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8 border-b border-zinc-100 pb-10">
+            <div className="space-y-4">
+              <h2 className="text-3xl font-black uppercase tracking-tighter text-zinc-900">
+                {selectedCategory === 'featured' 
+                  ? t.products.featured 
+                  : searchQuery 
+                    ? `${t.products.searchResults} "${searchQuery}"`
+                    : selectedCategory || t.products.allProducts}
+              </h2>
+              
+              <div className="flex items-center gap-4">
+                <span className="h-[1px] w-12 bg-zinc-900" />
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">
+                  {lang === 'kh' 
+                    ? `${t.products.found} ${displayedProducts.length} ${t.products.unit}`
+                    : `${displayedProducts.length} ${t.products.unit} ${t.products.found}`}
+                </p>
+              </div>
             </div>
+            
+            {searchQuery && (
+              <div className="bg-zinc-50 px-6 py-3 rounded-full border border-zinc-100 flex items-center gap-3">
+                <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">
+                  {lang === 'kh' ? 'លទ្ធផលស្វែងរកសម្រាប់:' : 'Results for:'}
+                </span>
+                <span className="text-sm font-bold italic">"{searchQuery}"</span>
+              </div>
+            )}
           </div>
-          
-          {searchQuery && (
-            <div className="bg-zinc-50 px-6 py-3 rounded-full border border-zinc-100 flex items-center gap-3">
-              <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Results for:</span>
-              <span className="text-sm font-bold italic">"{searchQuery}"</span>
-            </div>
-          )}
-        </div>
-
         <div className="grid gap-16 lg:grid-cols-[260px_1fr]">
           <aside className="relative">
             <div className="sticky top-32">

@@ -60,8 +60,8 @@ export function InstagramFeed() {
                 onClick={() => setFilter(p.id)}
                 className={`flex items-center gap-2 px-8 py-3 rounded-full text-[10px] font-black uppercase tracking-widest transition-all duration-500 ${
                   filter === p.id 
-                  ? "bg-zinc-900 text-white shadow-xl shadow-zinc-200" 
-                  : "text-zinc-400 hover:text-zinc-900 hover:bg-zinc-50"
+                  ? "bg-black text-white shadow-xl scale-105" 
+                  : "text-gray-400 hover:text-black"
                 }`}
               >
                 {p.icon} {p.label}
