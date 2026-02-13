@@ -16,19 +16,22 @@ import { formatPrice } from '@/lib/utils/format';
 import { OrderInvoice } from '../checkout/OrderInvoice';
 import { toast } from 'sonner';
 import { useCartStore } from "@/lib/store/cart-store";
+import { useLanguage } from '@/lib/store/use-language';
+import { translations } from '@/lib/i18n/translations';
 
- const TELEGRAM_BOT_TOKEN = "8174063017:AAEvRhmDVFJ_gX6wCS1D0-8cs0tECZkbnZA";
-  const TELEGRAM_CHAT_ID = "8174063017";
+const TELEGRAM_BOT_TOKEN = "8174063017:AAEvRhmDVFJ_gX6wCS1D0-8cs0tECZkbnZA";
+const TELEGRAM_CHAT_ID = "8174063017";
 
 export function CheckoutModal({ isOpen, onOpenChange, total, cartItems }: any) {
+  const { lang } = useLanguage();
+  const t = translations[lang].checkout;
+
   const [paymentMethod, setPaymentMethod] = useState('khqr');
   const [country, setCountry] = useState('cambodia');
   const [shippingCarrier, setShippingCarrier] = useState('');
   const [isInvoiceOpen, setIsInvoiceOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
   const [finalOrderData, setFinalOrderData] = useState<any>(null);
-  
   const { clearCart } = useCartStore();
 
   const [formData, setFormData] = useState({
@@ -80,13 +83,12 @@ ${order.items.map((item: any) => `• ${item.product?.name || item.name} (x${ite
       });
     } catch (e) { console.error(e); }
   };
- 
 
   const handleConfirmOrder = async () => {
-    if (!formData.fullName.trim()) return toast.error("Please input your full name!");
-    if (!formData.phone.trim()) return toast.error("Please input your phone number!");
-    if (!shippingCarrier) return toast.error("Please select shipping delivery!");
-    if (!formData.province.trim() || !formData.address.trim()) return toast.error("Please input your fuul location!");
+    if (!formData.fullName.trim()) return toast.error(t.errorName);
+    if (!formData.phone.trim()) return toast.error(t.errorPhone);
+    if (!shippingCarrier) return toast.error(t.errorCarrier);
+    if (!formData.province.trim() || !formData.address.trim()) return toast.error(t.errorLocation);
 
     setIsSubmitting(true);
     
@@ -107,7 +109,7 @@ ${order.items.map((item: any) => `• ${item.product?.name || item.name} (x${ite
       await sendToTelegram(orderSummary);
       setFinalOrderData(orderSummary); 
 
-      toast.success("Payment successfully!");
+      toast.success(t.success);
 
       if (typeof onOpenChange === 'function') {
         onOpenChange(false); 
@@ -119,7 +121,7 @@ ${order.items.map((item: any) => `• ${item.product?.name || item.name} (x${ite
       }, 400);
 
     } catch (error) {
-      toast.error("Your information involed!");
+      toast.error("Error occurred!");
     } finally {
       setIsSubmitting(false);
     }
@@ -131,28 +133,28 @@ ${order.items.map((item: any) => `• ${item.product?.name || item.name} (x${ite
         <SheetContent className="flex w-full flex-col sm:max-w-2xl p-10 md:p-12 overflow-y-auto z-[999]">
           
           <SheetHeader className="pb-8 text-center">
-            <SheetTitle className="font-black uppercase tracking-tighter text-3xl">Checkout</SheetTitle>
-            <SheetDescription className="text-sm mt-2">Provide your delivery and payment details.</SheetDescription>
+            <SheetTitle className="font-black uppercase tracking-tighter text-3xl">{t.title}</SheetTitle>
+            <SheetDescription className="text-sm mt-2">{t.desc}</SheetDescription>
           </SheetHeader>
 
           <div className="flex-1 space-y-12">
             <div className="space-y-8">
-              <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400 text-center">Shipping Information</h3>
+              <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400 text-center">{t.shippingInfo}</h3>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                 <div className="space-y-2 border-b border-gray-100 italic">
-                  <p className="text-[10px] font-bold uppercase text-gray-400">Full Name</p>
+                  <p className="text-[10px] font-bold uppercase text-gray-400">{t.fullName}</p>
                   <input name="fullName" value={formData.fullName} onChange={handleInputChange} type="text" className="w-full py-2 outline-none text-sm bg-transparent" placeholder="John Doe" />
                 </div>
                 <div className="space-y-2 border-b border-gray-100 italic">
-                  <p className="text-[10px] font-bold uppercase text-gray-400">Phone Number</p>
+                  <p className="text-[10px] font-bold uppercase text-gray-400">{t.phone}</p>
                   <input name="phone" value={formData.phone} onChange={handleInputChange} type="text" className="w-full py-2 outline-none text-sm bg-transparent" placeholder="+855..." />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-10 italic">
                 <div className="space-y-2 border-b border-gray-100">
-                  <p className="text-[10px] font-bold uppercase text-gray-400">Country</p>
+                  <p className="text-[10px] font-bold uppercase text-gray-400">{t.country}</p>
                   <select value={country} onChange={(e) => { setCountry(e.target.value); setShippingCarrier(''); }} className="w-full py-2 outline-none text-sm bg-transparent cursor-pointer">
                     {Object.keys(shippingData).map((key) => (
                       <option key={key} value={key}>{key.charAt(0).toUpperCase() + key.slice(1)}</option>
@@ -160,9 +162,9 @@ ${order.items.map((item: any) => `• ${item.product?.name || item.name} (x${ite
                   </select>
                 </div>
                 <div className="space-y-2 border-b border-gray-100">
-                  <p className="text-[10px] font-bold uppercase text-gray-400">Shipping Carrier</p>
+                  <p className="text-[10px] font-bold uppercase text-gray-400">{t.carrier}</p>
                   <select value={shippingCarrier} onChange={(e) => setShippingCarrier(e.target.value)} className="w-full py-2 outline-none text-sm bg-transparent cursor-pointer font-bold text-blue-600">
-                    <option value="">Select Carrier</option>
+                    <option value="">{t.selectCarrier}</option>
                     {shippingData[country]?.map((carrier: any) => (
                       <option key={carrier.id} value={carrier.id}>{carrier.name}</option>
                     ))}
@@ -172,30 +174,29 @@ ${order.items.map((item: any) => `• ${item.product?.name || item.name} (x${ite
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 italic">
                 <div className="space-y-2 border-b border-gray-100">
-                  <p className="text-[10px] font-bold uppercase text-gray-400">Province / City</p>
+                  <p className="text-[10px] font-bold uppercase text-gray-400">{t.province}</p>
                   <input name="province" value={formData.province} onChange={handleInputChange} type="text" className="w-full py-2 outline-none text-sm bg-transparent" placeholder="Phnom Penh" />
                 </div>
                 <div className="space-y-2 border-b border-gray-100">
-                  <p className="text-[10px] font-bold uppercase text-gray-400">District / Khan</p>
+                  <p className="text-[10px] font-bold uppercase text-gray-400">{t.district}</p>
                   <input name="district" value={formData.district} onChange={handleInputChange} type="text" className="w-full py-2 outline-none text-sm bg-transparent" placeholder="Daun Penh" />
                 </div>
                 <div className="space-y-2 border-b border-gray-100">
-                  <p className="text-[10px] font-bold uppercase text-gray-400">Commune / Sangkat</p>
+                  <p className="text-[10px] font-bold uppercase text-gray-400">{t.commune}</p>
                   <input name="commune" value={formData.commune} onChange={handleInputChange} type="text" className="w-full py-2 outline-none text-sm bg-transparent" placeholder="Phsar Thmei" />
                 </div>
               </div>
 
               <div className="space-y-2 border-b border-gray-100 italic">
-                <p className="text-[10px] font-bold uppercase text-gray-400">Specific Address</p>
+                <p className="text-[10px] font-bold uppercase text-gray-400">{t.address}</p>
                 <textarea name="address" value={formData.address} onChange={handleInputChange} placeholder="e.g. St. 123, House 45B..." className="w-full py-2 outline-none text-sm bg-transparent resize-none" rows={1} />
               </div>
             </div>
 
             <Separator className="opacity-50" />
 
-            {/* --- Payment Method Section --- */}
             <div className="space-y-10 flex flex-col items-center italic">
-              <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400 text-center w-full">Payment Method</h3>
+              <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400 text-center w-full">{t.paymentMethod}</h3>
               
               <div className="inline-flex p-1.5 bg-zinc-100/50 rounded-full border border-zinc-100">
                 {['khqr', 'visa', 'cod'].map((method) => (
@@ -217,11 +218,11 @@ ${order.items.map((item: any) => `• ${item.product?.name || item.name} (x${ite
                         <img src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=PAY_TO_STORE_${total}`} alt="QR" className="w-40 h-40" />
                       </div>
                       <div className="text-center space-y-1">
-                        <p className="text-[10px] font-bold uppercase text-zinc-400 tracking-widest">Amount to Pay</p>
+                        <p className="text-[10px] font-bold uppercase text-zinc-400 tracking-widest">{t.amountToPay}</p>
                         <p className="text-3xl font-black text-blue-600">{formatPrice(total)}</p>
                       </div>
                       <Button onClick={handleConfirmOrder} disabled={isSubmitting} className="mt-8 bg-blue-600 hover:bg-blue-700 text-white w-full rounded-xl uppercase text-[10px] tracking-widest font-black py-6 shadow-lg transition-transform active:scale-95">
-                        {isSubmitting ? <Loader2 className="animate-spin" /> : "I have paid via KHQR"}
+                        {isSubmitting ? <Loader2 className="animate-spin" /> : t.khqrLabel}
                       </Button>
                     </motion.div>
                   )}
@@ -251,12 +252,12 @@ ${order.items.map((item: any) => `• ${item.product?.name || item.name} (x${ite
             <Separator className="opacity-50" />
             <div className="flex justify-between items-center px-2">
               <div className="space-y-1">
-                <p className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Total Payable</p>
+                <p className="text-[10px] font-black uppercase text-gray-400 tracking-widest">{t.totalPayable}</p>
                 <p className="text-4xl font-black tracking-tighter">{formatPrice(total)}</p>
               </div>
               <div className="flex items-center gap-2 opacity-40 text-green-600">
                 <ShieldCheck size={18} />
-                <span className="text-[10px] font-bold uppercase">Secure</span>
+                <span className="text-[10px] font-bold uppercase">{t.secure}</span>
               </div>
             </div>
 
@@ -264,9 +265,9 @@ ${order.items.map((item: any) => `• ${item.product?.name || item.name} (x${ite
               <Button 
                 onClick={handleConfirmOrder}
                 disabled={isSubmitting}
-                className="w-full bg-black text-white h-20 rounded-2xl font-bold uppercase tracking-[0.3em] text-[10px] shadow-2xl hover:bg-zinc-800 transition-all"
+                className="w-full bg-black text-white h-14 rounded-2xl font-bold uppercase tracking-[0.3em] text-[10px] shadow-2xl hover:bg-zinc-800 transition-all"
               >
-                {isSubmitting ? <Loader2 className="animate-spin" /> : "Confirm Order"}
+                {isSubmitting ? <Loader2 className="animate-spin" /> : t.confirmBtn}
               </Button>
             )}
             
@@ -275,14 +276,13 @@ ${order.items.map((item: any) => `• ${item.product?.name || item.name} (x${ite
                 onClick={() => onOpenChange(false)} 
                 className="w-full py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 hover:text-black transition-colors italic"
               >
-                Cancel and Return to Cart
+                {t.cancel}
               </button>
             )}
           </div>
         </SheetContent>
       </Sheet>
 
-      {/* ការហៅ Invoice បង្ហាញចេញពី Snapshot Data */}
       {finalOrderData && (
         <OrderInvoice 
           isOpen={isInvoiceOpen} 

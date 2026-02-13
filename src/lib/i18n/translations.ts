@@ -1,80 +1,470 @@
-
 export const translations = {
-  en: {
-    auth: {
-      welcome: "Welcome Back",
-      description: "Access your account to manage orders and profile.",
-      loginTab: "Login",
-      signupTab: "Sign Up",
-      emailLabel: "Email Address",
-      passwordLabel: "Password",
-      nameLabel: "Full Name",
-      confirmPasswordLabel: "Confirm Password",
-      forgotPassword: "Forgot Password?",
-      loginBtn: "Sign In Now",
-      signupBtn: "Create My Account",
+  kh: {
+    home: {
+      heroTitle: "ហាងសម្លៀកបំពាក់ ZWAY",
+      heroDesc: "ស្វែងរកការប្រមូលផ្តុំសម្លៀកបំពាក់ គ្រឿងអលង្ការ ស្បែកជើង មួក និងកាបូបដ៏ប្រណិតរបស់យើង។ លើកកម្ពស់ស្ទីលរបស់អ្នកជាមួយនឹងបំណែកដែលមិនចេះរីងស្ងួត។",
+      shopByBrand: "ទិញតាមម៉ាកផលិតផល",
+      allProductsBtn: "ផលិតផលទាំងអស់...",
     },
-    cart: {
-    subtotal: "Subtotal",
-    empty: "Your cart is empty",
-    checkout: "Checkout Now"
-  },
-  invoice: {
-    successTitle: "Order Success",
-    thankYou: "Thank you for your purchase",
-    orderId: "Order ID",
-    date: "Date",
-    qty: "Qty",
-    totalPaid: "Total Amount Paid",
-    confirmed: "Payment Confirmed",
-    print: "Print",
-    download: "Download PDF",
-    return: "Return to Store"
-  },
-  footer: {
-  aboutText: "Elevating your everyday style with premium collections designed for confidence and comfort.",
-  quickLinks: "Quick Links",
-  customerCare: "Customer Care",
-  contactUs: "Contact Us"
-},
-  },
-  
-  km: {
+    products: {
+      allProducts: "ផលិតផលទាំងអស់",
+      featured: "ផលិតផលណែនាំ",
+      searchResults: "លទ្ធផលស្វែងរកសម្រាប់",
+      found: "រកឃើញផលិតផល",
+      unit: "មុខ",
+      noFound: "រកមិនឃើញផលិតផលទេ",
+      noFoundDesc: "សូមព្យាយាមកែសម្រួលតម្រង ឬពាក្យស្វែងរករបស់អ្នកឡើងវិញ",
+    },
+    megaMenu: {
+      trigger: "ទិញទំនិញតាមប្រភេទ",
+      featured: "ទំនិញពេញនិយម",
+      viewAll: "មើលទាំងអស់",
+      shopAllTitle: "មើលផលិតផលគ្រប់ប្រភេទ",
+      shopAllDesc: "ស្វែងរកការប្រមូលផ្តុំផលិតផលទាំងអស់របស់យើង",
+      descClothes: "ស្វែងរកការប្រមូលសម្លៀកបំពាក់លំដាប់ខ្ពស់",
+      descJewelry: "ស្វែងរកគ្រឿងអលង្ការដ៏ប្រណិត",
+      descShoes: "ឈានជើងចូលទៅក្នុងភាពទាន់សម័យជាមួយស្បែកជើងរបស់យើង",
+      descHats: "បង្កើនភាពទាក់ទាញជាមួយនឹងមួកម៉ូតថ្មីៗ",
+      descBags: "ដាក់សម្ភារៈរបស់អ្នកដោយភាពទាន់សម័យ",
+      defaultDesc: "មើលការប្រមូលផ្តុំរបស់យើង"
+    },
+    nav: {
+      search: "ស្វែងរកផលិតផល...",
+      login: "ចូលប្រើ",
+      logout: "ចាកចេញ",
+      allProducts: "ផលិតផលទាំងអស់",
+      categories: "ជម្រើសផលិតផល",
+      clothes: "សម្លៀកបំពាក់",
+      jewelry: "គ្រឿងអលង្ការ",
+      shoes: "ស្បែកជើង",
+      hats: "មួក",
+      bags: "កាបូប",
+    },
     footer: {
-  aboutText: "លើកកម្ពស់ស្ទីលប្រចាំថ្ងៃរបស់អ្នកជាមួយនឹងបណ្តុំសម្លៀកបំពាក់កម្រិតខ្ពស់ ដែលរចនាឡើងដើម្បីភាពជឿជាក់ និងផាសុកភាព។",
-  quickLinks: "តំណភ្ជាប់រហ័ស",
-  customerCare: "សេវាកម្មអតិថិជន",
-  contactUs: "ទំនាក់ទំនងយើង"
-},
-    invoice: {
-    successTitle: "ការបញ្ជាទិញជោគជ័យ",
-    thankYou: "សូមអរគុណសម្រាប់ការគាំទ្ររបស់អ្នក",
-    orderId: "លេខកូដវិក្កយបត្រ",
-    date: "កាលបរិច្ឆេទ",
-    qty: "ចំនួន",
-    totalPaid: "ទឹកប្រាក់បានបង់សរុប",
-    confirmed: "បង់ប្រាក់រួចរាល់",
-    print: "បោះពុម្ព",
-    download: "ទាញយក PDF",
-    return: "ត្រឡប់ទៅកាន់ហាង"
-  },
-    auth: {
-      welcome: "សូមស្វាគមន៍ត្រឡប់មកវិញ",
-      description: "ចូលប្រើគណនីរបស់អ្នកដើម្បីគ្រប់គ្រងការបញ្ជាទិញ។",
-      loginTab: "ចូលប្រើ",
-      signupTab: "ចុះឈ្មោះ",
-      emailLabel: "អាសយដ្ឋានអ៊ីមែល",
-      passwordLabel: "លេខសម្ងាត់",
-      nameLabel: "ឈ្មោះពេញ",
-      confirmPasswordLabel: "បញ្ជាក់លេខសម្ងាត់",
-      forgotPassword: "ភ្លេចលេខសម្ងាត់?",
-      loginBtn: "ចូលប្រើប្រាស់ឥឡូវនេះ",
-      signupBtn: "បង្កើតគណនីរបស់ខ្ញុំ",
+      aboutDesc: "យើងនាំមកជូនអ្នកនូវសម្លៀកបំពាក់ និងគ្រឿងបន្លាស់កម្រិតខ្ពស់ ដើម្បីលើកកម្ពស់សម្រស់ និងទំនុកចិត្តរបស់អ្នកក្នុងគ្រប់ឱកាសទាំងអស់។",
+      quickLinks: "តំណភ្ជាប់រហ័ស",
+      customerCare: "សេវាកម្មអតិថិជន",
+      contactUs: "ទាក់ទងមកយើង",
+      newArrivals: "ទំនិញមកដល់ថ្មី",
+      popular: "ផលិតផលពេញនិយម",
+      blog: "ប្លុកម៉ូដសម្លៀកបំពាក់",
+      aboutUs: "អំពីយើង",
+      shipping: "គោលការណ៍ដឹកជញ្ជូន",
+      returns: "ការប្តូរ និងសងទំនិញ",
+      faqs: "សំណួរដែលសួរញឹកញាប់",
+      support: "ទំនាក់ទំនងផ្នែកគាំទ្រ",
+      address: "ភ្នំពេញ, ប្រទេសកម្ពុជា",
+      rights: "រក្សាសិទ្ធិគ្រប់យ៉ាង។ បង្កើតឡើងដោយនិស្សិតជំនាន់ ១៨ ក្រុមទី២ បន្ទប់ប្រាសាទកោះកេរ្តិ៍។"
+    },
+    filters: {
+      title: "តម្រងស្វែងរក",
+      sortBy: "តម្រៀបតាម",
+      categories: "ប្រភេទផលិតផល",
+      allCategories: "គ្រប់ប្រភេទ",
+      price: "តម្លៃ",
+      clear: "សម្អាតតម្រង",
+      sortNewest: "ថ្មីបំផុត",
+      sortPriceAsc: "តម្លៃ: ទាបទៅខ្ពស់",
+      sortPriceDesc: "តម្លៃ: ខ្ពស់ទៅទាប",
+      sortName: "ឈ្មោះ: A ដល់ Z",
+      mobileTrigger: "តម្រង និង ការតម្រៀប",
+      mobileDesc: "ស្វែងរកផលិតផលតាមប្រភេទ តម្លៃ និងអ្វីៗជាច្រើនទៀត។"
+    },
+    productCard: {
+      featured: "ទំនិញណែនាំ",
+      lowStock: "ជិតអស់ពីស្តុក",
+      soldOut: "អស់ពីស្តុក",
+      addToCart: "ដាក់ក្នុងកន្ត្រក",
+      addedToCart: "បានដាក់ចូលក្នុងកន្ត្រក",
+      addedToWishlist: "បានដាក់ក្នុងបញ្ជីប្រាថ្នា",
+      inStock: "ក្នុងស្តុក",
+      stockUnit: "គ្រឿង",
     },
     cart: {
-    subtotal: "តម្លៃសរុប",
-    empty: "មិនទាន់មានទំនិញក្នុងកញ្ចប់",
-    checkout: "ទូទាត់ប្រាក់ឥឡូវនេះ"
+      title: "កន្ត្រកទំនិញ",
+      desc: "ពិនិត្យទំនិញរបស់អ្នកមុនពេលបន្តទៅការទូទាត់ប្រាក់។",
+      empty: "កន្ត្រកទំនិញទទេ",
+      emptyDesc: "សូមបន្ថែមផលិតផលខ្លះដើម្បីចាប់ផ្តើម",
+      startShopping: "ចាប់ផ្តើមទិញទំនិញ",
+      subtotal: "តម្លៃសរុបបណ្តោះអាសន្ន",
+      shipping: "សេវាដឹកជញ្ជូន",
+      shippingDesc: "គណនានៅពេលទូទាត់ប្រាក់",
+      totalAmount: "ចំនួនទឹកប្រាក់សរុប",
+      checkout: "បន្តទៅការទូទាត់ប្រាក់",
+      continue: "ទិញបន្ថែម",
+      clearAll: "សម្អាតទាំងអស់",
+      cleared: "បានសម្អាតកន្ត្រកទំនិញ",
+    },
+    checkout: {
+      title: "ទូទាត់ប្រាក់",
+      desc: "សូមផ្តល់ព័ត៌មានដឹកជញ្ជូន និងការបង់ប្រាក់របស់អ្នក។",
+      shippingInfo: "ព័ត៌មានដឹកជញ្ជូន",
+      fullName: "ឈ្មោះពេញ",
+      phone: "លេខទូរសព្ទ",
+      country: "ប្រទេស",
+      carrier: "ក្រុមហ៊ុនដឹកជញ្ជូន",
+      selectCarrier: "ជ្រើសរើសក្រុមហ៊ុន",
+      province: "ខេត្ត / រាជធានី",
+      district: "ស្រុក / ខណ្ឌ",
+      commune: "ឃុំ / សង្កាត់",
+      address: "អាសយដ្ឋានលម្អិត (លេខផ្ទះ/ផ្លូវ)",
+      paymentMethod: "វិធីសាស្រ្តបង់ប្រាក់",
+      amountToPay: "ចំនួនទឹកប្រាក់ត្រូវបង់",
+      khqrLabel: "ខ្ញុំបានបង់ប្រាក់តាម KHQR រួចហើយ",
+      confirmBtn: "បញ្ជាក់ការបញ្ជាទិញ",
+      cancel: "បោះបង់ និងត្រឡប់ទៅកន្ត្រកវិញ",
+      totalPayable: "ទឹកប្រាក់ត្រូវបង់សរុប",
+      secure: "សុវត្ថិភាព",
+      errorName: "សូមបញ្ចូលឈ្មោះពេញរបស់អ្នក!",
+      errorPhone: "សូមបញ្ចូលលេខទូរសព្ទរបស់អ្នក!",
+      errorCarrier: "សូមជ្រើសរើសក្រុមហ៊ុនដឹកជញ្ជូន!",
+      errorLocation: "សូមបញ្ចូលទីតាំងរបស់អ្នកឱ្យបានពេញលេញ!",
+      success: "ការបង់ប្រាក់ជោគជ័យ!"
+    },
+    cartItem: {
+      size: "ទំហំ",
+      color: "ពណ៌",
+      remove: "លុបចេញ",
+    },
+    invoice: {
+      officialTitle: "វិក្កយបត្រផ្លូវការ",
+      paidStatus: "បានបង់ប្រាក់",
+      billTo: "អ្នកទិញ",
+      shipTo: "ផ្ញើទៅកាន់",
+      via: "តាមរយៈ",
+      description: "បរិយាយមុខទំនិញ",
+      qtyPrice: "ចំនួន x តម្លៃ",
+      total: "សរុប",
+      subtotal: "តម្លៃសរុបបណ្តោះអាសន្ន",
+      shipping: "សេវាដឹកជញ្ជូន",
+      free: "ឥតគិតថ្លៃ",
+      grandTotal: "ទឹកប្រាក់សរុប",
+      trackOrder: "តាមដានការដឹកជញ្ជូន",
+      trackingMsg: "កំពុងឆែកស្ថានភាពឥវ៉ាន់...",
+      footerMsg: "នេះគឺជាវិក្កយបត្រដែលបង្កើតដោយស្វ័យប្រវត្តិ",
+    },
+    auth: {
+      welcome: "សូមស្វាគមន៍",
+      desc: "ចូលគណនី ឬបង្កើតថ្មីដើម្បីបន្តការទិញទំនិញរបស់អ្នក។",
+      login: "ចូលប្រើ",
+      signup: "ចុះឈ្មោះ",
+      name: "ឈ្មោះ",
+      email: "អ៊ីមែល",
+      password: "លេខសម្ងាត់",
+      confirmPassword: "បញ្ជាក់លេខសម្ងាត់",
+      loginBtn: "ចូលប្រើប្រាស់",
+      signupBtn: "បង្កើតគណនី",
+      successLogin: "ចូលប្រើបានជោគជ័យ!",
+      successSignup: "បង្កើតគណនីបានជោគជ័យ!",
+      errorMatch: "លេខសម្ងាត់មិនស៊ីគ្នាទេ",
+    },
+    blog: {
+      title: "ប្លុកម៉ូតសម្លៀកបំពាក់",
+      viewAll: "មើលទាំងអស់",
+      readMore: "អានបន្ត",
+      allStories: "រឿងរ៉ាវម៉ូតសម្លៀកបំពាក់ទាំងអស់",
+      categories: {
+        all: "ទាំងអស់",
+        men: "បុរស",
+        women: "នារី"
+      }
+    },
+    collections: {
+      heading: "បណ្តុំសម្លៀកបំពាក់ពិសេស",
+      browse: "មើលផលិតផល",
+      items: {
+        streetwear: { title: "Streetwear", subtitle: "ម៉ូដឆ្នាំ ២០២៦" },
+        essentials: { title: "Essentials", subtitle: "សម្លៀកបំពាក់ប្រចាំថ្ងៃ" },
+        accessories: { title: "គ្រឿងតុបតែង", subtitle: "បន្ថែមភាពទាក់ទាញ" }
+      }
+    },
+    hero :{
+      shopNow: "ទិញឥឡូវនេះ",
+      banners: [
+        {
+          title: "ទំនិញមកដល់ថ្មី",
+          desc: "ស្វែងរកម៉ូដសម្លៀកបំពាក់ចុងក្រោយបំផុត និងទាន់សម័យបំផុតសម្រាប់រដូវកាលថ្មីនេះ។",
+        },
+        {
+          title: "បណ្តុំរដូវក្តៅ",
+          desc: "ត្រៀមខ្លួនសម្រាប់រដូវក្តៅជាមួយការបញ្ចុះតម្លៃរហូតដល់ ៥០% លើម៉ូដពេញនិយមបំផុត។",
+        },
+        {
+          title: "ស្ទីលបែប STREETWEAR",
+          desc: "បង្ហាញពីបុគ្គលិកលក្ខណៈពិសេសរបស់អ្នកជាមួយបណ្តុំសម្លៀកបំពាក់ Streetwear កម្រិតខ្ពស់។",
+        }
+      ]
+    },
+    social: {
+      heading: "ទិញតាមការតុបតែងខ្លួន",
+      subheading: "តាមដានពួកយើងនៅលើបណ្តាញសង្គមសម្រាប់គំនិតតុបតែងខ្លួនប្រចាំថ្ងៃ",
+      platforms: {
+        all: "ទាំងអស់",
+        instagram: "Instagram",
+        facebook: "Facebook",
+        x: "X (Twitter)"
+      }
+    },
+    seasonal: {
+      heading: "កម្រងរូបភាពតាមរដូវកាល",
+      shopSelection: "ទិញទំនិញដែលបានជ្រើសរើស",
+      viewLookbook: "មើលកម្រងរូបភាពទាំងមូល",
+      availability: "ចំនួនមានកំណត់",
+      limited: "Limited Edition",
+      shipping: "ការដឹកជញ្ជូន",
+      worldwide: "ទូទាំងពិភពលោក",
+      seasons: {
+        Spring: "រដូវផ្ការីក",
+        Summer: "រដូវក្ដៅ",
+        Autumn: "រដូវស្លឹកឈើជ្រុះ",
+        Winter: "រដូវរងា"
+      }
+    },
+    shopLook: {
+      tagline: "ស្ទីលពណ៌បែបធម្មជាតិ",
+      title: "ទិញឈុតសម្លៀកបំពាក់នេះ",
+      desc: "តើត្រូវរង់ចាំដល់ពេលណាទៀត បើអ្នកអាចគ្រងឈុតដ៏ស្រស់ស្អាតនេះបានទាំងមូល? ចុចលើសញ្ញា (+) លើរូបភាព ដើម្បីមើលព័ត៌មានលម្អិតនៃទំនិញនីមួយៗ។",
+      btnFull: "មើលកម្រងរូបភាពទាំងមូល",
+      addToCart: "បញ្ចូលក្នុងកន្ត្រក",
+      products: {
+        top: "អាវក្រៅពណ៌ស",
+        trouser: "ខោជើងវែង",
+        bag: "កាបូបពណ៌ត្នោត"
+      }
+    },
+  },
+  en: {
+    shopLook: {
+      tagline: "Neutral Tones Style",
+      title: "Shop The Whole Look",
+      desc: "Why settle for one piece when you can have the entire aesthetic? Click the markers on the image to discover each element of this season's signature outfit.",
+      btnFull: "Explore Full Lookbook",
+      addToCart: "Add to Cart",
+      products: {
+        top: "Creamy White Top",
+        trouser: "Classic Trouser",
+        bag: "Nude/Tan Bag"
+      }
+    },
+    seasonal: {
+      heading: "Seasonal Lookbook",
+      shopSelection: "Shop The Selection",
+      viewLookbook: "View Full Lookbook",
+      availability: "Availability",
+      limited: "Limited Edition",
+      shipping: "Shipping",
+      worldwide: "Worldwide",
+      seasons: {
+        Spring: "Spring",
+        Summer: "Summer",
+        Autumn: "Autumn",
+        Winter: "Winter"
+      }
+    },
+    social: {
+      heading: "Shop The Look",
+      subheading: "Follow us on social media for daily inspiration",
+      platforms: {
+        all: "All",
+        instagram: "Instagram",
+        facebook: "Facebook",
+        x: "X"
+      }
+    },
+    hero : {
+      shopNow: "Shop Now",
+      banners: [
+        {
+          title: "NEW ARRIVALS",
+          desc: "Explore the latest trends and essential pieces for the upcoming season.",
+        },
+        {
+          title: "SUMMER COLLECTION",
+          desc: "Get ready for the sun with up to 50% off on our most popular summer styles.",
+        },
+        {
+          title: "STREETWEAR VIBES",
+          desc: "Express your unique personality with our premium urban streetwear collection.",
+        }
+      ]
+    },
+    collections: {
+      heading: "Featured Collections",
+      browse: "Browse Collection",
+      items: {
+        streetwear: { title: "Streetwear", subtitle: "2026 Edition" },
+        essentials: { title: "Essentials", subtitle: "Daily Wear" },
+        accessories: { title: "Accessories", subtitle: "Final Touch" }
+      }
+    },
+    blog: {
+      title: "Fashion Blog",
+      viewAll: "View All",
+      readMore: "Read More",
+      allStories: "All Fashion Stories",
+      categories: {
+        all: "All",
+        men: "Men",
+        women: "Women"
+      }
+    },
+    auth: {
+      welcome: "Welcome",
+      desc: "Login to your account or create a new one to continue shopping.",
+      login: "Login",
+      signup: "Sign Up",
+      name: "Name",
+      email: "Email",
+      password: "Password",
+      confirmPassword: "Confirm Password",
+      loginBtn: "Login",
+      signupBtn: "Create Account",
+      successLogin: "Successfully logged in!",
+      successSignup: "Account created successfully!",
+      errorMatch: "Passwords do not match",
+    },
+    invoice: {
+      officialTitle: "Official Invoice",
+      paidStatus: "Paid",
+      billTo: "Bill To",
+      shipTo: "Ship To",
+      via: "Via",
+      description: "Description",
+      qtyPrice: "Qty x Price",
+      total: "Total",
+      subtotal: "Subtotal",
+      shipping: "Shipping",
+      free: "Free",
+      grandTotal: "Grand Total",
+      trackOrder: "Track My Order",
+      trackingMsg: "Checking order status...",
+      footerMsg: "This is a computer-generated receipt",
+    },
+    checkout: {
+      title: "Checkout",
+      desc: "Provide your delivery and payment details.",
+      shippingInfo: "Shipping Information",
+      fullName: "Full Name",
+      phone: "Phone Number",
+      country: "Country",
+      carrier: "Shipping Carrier",
+      selectCarrier: "Select Carrier",
+      province: "Province / City",
+      district: "District / Khan",
+      commune: "Commune / Sangkat",
+      address: "Specific Address (St. / House)",
+      paymentMethod: "Payment Method",
+      amountToPay: "Amount to Pay",
+      khqrLabel: "I have paid via KHQR",
+      confirmBtn: "Confirm Order",
+      cancel: "Cancel and Return to Cart",
+      totalPayable: "Total Payable",
+      secure: "Secure",
+      errorName: "Please input your full name!",
+      errorPhone: "Please input your phone number!",
+      errorCarrier: "Please select shipping delivery!",
+      errorLocation: "Please input your full location!",
+      success: "Payment successfully!"
+    },
+    cartItem: {
+      size: "Size",
+      color: "Color",
+      remove: "Remove",
+    },
+    cart: {
+      title: "Cart",
+      desc: "Review your items before proceeding to checkout.",
+      empty: "Your cart is empty",
+      emptyDesc: "Add some products to get started",
+      startShopping: "Start Shopping",
+      subtotal: "Subtotal",
+      shipping: "Shipping",
+      shippingDesc: "Calculated at checkout",
+      totalAmount: "Total Amount",
+      checkout: "Proceed to Checkout",
+      continue: "Continue",
+      clearAll: "Clear All",
+      cleared: "Cart cleared",
+    },
+    productCard: {
+      featured: "Featured",
+      lowStock: "Low Stock",
+      soldOut: "Sold Out",
+      addToCart: "Add to Cart",
+      addedToCart: "Added to cart",
+      addedToWishlist: "Added to wishlist",
+      inStock: "in stock",
+      stockUnit: "",
+    },
+    filters: {
+      title: "Filters",
+      sortBy: "Sort By",
+      categories: "Categories",
+      allCategories: "All Categories",
+      price: "Price",
+      clear: "Clear Filters",
+      sortNewest: "Newest",
+      sortPriceAsc: "Price: Low to High",
+      sortPriceDesc: "Price: High to Low",
+      sortName: "Name: A to Z",
+      mobileTrigger: "Filters & Sort",
+      mobileDesc: "Filter and sort products by category, price, and more."
+    },
+    footer: {
+      aboutDesc: "We bring you premium clothing and accessories to enhance your beauty and confidence in every occasion.",
+      quickLinks: "Quick Links",
+      customerCare: "Customer Care",
+      contactUs: "Contact Us",
+      newArrivals: "New Arrivals",
+      popular: "Popular Products",
+      blog: "Fashion Blog",
+      aboutUs: "About Us",
+      shipping: "Shipping Policy",
+      returns: "Return & Exchange",
+      faqs: "FAQs",
+      support: "Contact Support",
+      address: "Phnom Penh, Cambodia",
+      rights: "All Rights Reserved. Create by group 2 room Koh Kai."
+    },
+    home: {
+      heroTitle: "ZWAY Fashion Store",
+      heroDesc: "Discover our curated collection of premium clothing, jewelry, shoes, hats, and bags. Elevate your style with timeless pieces.",
+      shopByBrand: "Shop by Brand",
+      allProductsBtn: "All Products...",
+    },
+    products: {
+      allProducts: "All Products",
+      featured: "Featured Products",
+      searchResults: "Search Results for",
+      found: "product(s) found",
+      unit: "",
+      noFound: "No products found",
+      noFoundDesc: "Try adjusting your filters or search query",
+    },
+    megaMenu: {
+      trigger: "Shop by Category",
+      featured: "Featured",
+      viewAll: "View All",
+      shopAllTitle: "Shop All Products",
+      shopAllDesc: "Browse our entire collection",
+      descClothes: "Explore our premium collection of clothing",
+      descJewelry: "Discover elegant jewelry pieces",
+      descShoes: "Step into style with our shoe collection",
+      descHats: "Top off your look with our hats",
+      descBags: "Carry your essentials in style",
+      defaultDesc: "Browse our collection"
+    },
+    nav: {
+      search: "Search products...",
+      login: "Login",
+      logout: "Logout",
+      allProducts: "All Products",
+      categories: "Categories",
+      clothes: "Clothes",
+      jewelry: "Jewelry",
+      shoes: "Shoes",
+      hats: "Hats",
+      bags: "Bags",
+    }
   }
-  }
-}
+};
