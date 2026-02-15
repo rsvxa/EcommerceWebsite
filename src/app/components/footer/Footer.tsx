@@ -10,9 +10,9 @@ export default function Footer() {
   const t = translations[lang].footer;
 
   const socialLinks = [
-    { icon: <Facebook size={18} />, href: "#", color: "hover:bg-blue-600" },
-    { icon: <Instagram size={18} />, href: "#", color: "hover:bg-gradient-to-tr from-yellow-500 via-red-500 to-purple-500" },
-    { icon: <Twitter size={18} />, href: "#", color: "hover:bg-sky-500" },
+    { icon: <Facebook size={18} />, href: "https://web.facebook.com/?_rdc=1&_rdr#", color: "hover:bg-blue-600" },
+    { icon: <Instagram size={18} />, href: "https://www.instagram.com/", color: "hover:bg-gradient-to-tr from-yellow-500 via-red-500 to-purple-500" },
+    { icon: <Twitter size={18} />, href: "https://x.com/", color: "hover:bg-sky-500" },
   ];
 
   return (

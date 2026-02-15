@@ -31,7 +31,7 @@ import { useLanguage } from '@/lib/store/use-language';
 import { translations } from '@/lib/i18n/translations'; 
 import { toast } from 'sonner';
 import { ProfileOverview } from '../../dashboard/profile/ProfileOverview';
-import { SettingsPage } from '../../dashboard/profile/Settings/page';
+import { SettingsPage } from '../../dashboard/profile/settings/page';
 import { ProfileSidebar } from '../../dashboard/profile/ProfileSidebar';
 import { OrderHistory } from '../../dashboard/profile/Order/OrderHistory';
 import { Wishlist } from '../../dashboard/profile/Order/Wishlist';

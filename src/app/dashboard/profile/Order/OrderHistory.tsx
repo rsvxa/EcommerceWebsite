@@ -1,122 +1,270 @@
-"use client";
+import { Package, Calendar, CreditCard, ChevronDown, ChevronUp } from "lucide-react";
+import { useState } from "react";
+import { Card } from "../../../components/ui/card";
+import { Badge } from "../../../components/ui/badge";
+import { Button } from "../../../components/ui/button";
 
-import React from 'react';
-import { motion } from 'framer-motion';
-import { useLanguage } from '@/lib/store/use-language';
-import { 
-  Package, Truck, CheckCircle2, 
-  Clock, ArrowUpRight, Search, Filter 
-} from 'lucide-react';
+interface OrderItem {
+  id: string;
+  name: string;
+  quantity: number;
+  price: number;
+  image?: string;
+}
 
-export function OrderHistory() {
-  const { lang } = useLanguage();
+interface Order {
+  id: string;
+  orderNumber: string;
+  date: string;
+  status: "delivered" | "shipped" | "processing" | "cancelled";
+  items: OrderItem[];
+  total: number;
+  shippingAddress: string;
+  paymentMethod: string;
+}
 
-  const orders = [
-    {
-      id: "ZW-ORD-9901",
-      date: "Oct 24, 2025",
-      status: "Delivered",
-      total: "$1,240.00",
-      items: 3,
-      image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&q=80&w=200",
-    },
-    {
-      id: "ZW-ORD-9852",
-      date: "Oct 12, 2025",
-      status: "In Transit",
-      total: "$850.00",
-      items: 1,
-      image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&q=80&w=200",
-    },
-  ];
+const mockOrders: Order[] = [
+  {
+    id: "1",
+    orderNumber: "ORD-2026-001234",
+    date: "2026-02-10",
+    status: "delivered",
+    total: 129.99,
+    shippingAddress: "123 Main St, New York, NY 10001",
+    paymentMethod: "Visa ending in 4242",
+    items: [
+      { id: "i1", name: "Wireless Bluetooth Headphones", quantity: 1, price: 79.99 },
+      { id: "i2", name: "Phone Case - Navy Blue", quantity: 2, price: 25.00 }
+    ]
+  },
+  {
+    id: "2",
+    orderNumber: "ORD-2026-001189",
+    date: "2026-02-05",
+    status: "shipped",
+    total: 299.99,
+    shippingAddress: "123 Main St, New York, NY 10001",
+    paymentMethod: "Mastercard ending in 5555",
+    items: [
+      { id: "i3", name: "Smart Watch Series 5", quantity: 1, price: 299.99 }
+    ]
+  },
+  {
+    id: "3",
+    orderNumber: "ORD-2026-001045",
+    date: "2026-01-28",
+    status: "delivered",
+    total: 459.97,
+    shippingAddress: "123 Main St, New York, NY 10001",
+    paymentMethod: "Visa ending in 4242",
+    items: [
+      { id: "i4", name: "Laptop Stand - Aluminum", quantity: 1, price: 89.99 },
+      { id: "i5", name: "Wireless Mouse", quantity: 1, price: 49.99 },
+      { id: "i6", name: "Mechanical Keyboard", quantity: 1, price: 159.99 },
+      { id: "i7", name: "USB-C Hub", quantity: 2, price: 79.99 }
+    ]
+  },
+  {
+    id: "4",
+    orderNumber: "ORD-2026-000923",
+    date: "2026-01-15",
+    status: "delivered",
+    total: 199.99,
+    shippingAddress: "456 Oak Ave, Brooklyn, NY 11201",
+    paymentMethod: "PayPal",
+    items: [
+      { id: "i8", name: "Running Shoes - Size 10", quantity: 1, price: 199.99 }
+    ]
+  },
+  {
+    id: "5",
+    orderNumber: "ORD-2025-008756",
+    date: "2025-12-20",
+    status: "cancelled",
+    total: 89.99,
+    shippingAddress: "123 Main St, New York, NY 10001",
+    paymentMethod: "Visa ending in 4242",
+    items: [
+      { id: "i9", name: "Tablet Case", quantity: 1, price: 89.99 }
+    ]
+  }
+];
+
+function getStatusColor(status: Order["status"]) {
+  switch (status) {
+    case "delivered":
+      return "bg-green-100 text-green-800 border-green-200";
+    case "shipped":
+      return "bg-blue-100 text-blue-800 border-blue-200";
+    case "processing":
+      return "bg-yellow-100 text-yellow-800 border-yellow-200";
+    case "cancelled":
+      return "bg-red-100 text-red-800 border-red-200";
+    default:
+      return "bg-gray-100 text-gray-800 border-gray-200";
+  }
+}
+
+function formatDate(dateString: string) {
+  const date = new Date(dateString);
+  return date.toLocaleDateString("en-US", { 
+    year: "numeric", 
+    month: "long", 
+    day: "numeric" 
+  });
+}
+
+function OrderCard({ order }: { order: Order }) {
+  const [expanded, setExpanded] = useState(false);
 
   return (
-    <div className="space-y-8 p-2">
-      {/* Search & Filter Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
-        <div className="space-y-1">
-          <h2 className="text-2xl font-black uppercase tracking-tighter italic text-zinc-900">
-            {lang === 'kh' ? 'ប្រវត្តិនៃការបញ្ជាទិញ' : 'Acquisition Vault'}
-          </h2>
-          <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-zinc-400">
-            Tracking your luxury investments
-          </p>
+    <Card className="p-6 hover:shadow-lg transition-shadow">
+      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-4">
+        <div className="flex-1">
+          <div className="flex items-center gap-3 mb-2">
+            <Package className="w-5 h-5 text-gray-600" />
+            <h3 className="font-semibold text-lg">{order.orderNumber}</h3>
+          </div>
+          <div className="flex items-center gap-2 text-sm text-gray-600">
+            <Calendar className="w-4 h-4" />
+            <span>{formatDate(order.date)}</span>
+          </div>
         </div>
         
-        <div className="flex items-center gap-3">
-          <div className="relative group">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-zinc-900 transition-colors" size={16} />
-            <input 
-              type="text" 
-              placeholder="Find order..." 
-              className="pl-12 pr-6 py-3 bg-zinc-50 border border-zinc-100 rounded-2xl text-xs font-bold outline-none focus:ring-1 ring-zinc-200 w-64 transition-all"
-            />
-          </div>
-          <button className="p-3 bg-zinc-50 border border-zinc-100 rounded-2xl text-zinc-900 hover:bg-zinc-900 hover:text-white transition-all">
-            <Filter size={18} />
-          </button>
+        <div className="flex flex-col items-start md:items-end gap-2">
+          <Badge className={getStatusColor(order.status)}>
+            {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+          </Badge>
+          <span className="text-xl font-bold">${order.total.toFixed(2)}</span>
         </div>
       </div>
 
-      {/* Orders List */}
-      <div className="space-y-6">
-        {orders.map((order, idx) => (
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: idx * 0.1 }}
-            key={order.id}
-            className="group relative bg-white border border-zinc-100 rounded-[2.5rem] p-6 hover:shadow-[0_20px_50px_rgba(0,0,0,0.04)] transition-all overflow-hidden"
+      <div className="border-t pt-4 mt-4">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-sm text-gray-600">
+            {order.items.length} item{order.items.length !== 1 ? "s" : ""}
+          </span>
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={() => setExpanded(!expanded)}
+            className="text-sm"
           >
-            <div className="flex flex-col lg:flex-row lg:items-center gap-8">
-              {/* Product Thumbnail */}
-              <div className="relative h-24 w-24 rounded-3xl bg-zinc-50 overflow-hidden flex-shrink-0 border border-zinc-100">
-                <img src={order.image} alt="Order" className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-700" />
-              </div>
-
-              {/* Order Info */}
-              <div className="flex-1 grid grid-cols-2 md:grid-cols-4 gap-6">
-                <div className="space-y-1">
-                  <p className="text-[9px] font-black uppercase tracking-widest text-zinc-400">Order ID</p>
-                  <p className="text-sm font-black text-zinc-900">#{order.id}</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-[9px] font-black uppercase tracking-widest text-zinc-400">Purchased On</p>
-                  <p className="text-sm font-bold text-zinc-600">{order.date}</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-[9px] font-black uppercase tracking-widest text-zinc-400">Total Investment</p>
-                  <p className="text-sm font-black text-zinc-900">{order.total}</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-[9px] font-black uppercase tracking-widest text-zinc-400">Status</p>
-                  <div className="flex items-center gap-2">
-                    <div className={`h-1.5 w-1.5 rounded-full ${order.status === 'Delivered' ? 'bg-emerald-500' : 'bg-amber-500 animate-pulse'}`} />
-                    <p className={`text-[10px] font-black uppercase tracking-widest ${order.status === 'Delivered' ? 'text-emerald-600' : 'text-amber-600'}`}>
-                      {order.status}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Action Button */}
-              <button className="flex items-center justify-center gap-3 bg-zinc-50 hover:bg-zinc-900 text-zinc-900 hover:text-white px-8 py-4 rounded-2xl transition-all duration-500 group/btn">
-                <span className="text-[10px] font-black uppercase tracking-widest">Details</span>
-                <ArrowUpRight size={14} className="group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1 transition-transform" />
-              </button>
-            </div>
-          </motion.div>
-        ))}
-      </div>
-
-      {orders.length === 0 && (
-        <div className="py-20 text-center space-y-4">
-          <div className="inline-flex h-20 w-20 items-center justify-center rounded-full bg-zinc-50 text-zinc-200">
-            <Package size={40} />
-          </div>
-          <p className="text-xs font-black uppercase tracking-[0.3em] text-zinc-300">No acquisitions found</p>
+            {expanded ? (
+              <>
+                Hide Details <ChevronUp className="ml-1 w-4 h-4" />
+              </>
+            ) : (
+              <>
+                View Details <ChevronDown className="ml-1 w-4 h-4" />
+              </>
+            )}
+          </Button>
         </div>
-      )}
+
+        {expanded && (
+          <div className="mt-4 space-y-4 animate-in slide-in-from-top-2">
+            <div className="space-y-2">
+              {order.items.map((item) => (
+                <div key={item.id} className="flex justify-between items-center py-2 border-b last:border-b-0">
+                  <div className="flex-1">
+                    <p className="font-medium">{item.name}</p>
+                    <p className="text-sm text-gray-600">Quantity: {item.quantity}</p>
+                  </div>
+                  <p className="font-semibold">${item.price.toFixed(2)}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="bg-gray-50 p-4 rounded-lg space-y-2">
+              <div className="flex items-start gap-2">
+                <Package className="w-4 h-4 text-gray-600 mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium text-gray-700">Shipping Address</p>
+                  <p className="text-sm text-gray-600">{order.shippingAddress}</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-2">
+                <CreditCard className="w-4 h-4 text-gray-600 mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium text-gray-700">Payment Method</p>
+                  <p className="text-sm text-gray-600">{order.paymentMethod}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </Card>
+  );
+}
+
+export function OrderHistory() {
+  const [filterStatus, setFilterStatus] = useState<Order["status"] | "all">("all");
+
+  const filteredOrders = filterStatus === "all" 
+    ? mockOrders 
+    : mockOrders.filter(order => order.status === filterStatus);
+
+  return (
+    <div className="min-h-screen bg-gray-50 py-8 px-4">
+      <div className="max-w-4xl mx-auto">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold mb-2">Order History</h1>
+          <p className="text-gray-600">View and track all your past orders</p>
+        </div>
+
+        <div className="mb-6 flex flex-wrap gap-2">
+          <Button 
+            variant={filterStatus === "all" ? "default" : "outline"}
+            onClick={() => setFilterStatus("all")}
+            size="sm"
+          >
+            All Orders
+          </Button>
+          <Button 
+            variant={filterStatus === "delivered" ? "default" : "outline"}
+            onClick={() => setFilterStatus("delivered")}
+            size="sm"
+          >
+            Delivered
+          </Button>
+          <Button 
+            variant={filterStatus === "shipped" ? "default" : "outline"}
+            onClick={() => setFilterStatus("shipped")}
+            size="sm"
+          >
+            Shipped
+          </Button>
+          <Button 
+            variant={filterStatus === "processing" ? "default" : "outline"}
+            onClick={() => setFilterStatus("processing")}
+            size="sm"
+          >
+            Processing
+          </Button>
+          <Button 
+            variant={filterStatus === "cancelled" ? "default" : "outline"}
+            onClick={() => setFilterStatus("cancelled")}
+            size="sm"
+          >
+            Cancelled
+          </Button>
+        </div>
+
+        <div className="space-y-4">
+          {filteredOrders.length > 0 ? (
+            filteredOrders.map((order) => (
+              <OrderCard key={order.id} order={order} />
+            ))
+          ) : (
+            <Card className="p-12 text-center">
+              <Package className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+              <p className="text-gray-600">No orders found with this status</p>
+            </Card>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

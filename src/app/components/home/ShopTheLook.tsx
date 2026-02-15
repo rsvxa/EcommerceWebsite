@@ -1,10 +1,18 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Plus, ShoppingBag, X } from 'lucide-react';
+import { Plus, ShoppingBag, ArrowRight, ImageIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/lib/store/use-language';
 import { translations } from '@/lib/i18n/translations';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "../ui/sheet";
+import { Button } from "../ui/button";
 
 export function ShopTheLook() {
   const [activeId, setActiveId] = useState<number | null>(null);
@@ -16,6 +24,13 @@ export function ShopTheLook() {
     { id: 2, name: "Trouser", price: "$63.00", top: "55%", left: "40%" },
     { id: 3, name: "Nude/Tan bag", price: "$85.00", top: "78%", left: "65%" },
     { id: 4, name: "Long Coat", price: "$125.00", top: "70%", left: "33%" }
+  ];
+
+  const LOOKBOOK_IMAGES = [
+    "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=1000",
+    "https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=1000",
+    "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=1000",
+    "https://images.unsplash.com/photo-1475180098004-ca77a66827be?q=80&w=1000"
   ];
 
   return (
@@ -33,10 +48,9 @@ export function ShopTheLook() {
               <img 
                 src="https://i.pinimg.com/736x/de/cc/cd/decccd1f0765a2020efc0a491c9a358a.jpg?q=80&w=1000" 
                 alt="High Fashion Editorial"
-                className="w-full h-full object-cover "
+                className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-zinc-900/10 group-hover:bg-transparent transition-colors duration-700" />
-
+              
               {/* Hotspot Markers */}
               {LOOK_PRODUCTS.map((product) => (
                 <div 
@@ -46,35 +60,30 @@ export function ShopTheLook() {
                 >
                   <button
                     onClick={() => setActiveId(activeId === product.id ? null : product.id)}
-                    className={`relative flex items-center justify-center w-8 h-8 bg-black text-white rounded-full hover:scale-110 transition-transform shadow-lg group ${
+                    className={`relative flex items-center justify-center w-8 h-8 rounded-full transition-all shadow-lg ${
                       activeId === product.id 
-                      ? "bg-black border-blue-400 text-white rotate-45" 
-                      : "bg-gray-300/50 border-white/40 text-white hover:bg-white hover:text-black shadow-xl"
+                      ? "bg-black text-white rotate-45" 
+                      : "bg-white/30 backdrop-blur-md border border-white/40 text-white hover:bg-white hover:text-black"
                     }`}
                   >
                     <Plus size={20} />
-                    <span className={activeId === product.id ? "rotate-45 transition-transform" : "transition-transform"}></span>
                   </button>
 
-                  {/* Glassmorphism Pop-up Card */}
                   <AnimatePresence>
                     {activeId === product.id && (
                       <motion.div
                         initial={{ opacity: 0, y: 20, scale: 0.8 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 10, scale: 0.8 }}
-                        className="absolute bottom-14 left-1/2 -translate-x-1/2 w-56 bg-white/80 backdrop-blur-2xl p-5 shadow-[0_20px_50px_rgba(0,0,0,0.1)] rounded-xl z-30 border border-white/50"
+                        className="absolute bottom-14 left-1/2 -translate-x-1/2 w-56 bg-white/90 backdrop-blur-2xl p-5 shadow-2xl rounded-xl z-30 border border-white"
                       >
-                        <div className="flex justify-between items-start mb-2">
-                          <h4 className="text-[11px] font-black uppercase tracking-widest text-zinc-900 leading-tight pr-4">{product.name}</h4>
+                        <div className="flex justify-between items-start mb-3">
+                          <h4 className="text-[11px] font-black uppercase tracking-widest text-zinc-900 leading-tight">{product.name}</h4>
                           <span className="text-[10px] font-bold text-black">{product.price}</span>
                         </div>
-                        <button className="flex items-center gap-3 bg-gray-200 text-black hover:text-white text-[9px] font-black uppercase tracking-[0.2em] px-4 py-3 w-full justify-center rounded-2xl hover:bg-gray-800 transition-all active:scale-95">
+                        <button className="flex items-center gap-3 bg-zinc-900 text-white text-[9px] font-black uppercase tracking-[0.2em] px-4 py-3 w-full justify-center rounded-lg hover:bg-black transition-all">
                           <ShoppingBag size={12} /> {t.addToCart}
                         </button>
-                        
-                        {/* Pointy Arrow for the card */}
-                        <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-white/80 backdrop-blur-2xl rotate-45 border-r border-b border-white/50" />
                       </motion.div>
                     )}
                   </AnimatePresence>
@@ -84,17 +93,17 @@ export function ShopTheLook() {
           </div>
 
           {/* Right Side: Editorial Content */}
-          <div className="w-full md:w-1/2 space-y-8 text-center md:text-left">
+          <div className="w-full md:w-1/2 space-y-10 text-center md:text-left">
             <div className="space-y-6">
               <motion.div
                 initial={{ opacity: 0, x: 30 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
               >
-                <span className="text-sm font-black uppercase tracking-[0.5em] text-gray-600">
+                <span className="text-sm font-black uppercase tracking-[0.5em] text-gray-400">
                   {t.tagline}
                 </span>
-                <h2 className={`text-5xl font-black uppercase tracking-tighter leading-none ${lang === 'kh' ? 'font-freehand py-2' : ''}`}>
+                <h2 className={`text-6xl font-black uppercase tracking-tighter leading-none mt-4 ${lang === 'kh' ? 'font-freehand py-2' : ''}`}>
                   {t.title}
                 </h2>
               </motion.div>
@@ -102,38 +111,86 @@ export function ShopTheLook() {
               <motion.p 
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 0.6 }}
-                className="text-gray-500 leading-relaxed max-w-md mx-auto md:mx-0"
+                className="text-gray-500 text-lg leading-relaxed max-w-md mx-auto md:mx-0 italic"
               >
                 "{t.desc}"
               </motion.p>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-6">
-              <button className="flex items-center justify-center gap-4 bg-black text-white px-12 py-6 rounded-sm font-black uppercase text-[13px] tracking-[0.2em] hover:bg-gray-800 transition-all shadow-lg">
-                <span className="relative z-10">{t.btnFull}</span>
-              </button>
-              
-              <div className="flex -space-x-4">
-                {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="w-12 h-12 rounded-full border-4 border-white overflow-hidden bg-zinc-200">
-                    <img src={`https://i.pravatar.cc/100?img=${i+10}`} alt="user" />
+            <div className="flex flex-col sm:flex-row items-center gap-8">
+              {/* ប៊ូតុងបើក Full Lookbook ជាមួយ Sheet */}
+              <Sheet>
+                <SheetTrigger asChild>
+                  <button className="group flex items-center justify-center gap-6 bg-black text-white px-10 py-6 rounded-sm font-black uppercase text-[13px] tracking-[0.2em] hover:bg-zinc-800 transition-all shadow-2xl">
+                    <span>{t.btnFull}</span>
+                    <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform" />
+                  </button>
+                </SheetTrigger>
+                
+                <SheetContent side="right" className="w-full sm:max-w-[40%] border-none p-0 bg-zinc-50 overflow-hidden">
+                  <div className="h-full flex flex-col">
+                    <SheetHeader className="p-10 bg-white border-b border-zinc-100">
+                      <SheetTitle className="text-4xl font-black uppercase tracking-tighter italic">
+                        Editorial Lookbook
+                      </SheetTitle>
+                      <p className="text-zinc-400 text-xs font-bold uppercase tracking-[0.3em]">
+                        Season 2026 — Volume 01
+                      </p>
+                    </SheetHeader>
+
+                    {/* បញ្ជីរូបភាព Lookbook ក្នុង Sheet */}
+                    <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                      {LOOKBOOK_IMAGES.map((img, index) => (
+                        <motion.div 
+                          key={index}
+                          initial={{ opacity: 0, y: 30 }}
+                          whileInView={{ opacity: 1, y: 0 }}
+                          transition={{ delay: index * 0.1 }}
+                          className="relative aspect-[4/5] overflow-hidden rounded-xl shadow-lg group"
+                        >
+                          <img 
+                            src={img} 
+                            className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-1000 scale-105 group-hover:scale-100" 
+                            alt={`Lookbook ${index}`} 
+                          />
+                          <div className="absolute bottom-6 left-6 text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                            <p className="text-[10px] font-black uppercase tracking-widest">Shot 0{index + 1}</p>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+
+                    <div className="p-8 bg-white border-t border-zinc-100">
+                      <Button className="w-full h-14 rounded-xl bg-black text-white font-black uppercase tracking-widest hover:bg-zinc-800">
+                        Shop All Pieces
+                      </Button>
+                    </div>
                   </div>
-                ))}
-                <div className="w-12 h-12 rounded-full border-4 border-white bg-zinc-100 flex items-center justify-center text-[10px] font-black">
-                  +12k
+                </SheetContent>
+              </Sheet>
+              
+              {/* Social Proof */}
+              <div className="flex flex-col items-center md:items-start gap-2">
+                <div className="flex -space-x-3">
+                  {[1, 2, 3, 4].map((i) => (
+                    <div key={i} className="w-10 h-10 rounded-full border-2 border-white overflow-hidden bg-zinc-200">
+                      <img src={`https://i.pravatar.cc/100?img=${i+10}`} alt="user" />
+                    </div>
+                  ))}
                 </div>
+                <p className="text-[10px] font-black uppercase tracking-tighter text-zinc-400">Join +12k Styled Users</p>
               </div>
             </div>
 
             {/* Feature List */}
-            <div className="grid grid-cols-2 gap-8 pt-4">
-              <div className="border-l-2 border-zinc-100 pl-6">
-                <p className="text-[13px] font-black text-zinc-400 uppercase tracking-widest mb-1">Tailored</p>
-                <p className="text-xl font-bold text-zinc-900">Perfect Fit Guarantee</p>
+            <div className="grid grid-cols-2 gap-8 pt-6 border-t border-zinc-100">
+              <div className="space-y-1">
+                <p className="text-[11px] font-black text-zinc-400 uppercase tracking-widest">Tailored</p>
+                <p className="text-lg font-bold text-zinc-900 tracking-tight">Perfect Fit</p>
               </div>
-              <div className="border-l-2 border-zinc-100 pl-6">
-                <p className="text-[13px] font-black text-zinc-400 uppercase tracking-widest mb-1">Eco-Conscious</p>
-                <p className="text-xl font-bold text-zinc-900">Sustainable Fabrics</p>
+              <div className="space-y-1">
+                <p className="text-[11px] font-black text-zinc-400 uppercase tracking-widest">Shipping</p>
+                <p className="text-lg font-bold text-zinc-900 tracking-tight">Worldwide</p>
               </div>
             </div>
           </div>

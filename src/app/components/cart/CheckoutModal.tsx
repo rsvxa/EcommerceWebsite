@@ -163,7 +163,7 @@ ${order.items.map((item: any) => `• ${item.product?.name || item.name} (x${ite
                 </div>
                 <div className="space-y-2 border-b border-gray-100">
                   <p className="text-[10px] font-bold uppercase text-gray-400">{t.carrier}</p>
-                  <select value={shippingCarrier} onChange={(e) => setShippingCarrier(e.target.value)} className="w-full py-2 outline-none text-sm bg-transparent cursor-pointer font-bold text-blue-600">
+                  <select value={shippingCarrier} onChange={(e) => setShippingCarrier(e.target.value)} className="w-full py-2 outline-none text-sm bg-transparent cursor-pointer font-bold text-black">
                     <option value="">{t.selectCarrier}</option>
                     {shippingData[country]?.map((carrier: any) => (
                       <option key={carrier.id} value={carrier.id}>{carrier.name}</option>
@@ -219,9 +219,9 @@ ${order.items.map((item: any) => `• ${item.product?.name || item.name} (x${ite
                       </div>
                       <div className="text-center space-y-1">
                         <p className="text-[10px] font-bold uppercase text-zinc-400 tracking-widest">{t.amountToPay}</p>
-                        <p className="text-3xl font-black text-blue-600">{formatPrice(total)}</p>
+                        <p className="text-3xl font-black text-black">{formatPrice(total)}</p>
                       </div>
-                      <Button onClick={handleConfirmOrder} disabled={isSubmitting} className="mt-8 bg-blue-600 hover:bg-blue-700 text-white w-full rounded-xl uppercase text-[10px] tracking-widest font-black py-6 shadow-lg transition-transform active:scale-95">
+                      <Button onClick={handleConfirmOrder} disabled={isSubmitting} className="mt-8 bg-black text-white w-full rounded-xl uppercase text-[13px] tracking-widest font-black py-6 shadow-lg transition-transform active:scale-95">
                         {isSubmitting ? <Loader2 className="animate-spin" /> : t.khqrLabel}
                       </Button>
                     </motion.div>

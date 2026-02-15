@@ -1,12 +1,11 @@
 "use client";
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
-  User, Package, Settings, LogOut, Heart, MapPin, ShieldCheck, ChevronRight 
+  User, Package, Settings, LogOut, Heart, ChevronRight 
 } from 'lucide-react';
 import { useLanguage } from '@/lib/store/use-language';
-import { useAuthStore } from '@/lib/store/auth-store';
 
 interface ProfileSidebarProps {
   activeTab: string;
@@ -16,7 +15,30 @@ interface ProfileSidebarProps {
 
 export function ProfileSidebar({ activeTab, setActiveTab, onLogout }: ProfileSidebarProps) {
   const { lang } = useLanguage();
-  const { user } = useAuthStore();
+  
+  const [sidebarImage, setSidebarImage] = useState<string | null>(null);
+  const [displayName, setDisplayName] = useState<string>("Guest");
+
+  const fetchUserData = () => {
+    const savedImage = localStorage.getItem('zway_user_avatar');
+    if (savedImage) setSidebarImage(savedImage);
+
+    const savedName = localStorage.getItem('zway_user_name');
+    if (savedName) setDisplayName(savedName);
+  };
+
+  useEffect(() => {
+    fetchUserData();
+
+    window.addEventListener('avatarUpdated', fetchUserData);
+
+    window.addEventListener('storage', fetchUserData);
+
+    return () => {
+      window.removeEventListener('avatarUpdated', fetchUserData);
+      window.removeEventListener('storage', fetchUserData);
+    };
+  }, []);
 
   const menuItems = [
     { id: 'profile', label: lang === 'kh' ? 'ព័ត៌មានទូទៅ' : 'Overview', icon: <User size={16} /> },
@@ -31,19 +53,38 @@ export function ProfileSidebar({ activeTab, setActiveTab, onLogout }: ProfileSid
       <div className="relative p-8 rounded-xl bg-zinc-900 text-white overflow-hidden shadow-2xl shadow-zinc-200">
         <div className="absolute -top-10 -right-10 h-32 w-32 bg-white/5 blur-[40px] rounded-full" />
         <div className="relative space-y-4">
-          <div className="h-12 w-12 rounded-2xl bg-gradient-to-tr from-zinc-700 to-zinc-500 flex items-center justify-center border border-white/10">
-            <User size={24} className="text-zinc-100" />
+          
+          <div className="h-14 w-14 rounded-2xl overflow-hidden border border-white/10 bg-zinc-800 flex items-center justify-center shadow-lg">
+            {sidebarImage ? (
+              <motion.img 
+                key={sidebarImage} 
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                src={sidebarImage} 
+                alt="Profile" 
+                className="h-full w-full object-cover" 
+              />
+            ) : (
+              <User size={24} className="text-zinc-500" />
+            )}
           </div>
+
           <div>
-            <p className="text-[9px] font-black uppercase tracking-[0.4em] text-zinc-500 mb-1">
+            <p className="text-[9px] font-black uppercase tracking-[0.4em] text-white mb-1">
               {lang === 'kh' ? 'គណនីផ្ដាច់មុខ' : 'Exclusive Member'}
             </p>
-            <h3 className="text-xl font-black uppercase tracking-tighter leading-none">{user?.name || 'Guest'}</h3>
+            <motion.h3 
+              key={displayName}
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-xl font-black uppercase tracking-tighter leading-none"
+            >
+              {displayName}
+            </motion.h3>
           </div>
         </div>
       </div>
 
-      {/* Navigation Menu */}
       <nav className="space-y-2 px-2">
         <div className="space-y-1">
           {menuItems.map((item) => {
@@ -76,7 +117,6 @@ export function ProfileSidebar({ activeTab, setActiveTab, onLogout }: ProfileSid
           })}
         </div>
 
-        {/* Sign Out Button */}
         <div className="pt-8 mt-8 border-t border-zinc-50">
           <button 
             onClick={onLogout}
