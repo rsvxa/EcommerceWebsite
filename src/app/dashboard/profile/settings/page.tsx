@@ -1,5 +1,11 @@
-import { User, Bell, Lock, Palette, CreditCard, Globe, Shield, Mail, Smartphone } from "lucide-react";
-import { useState } from "react";
+"use client";
+
+import React, { useState, useEffect } from "react";
+import { 
+  User, Bell, Lock, Palette, CreditCard, Shield, 
+  Mail, Smartphone, Loader2, MapPin, Phone, Globe
+} from "lucide-react";
+import { useLanguage } from "@/lib/store/use-language";
 import { Card } from "../../../components/ui/card";
 import { Input } from "../../../components/ui/input";
 import { Label } from "../../../components/ui/label";
@@ -8,380 +14,290 @@ import { Button } from "../../../components/ui/button";
 import { Separator } from "../../../components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
+import { toast } from "sonner";
+import { motion } from "framer-motion";
 
 export function SettingsPage() {
-  const [emailNotifications, setEmailNotifications] = useState(true);
-  const [pushNotifications, setPushNotifications] = useState(true);
-  const [orderUpdates, setOrderUpdates] = useState(true);
-  const [promotions, setPromotions] = useState(false);
-  const [twoFactor, setTwoFactor] = useState(false);
+  const { lang, setLanguage } = useLanguage();
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  const [profileData, setProfileData] = useState({
+    fullName: "",
+    email: "",
+    phone: "",
+    country: "",
+    city: "",
+    zipCode: "",
+    address: ""
+  });
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setProfileData({
+        fullName: localStorage.getItem('zway_user_name') || "",
+        email: localStorage.getItem('zway_user_email') || "",
+        phone: localStorage.getItem('zway_user_phone') || "",
+        country: localStorage.getItem('zway_user_country') || "",
+        city: localStorage.getItem('zway_user_city') || "",
+        zipCode: localStorage.getItem('zway_user_zip') || "",
+        address: localStorage.getItem('zway_user_address') || "",
+      });
+    }
+  }, []);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setProfileData({ ...profileData, [e.target.name]: e.target.value });
+  };
+
+  const handleUpdateProfile = () => {
+    setIsUpdating(true);
+    
+    try {
+      localStorage.setItem('zway_user_name', profileData.fullName);
+      localStorage.setItem('zway_user_email', profileData.email);
+      localStorage.setItem('zway_user_phone', profileData.phone);
+      localStorage.setItem('zway_user_country', profileData.country);
+      localStorage.setItem('zway_user_city', profileData.city);
+      localStorage.setItem('zway_user_zip', profileData.zipCode);
+      localStorage.setItem('zway_user_address', profileData.address);
+
+      window.dispatchEvent(new Event('avatarUpdated'));
+
+      setTimeout(() => {
+        setIsUpdating(false);
+        toast.success(lang === 'kh' ? "រក្សាទុកជោគជ័យ!" : "Profile updated successfully!");
+      }, 800);
+    } catch (error) {
+      setIsUpdating(false);
+      toast.error("Error updating profile");
+    }
+  };
+
+  const [notifications, setNotifications] = useState({
+    email: true,
+    push: true,
+    order: true
+  });
+
+  const t = (kh: string, en: string) => (lang === "kh" ? kh : en);
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
+    <div className="min-h-screen bg-white py-12 px-4 italic selection:bg-zinc-900 selection:text-white">
       <div className="max-w-4xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Settings</h1>
-          <p className="text-gray-600">Manage your account settings and preferences</p>
+        {/* Header Section */}
+        <div className="mb-12">
+          <h1 className="text-5xl font-black uppercase tracking-tighter mb-3 italic">
+            {t("ការកំណត់", "Settings")}
+          </h1>
+          <p className="text-[11px] font-black text-zinc-400 uppercase tracking-[0.3em]">
+            {t("គ្រប់គ្រងគណនី ZWAY របស់អ្នក", "Manage your ZWAY account settings")}
+          </p>
         </div>
 
         <Tabs defaultValue="profile" className="space-y-6">
           <TabsList className="grid w-full grid-cols-2 lg:grid-cols-5 gap-2">
-            <TabsTrigger value="profile">Profile</TabsTrigger>
-            <TabsTrigger value="notifications">Notifications</TabsTrigger>
-            <TabsTrigger value="security">Security</TabsTrigger>
-            <TabsTrigger value="appearance">Appearance</TabsTrigger>
-            <TabsTrigger value="billing">Billing</TabsTrigger>
+            <TabsTrigger value="profile">{lang === 'kh' ? 'ឯកជនភាព' : 'Privatcy'}</TabsTrigger>
+            <TabsTrigger value="notifications">{lang === 'kh' ? 'ការជូនដំណឹង' : 'Notifications'}</TabsTrigger>
+            <TabsTrigger value="security">{lang === 'kh' ? 'សុវត្ថិភាព' : 'Security'}</TabsTrigger>
+            <TabsTrigger value="appearance">{lang === 'kh' ? 'រូបរាង' : 'Appearance'}</TabsTrigger>
+            <TabsTrigger value="billing">{lang === 'kh' ? 'ការបង់ប្រាក់' : 'Billing'}</TabsTrigger>
           </TabsList>
 
-          {/* Profile Settings */}
-          <TabsContent value="profile">
-            <Card className="p-6">
-              <div className="flex items-center gap-3 mb-6">
-                <User className="w-5 h-5" />
-                <h2 className="text-xl font-semibold">Profile Information</h2>
+          {/* 1. Profile Content (Updated with Account Details Form) */}
+          <TabsContent value="profile" className="space-y-8">
+            <div className="bg-white rounded-[2.5rem] p-10 border border-zinc-100 shadow-2xl shadow-zinc-100/50 space-y-8">
+              <div className="flex items-center gap-4 mb-2">
+                <div className="p-4 bg-zinc-900 rounded-2xl text-white rotate-3 shadow-lg">
+                  <User size={24} />
+                </div>
+                <h2 className="text-2xl font-black italic">
+                  {lang === 'kh' ? 'ព័ត៌មានលម្អិត' : 'Account Details'}
+                </h2>
               </div>
 
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="firstName">First Name</Label>
-                    <Input id="firstName" placeholder="John" defaultValue="John" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="lastName">Last Name</Label>
-                    <Input id="lastName" placeholder="Doe" defaultValue="Doe" />
-                  </div>
-                </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-7">
+                <InputGroup label={lang === 'kh' ? "ឈ្មោះពេញ*" : "Full Name*"} name="fullName" value={profileData.fullName} onChange={handleChange} />
+                <InputGroup label={lang === 'kh' ? "អ៊ីមែល*" : "Email Address*"} name="email" value={profileData.email} onChange={handleChange} />
+                <InputGroup label={lang === 'kh' ? "លេខទូរស័ព្ទ" : "Phone Number"} name="phone" value={profileData.phone} onChange={handleChange} />
+                <InputGroup label={lang === 'kh' ? "ប្រទេស" : "Country"} name="country" value={profileData.country} onChange={handleChange} />
+                <InputGroup label={lang === 'kh' ? "ទីក្រុង" : "City"} name="city" value={profileData.city} onChange={handleChange} />
+                <InputGroup label={lang === 'kh' ? "លេខកូដតំបន់" : "Zip Code"} name="zipCode" value={profileData.zipCode} onChange={handleChange} />
 
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email Address</Label>
-                  <Input id="email" type="email" placeholder="john.doe@example.com" defaultValue="john.doe@example.com" />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="phone">Phone Number</Label>
-                  <Input id="phone" type="tel" placeholder="+1 (555) 000-0000" defaultValue="+1 (555) 123-4567" />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="address">Address</Label>
-                  <Input id="address" placeholder="123 Main St" defaultValue="123 Main St, New York, NY 10001" />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="city">City</Label>
-                    <Input id="city" placeholder="New York" defaultValue="New York" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="state">State</Label>
-                    <Input id="state" placeholder="NY" defaultValue="NY" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="zip">ZIP Code</Label>
-                    <Input id="zip" placeholder="10001" defaultValue="10001" />
-                  </div>
-                </div>
-
-                <Separator className="my-6" />
-
-                <div className="flex justify-end gap-3">
-                  <Button variant="outline">Cancel</Button>
-                  <Button>Save Changes</Button>
+                <div className="md:col-span-2">
+                  <InputGroup label={lang === 'kh' ? "អាសយដ្ឋាន*" : "Address*"} name="address" value={profileData.address} onChange={handleChange} />
                 </div>
               </div>
-            </Card>
+
+              <Separator className="opacity-50" />
+
+              {/* ផ្នែក Privacy Policy */}
+              <div className="bg-zinc-50 rounded-[35px] p-8 border border-zinc-100 relative overflow-hidden group">
+                <Shield className="absolute top-[-20px] right-[-20px] opacity-[0.04] group-hover:scale-110 transition-transform duration-700" size={180} />
+                <div className="relative">
+                  <div className="flex items-center gap-3 mb-4">
+                    <Shield className="w-5 h-5 text-zinc-900" />
+                    <h3 className="font-black uppercase text-[11px] tracking-widest text-zinc-900">
+                      {lang === 'kh' ? 'គោលការណ៍ឯកជនភាព និងការគ្រប់គ្រងទិន្នន័យ' : 'Privacy Policy & Data Handling'}
+                    </h3>
+                  </div>
+                  
+                  <p className="text-[13px] font-bold text-zinc-500 leading-relaxed italic mb-6">
+                    {lang === 'kh' 
+                      ? 'យើងខ្ញុំយកចិត្តទុកដាក់បំផុតចំពោះការសម្ងាត់នៃទិន្នន័យរបស់អ្នក។ រាល់ព័ត៌មានផ្ទាល់ខ្លួនដែលអ្នកបានផ្តល់ឱ្យ នឹងត្រូវបានប្រើប្រាស់សម្រាប់តែការកែលម្អសេវាកម្ម និងការដឹកជញ្ជូនទំនិញតែប៉ុណ្ណោះ។' 
+                      : 'We take your data privacy seriously. All personal information provided will only be used to improve our services and ensure secure delivery.'}
+                  </p>
+                  
+                  <div className="flex items-center space-x-3 pt-2">
+                    <Switch id="data-share" className="data-[state=checked]:bg-zinc-900" />
+                    <Label htmlFor="data-share" className="text-[10px] font-bold text-zinc-400 uppercase tracking-tighter">
+                      {lang === 'kh' 
+                        ? 'អនុញ្ញាតឱ្យ ZWAY ចែករំលែកទិន្នន័យអនាមិកជាមួយដៃគូដើម្បីបទពិសោធន៍កាន់តែប្រសើរ' 
+                        : 'Allow ZWAY to share anonymized data with partners for better experience'}
+                    </Label>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-end pt-4">
+                <Button 
+                  onClick={handleUpdateProfile}
+                  disabled={isUpdating}
+                  className="bg-zinc-900 hover:bg-zinc-800 text-white rounded-[20px] px-14 py-8 uppercase text-[12px] font-black tracking-[0.2em] shadow-2xl active:scale-95 transition-all italic"
+                >
+                  {isUpdating ? <Loader2 className="w-5 h-5 animate-spin" /> : t("ធ្វើបច្ចុប្បន្នភាពគណនី", "Update Profile")}
+                </Button>
+              </div>
+            </div>
           </TabsContent>
 
-          {/* Notification Settings */}
+          {/* 2. Notifications */}
           <TabsContent value="notifications">
-            <Card className="p-6">
-              <div className="flex items-center gap-3 mb-6">
-                <Bell className="w-5 h-5" />
-                <h2 className="text-xl font-semibold">Notification Preferences</h2>
+            <Card className="p-8 border-none shadow-2xl shadow-zinc-100 rounded-[40px] space-y-10">
+              <div className="flex items-center gap-4">
+                <div className="p-4 bg-zinc-900 rounded-2xl text-white -rotate-3 shadow-lg">
+                  <Bell size={24} />
+                </div>
+                <h2 className="text-2xl font-black uppercase tracking-tighter">{t("ការជូនដំណឹង", "Alerts")}</h2>
               </div>
-
-              <div className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-start gap-3">
-                    <Mail className="w-5 h-5 text-gray-600 mt-0.5" />
-                    <div>
-                      <p className="font-medium">Email Notifications</p>
-                      <p className="text-sm text-gray-600">Receive notifications via email</p>
-                    </div>
-                  </div>
-                  <Switch checked={emailNotifications} onCheckedChange={setEmailNotifications} />
-                </div>
-
-                <Separator />
-
-                <div className="flex items-center justify-between">
-                  <div className="flex items-start gap-3">
-                    <Smartphone className="w-5 h-5 text-gray-600 mt-0.5" />
-                    <div>
-                      <p className="font-medium">Push Notifications</p>
-                      <p className="text-sm text-gray-600">Receive push notifications on your device</p>
-                    </div>
-                  </div>
-                  <Switch checked={pushNotifications} onCheckedChange={setPushNotifications} />
-                </div>
-
-                <Separator />
-
-                <div className="flex items-center justify-between">
-                  <div className="flex items-start gap-3">
-                    <Bell className="w-5 h-5 text-gray-600 mt-0.5" />
-                    <div>
-                      <p className="font-medium">Order Updates</p>
-                      <p className="text-sm text-gray-600">Get notified about order status changes</p>
-                    </div>
-                  </div>
-                  <Switch checked={orderUpdates} onCheckedChange={setOrderUpdates} />
-                </div>
-
-                <Separator />
-
-                <div className="flex items-center justify-between">
-                  <div className="flex items-start gap-3">
-                    <Mail className="w-5 h-5 text-gray-600 mt-0.5" />
-                    <div>
-                      <p className="font-medium">Promotions & Newsletters</p>
-                      <p className="text-sm text-gray-600">Receive promotional emails and newsletters</p>
-                    </div>
-                  </div>
-                  <Switch checked={promotions} onCheckedChange={setPromotions} />
-                </div>
-
-                <Separator className="my-6" />
-
-                <div className="flex justify-end">
-                  <Button>Save Preferences</Button>
-                </div>
+              <div className="space-y-2">
+                <SwitchRow 
+                  icon={<Mail size={20}/>} 
+                  label={t("អ៊ីមែល", "Email Updates")} 
+                  checked={notifications.email} 
+                  onChange={(v) => setNotifications(p => ({...p, email: v}))} 
+                />
+                <SwitchRow 
+                  icon={<Smartphone size={20}/>} 
+                  label={t("ទូរស័ព្ទ", "Push Alerts")} 
+                  checked={notifications.push} 
+                  onChange={(v) => setNotifications(p => ({...p, push: v}))} 
+                />
               </div>
             </Card>
           </TabsContent>
 
-          {/* Security Settings */}
+          {/* 3. Security */}
           <TabsContent value="security">
-            <Card className="p-6">
-              <div className="flex items-center gap-3 mb-6">
-                <Lock className="w-5 h-5" />
-                <h2 className="text-xl font-semibold">Security Settings</h2>
+            <Card className="p-8 border-none shadow-2xl shadow-zinc-100 rounded-[40px] space-y-10">
+              <div className="flex items-center gap-4">
+                <div className="p-4 bg-zinc-900 rounded-2xl text-white rotate-2 shadow-lg">
+                  <Lock size={24} />
+                </div>
+                <h2 className="text-2xl font-black uppercase tracking-tighter">{t("សុវត្ថិភាព", "Security")}</h2>
               </div>
-
               <div className="space-y-6">
-                <div>
-                  <h3 className="font-medium mb-4">Change Password</h3>
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="currentPassword">Current Password</Label>
-                      <Input id="currentPassword" type="password" placeholder="Enter current password" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="newPassword">New Password</Label>
-                      <Input id="newPassword" type="password" placeholder="Enter new password" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="confirmPassword">Confirm New Password</Label>
-                      <Input id="confirmPassword" type="password" placeholder="Confirm new password" />
-                    </div>
-                    <Button>Update Password</Button>
-                  </div>
-                </div>
-
-                <Separator />
-
-                <div>
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-start gap-3">
-                      <Shield className="w-5 h-5 text-gray-600 mt-0.5" />
-                      <div>
-                        <p className="font-medium">Two-Factor Authentication</p>
-                        <p className="text-sm text-gray-600">Add an extra layer of security to your account</p>
-                      </div>
-                    </div>
-                    <Switch checked={twoFactor} onCheckedChange={setTwoFactor} />
-                  </div>
-                  {twoFactor && (
-                    <div className="ml-8 mt-3 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                      <p className="text-sm text-blue-900">Two-factor authentication is enabled. You'll need to enter a code from your authenticator app when signing in.</p>
-                    </div>
-                  )}
-                </div>
-
-                <Separator />
-
-                <div>
-                  <h3 className="font-medium mb-2">Active Sessions</h3>
-                  <p className="text-sm text-gray-600 mb-4">Manage devices where you're currently logged in</p>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between p-3 border rounded-lg">
-                      <div>
-                        <p className="font-medium">MacBook Pro - Chrome</p>
-                        <p className="text-sm text-gray-600">New York, USA • Active now</p>
-                      </div>
-                      <Button variant="outline" size="sm">Current</Button>
-                    </div>
-                    <div className="flex items-center justify-between p-3 border rounded-lg">
-                      <div>
-                        <p className="font-medium">iPhone 15 - Safari</p>
-                        <p className="text-sm text-gray-600">New York, USA • 2 hours ago</p>
-                      </div>
-                      <Button variant="outline" size="sm">Revoke</Button>
-                    </div>
-                  </div>
-                </div>
+                <InputGroupSimple label={t("លេខសម្ងាត់ចាស់", "Current Password")} type="password" />
+                <InputGroupSimple label={t("លេខសម្ងាត់ថ្មី", "New Password")} type="password" />
+                <Button className="w-full bg-zinc-900 text-white py-7 rounded-2xl font-black uppercase tracking-widest italic shadow-xl hover:bg-zinc-800 transition-all">
+                  {t("ប្តូរលេខសម្ងាត់", "Change Password")}
+                </Button>
               </div>
             </Card>
           </TabsContent>
 
-          {/* Appearance Settings */}
+          {/* 4. Appearance */}
           <TabsContent value="appearance">
-            <Card className="p-6">
-              <div className="flex items-center gap-3 mb-6">
-                <Palette className="w-5 h-5" />
-                <h2 className="text-xl font-semibold">Appearance Settings</h2>
+            <Card className="p-8 border-none shadow-2xl shadow-zinc-100 rounded-[40px] space-y-10">
+              <div className="flex items-center gap-4">
+                <div className="p-4 bg-zinc-900 rounded-2xl text-white -rotate-2 shadow-lg">
+                  <Palette size={24} />
+                </div>
+                <h2 className="text-2xl font-black uppercase tracking-tighter">{t("រូបរាង និងភាសា", "Interface")}</h2>
               </div>
-
-              <div className="space-y-6">
-                <div className="space-y-2">
-                  <Label htmlFor="theme">Theme</Label>
-                  <Select defaultValue="light">
-                    <SelectTrigger id="theme">
-                      <SelectValue placeholder="Select theme" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="light">Light</SelectItem>
-                      <SelectItem value="dark">Dark</SelectItem>
-                      <SelectItem value="auto">Auto (System)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <p className="text-sm text-gray-600">Choose your preferred color theme</p>
-                </div>
-
-                <Separator />
-
-                <div className="space-y-2">
-                  <Label htmlFor="language">Language</Label>
-                  <Select defaultValue="en">
-                    <SelectTrigger id="language">
-                      <SelectValue placeholder="Select language" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="en">English</SelectItem>
-                      <SelectItem value="es">Español</SelectItem>
-                      <SelectItem value="fr">Français</SelectItem>
-                      <SelectItem value="de">Deutsch</SelectItem>
-                      <SelectItem value="ja">日本語</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <Separator />
-
-                <div className="space-y-2">
-                  <Label htmlFor="timezone">Timezone</Label>
-                  <Select defaultValue="est">
-                    <SelectTrigger id="timezone">
-                      <SelectValue placeholder="Select timezone" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="est">Eastern Time (ET)</SelectItem>
-                      <SelectItem value="cst">Central Time (CT)</SelectItem>
-                      <SelectItem value="mst">Mountain Time (MT)</SelectItem>
-                      <SelectItem value="pst">Pacific Time (PT)</SelectItem>
-                      <SelectItem value="utc">UTC</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <Separator className="my-6" />
-
-                <div className="flex justify-end">
-                  <Button>Save Preferences</Button>
-                </div>
+              <div className="space-y-3">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">{t("ជ្រើសរើសភាសា", "Select Language")}</Label>
+                <Select value={lang} onValueChange={(v: "en" | "kh") => setLanguage(v)}>
+                  <SelectTrigger className="rounded-2xl py-7 font-bold border-zinc-100 bg-zinc-50 shadow-inner italic">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-2xl font-bold italic">
+                    <SelectItem value="kh">ខ្មែរ (Khmer)</SelectItem>
+                    <SelectItem value="en">English (US)</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </Card>
           </TabsContent>
 
-          {/* Billing Settings */}
+          {/* 5. Billing */}
           <TabsContent value="billing">
-            <Card className="p-6">
-              <div className="flex items-center gap-3 mb-6">
-                <CreditCard className="w-5 h-5" />
-                <h2 className="text-xl font-semibold">Billing & Payment</h2>
+            <Card className="p-8 border-none shadow-2xl shadow-zinc-100 rounded-[40px] space-y-10">
+              <div className="flex items-center gap-4">
+                <div className="p-4 bg-zinc-900 rounded-2xl text-white rotate-3 shadow-lg">
+                  <CreditCard size={24} />
+                </div>
+                <h2 className="text-2xl font-black uppercase tracking-tighter">{t("ការបង់ប្រាក់", "Billing")}</h2>
               </div>
-
-              <div className="space-y-6">
-                <div>
-                  <h3 className="font-medium mb-4">Payment Methods</h3>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between p-4 border rounded-lg">
-                      <div className="flex items-center gap-3">
-                        <CreditCard className="w-5 h-5 text-gray-600" />
-                        <div>
-                          <p className="font-medium">Visa ending in 4242</p>
-                          <p className="text-sm text-gray-600">Expires 12/2027</p>
-                        </div>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button variant="outline" size="sm">Edit</Button>
-                        <Button variant="outline" size="sm">Remove</Button>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between p-4 border rounded-lg">
-                      <div className="flex items-center gap-3">
-                        <CreditCard className="w-5 h-5 text-gray-600" />
-                        <div>
-                          <p className="font-medium">Mastercard ending in 5555</p>
-                          <p className="text-sm text-gray-600">Expires 08/2026</p>
-                        </div>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button variant="outline" size="sm">Edit</Button>
-                        <Button variant="outline" size="sm">Remove</Button>
-                      </div>
-                    </div>
-                  </div>
-                  <Button variant="outline" className="mt-4">Add Payment Method</Button>
-                </div>
-
-                <Separator />
-
-                <div>
-                  <h3 className="font-medium mb-4">Billing Address</h3>
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="billingAddress">Street Address</Label>
-                      <Input id="billingAddress" placeholder="123 Main St" defaultValue="123 Main St" />
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="billingCity">City</Label>
-                        <Input id="billingCity" placeholder="New York" defaultValue="New York" />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="billingState">State</Label>
-                        <Input id="billingState" placeholder="NY" defaultValue="NY" />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="billingZip">ZIP Code</Label>
-                        <Input id="billingZip" placeholder="10001" defaultValue="10001" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <Separator className="my-6" />
-
-                <div className="flex justify-end">
-                  <Button>Save Changes</Button>
-                </div>
+              <div className="p-16 border-2 border-dashed border-zinc-100 rounded-[35px] text-center italic">
+                <p className="font-black uppercase text-[12px] tracking-widest text-zinc-400">
+                  {t("មិនទាន់មានព័ត៌មានបង់ប្រាក់", "No Payment Method Saved")}
+                </p>
               </div>
             </Card>
           </TabsContent>
         </Tabs>
       </div>
+    </div>
+  );
+}
+
+// ១. Reusable InputGroup សម្រាប់ Form លម្អិត (ប្រើ name ជំនួស id)
+function InputGroup({ label, name, value, onChange, type = "text" }: { label: string, name: string, value: string, onChange: (e: any) => void, type?: string }) {
+  return (
+    <div className="space-y-2">
+      <Label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">{label}</Label>
+      <Input 
+        name={name}
+        type={type} 
+        value={value}
+        onChange={onChange}
+        className="rounded-2xl border-zinc-100 py-7 font-bold text-lg bg-zinc-50 focus:bg-white transition-all shadow-inner italic" 
+      />
+    </div>
+  );
+}
+
+// ២. Reusable Input ធម្មតាសម្រាប់ Security Tab
+function InputGroupSimple({ label, type = "text" }: { label: string, type?: string }) {
+  return (
+    <div className="space-y-2">
+      <Label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">{label}</Label>
+      <Input 
+        type={type} 
+        className="rounded-2xl border-zinc-100 py-7 font-bold text-lg bg-zinc-50 focus:bg-white transition-all shadow-inner italic" 
+      />
+    </div>
+  );
+}
+
+function SwitchRow({ icon, label, checked, onChange }: { icon: React.ReactNode, label: string, checked: boolean, onChange: (v: boolean) => void }) {
+  return (
+    <div className="flex items-center justify-between p-6 bg-zinc-50 rounded-[24px] border border-transparent hover:border-zinc-200 transition-all mb-4 shadow-sm italic">
+      <div className="flex items-center gap-5">
+        <div className="p-2 bg-white rounded-xl shadow-sm">{icon}</div>
+        <p className="font-black uppercase text-[11px] tracking-widest">{label}</p>
+      </div>
+      <Switch checked={checked} onCheckedChange={onChange} className="data-[state=checked]:bg-zinc-900" />
     </div>
   );
 }

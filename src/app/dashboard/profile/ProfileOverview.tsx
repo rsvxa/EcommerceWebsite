@@ -1,9 +1,8 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
 import { useLanguage } from '@/lib/store/use-language';
-import { Camera, ChevronDown, Loader2, CheckCircle2, Trash2 } from 'lucide-react';
+import { Camera, Trash2, User, Mail, Phone, Globe, MapPin, Hash, Building2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 export function ProfileOverview() {
@@ -15,153 +14,124 @@ export function ProfileOverview() {
     fullName: "",
     email: "",
     phone: "",
-    address: "",
+    country: "",
     city: "",
-    zipCode: ""
+    zipCode: "",
+    address: ""
   });
 
   const [profileImage, setProfileImage] = useState(defaultAvatar);
-  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    // ១. ឆែកមើលទិន្នន័យពី LocalStorage (ត្រូវប្រាកដថា Key នេះដូចក្នុង AuthDialog)
-    const savedName = localStorage.getItem('zway_user_name') || "";
-    const savedEmail = localStorage.getItem('zway_user_email') || ""; 
+    const savedName = localStorage.getItem('zway_user_name') || "N/A";
+    const savedEmail = localStorage.getItem('zway_user_email') || "N/A"; 
     const checkoutData = JSON.parse(localStorage.getItem('zway_checkout_info') || '{}');
     const savedImage = localStorage.getItem('zway_user_avatar');
 
     setUserData({
       fullName: savedName,
-      email: savedEmail, // ត្រង់នេះនឹងទាញ Email ពី Login មក
-      phone: checkoutData.phone || "",
-      address: checkoutData.address || "",
-      city: checkoutData.city || "",
-      zipCode: checkoutData.zipCode || ""
+      email: savedEmail,
+      phone: checkoutData.phone || "N/A",
+      country: checkoutData.country || "N/A",
+      city: checkoutData.city || "N/A",
+      zipCode: checkoutData.zipCode || "N/A",
+      address: checkoutData.address || "N/A"
     });
 
     if (savedImage) setProfileImage(savedImage);
   }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setUserData(prev => ({ ...prev, [name]: value }));
-  };
-
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = () => setProfileImage(reader.result as string);
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        setProfileImage(base64String);
+        localStorage.setItem('zway_user_avatar', base64String);
+        window.dispatchEvent(new Event('avatarUpdated'));
+        toast.success(lang === 'kh' ? "បានប្តូររូបភាពជោគជ័យ" : "Photo updated!");
+      };
       reader.readAsDataURL(file);
     }
   };
 
-  // បន្ថែមមុខងារលុបរូបថត
   const handleRemovePhoto = () => {
     setProfileImage(defaultAvatar);
+    localStorage.removeItem('zway_user_avatar');
+    window.dispatchEvent(new Event('avatarUpdated'));
     toast.info(lang === 'kh' ? "បានលុបរូបថត" : "Photo removed");
   };
 
-  const handleSaveChanges = () => {
-    setIsLoading(true);
-    try {
-      localStorage.setItem('zway_user_avatar', profileImage);
-      localStorage.setItem('zway_user_name', userData.fullName);
-      localStorage.setItem('zway_user_email', userData.email); // រក្សាទុក Email ដែលបានកែ
-
-      const updatedCheckoutInfo = {
-        phone: userData.phone,
-        address: userData.address,
-        city: userData.city,
-        zipCode: userData.zipCode
-      };
-      localStorage.setItem('zway_checkout_info', JSON.stringify(updatedCheckoutInfo));
-
-      window.dispatchEvent(new Event('avatarUpdated'));
-
-      setTimeout(() => {
-        setIsLoading(false);
-        toast.success(lang === 'kh' ? "រក្សាទុកជោគជ័យ!" : "Saved successfully!");
-      }, 800);
-    } catch (error) {
-      setIsLoading(false);
-      toast.error("Error saving data");
-    }
-  };
+  const t = (kh: string, en: string) => (lang === 'kh' ? kh : en);
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 pb-10">
+    <div className="max-w-4xl mx-auto space-y-6 pb-10 italic">
       
       {/* Photo Section */}
-      <div className="bg-white rounded-3xl p-6 border border-zinc-100 shadow-sm flex items-center justify-between">
-        <div className="flex items-center gap-5">
+      <div className="bg-white rounded-[2.5rem] p-8 border border-zinc-100 shadow-sm flex items-center justify-between">
+        <div className="flex items-center gap-6">
           <input type="file" ref={fileInputRef} onChange={handleImageChange} accept="image/*" className="hidden" />
           <div className="relative group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
-            <div className="h-24 w-24 rounded-full overflow-hidden border-4 border-zinc-50 shadow-inner bg-zinc-100">
+            <div className="h-28 w-28 rounded-full overflow-hidden border-4 border-zinc-50 shadow-md bg-zinc-100 transition-transform group-hover:scale-105">
               <img src={profileImage} alt="Profile" className="h-full w-full object-cover" />
             </div>
             <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-              <Camera size={20} className="text-white" />
+              <Camera size={24} className="text-white" />
             </div>
           </div>
           <div>
-            <h3 className="text-xl font-black italic">{lang === 'kh' ? 'រូបថតគណនី' : 'Profile Photo'}</h3>
-            <div className="flex gap-3 mt-2">
-               <button onClick={() => fileInputRef.current?.click()} className="text-[13px] font-black uppercase text-gray-400 hover:text-black cursor-pointer">
-                 {lang === 'kh' ? 'ប្តូររូប' : 'Change'}
+            <h3 className="text-2xl font-black uppercase tracking-tighter">{t('រូបថតគណនី', 'Profile Photo')}</h3>
+            <div className="flex gap-4 mt-2">
+               <button onClick={() => fileInputRef.current?.click()} className="text-[12px] font-black uppercase text-zinc-400 hover:text-black transition-colors cursor-pointer">
+                 {t('ប្តូររូប', 'Change Photo')}
                </button>
-               <button onClick={handleRemovePhoto} className="text-[13px] font-black uppercase text-red-500 flex items-center gap-1 cursor-pointer">
-                 <Trash2 size={13} /> {lang === 'kh' ? 'លុប' : 'Remove'}
+               <button onClick={handleRemovePhoto} className="text-[12px] font-black uppercase text-red-500 flex items-center gap-1 hover:text-red-700 transition-colors cursor-pointer">
+                 <Trash2 size={14} /> {t('លុប', 'Remove')}
                </button>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Form Section */}
-      <div className="bg-white rounded-[2.5rem] p-10 border border-zinc-100 shadow-sm space-y-8">
-        <h2 className="text-2xl font-black italic">{lang === 'kh' ? 'ព័ត៌មានលម្អិត' : 'Account Details'}</h2>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-7">
-          <InputGroup label={lang === 'kh' ? "ឈ្មោះពេញ*" : "Full Name*"} name="fullName" value={userData.fullName} onChange={handleChange} />
-          
-          <InputGroup label={lang === 'kh' ? "អ៊ីមែល*" : "Email Address*"} name="email" value={userData.email} onChange={handleChange} />
-          
-          <InputGroup label={lang === 'kh' ? "លេខទូរស័ព្ទ" : "Phone Number"} name="phone" value={userData.phone} onChange={handleChange} />
-          <InputGroup label={lang === 'kh' ? "លេខកូដតំបន់" : "Zip Code"} name="zipCode" value={userData.zipCode} onChange={handleChange} />
-
-          <div className="md:col-span-2">
-            <InputGroup label={lang === 'kh' ? "អាសយដ្ឋាន*" : "Address*"} name="address" value={userData.address} onChange={handleChange} />
-          </div>
-
-          <InputGroup label={lang === 'kh' ? "ទីក្រុង" : "City"} name="city" value={userData.city} onChange={handleChange} />
+      {/* Information Table Section */}
+      <div className="bg-white rounded-[2.5rem] p-10 border border-zinc-100 shadow-sm overflow-hidden">
+        <div className="flex items-center justify-between mb-8">
+          <h2 className="text-2xl font-black uppercase tracking-tighter">{t('ព័ត៌មានលម្អិត', 'Account Details')}</h2>
         </div>
 
-        <motion.button 
-          whileTap={{ scale: 0.98 }}
-          onClick={handleSaveChanges}
-          disabled={isLoading}
-          className="w-full py-5 bg-black text-white rounded-2xl text-[13px] font-black uppercase tracking-[0.3em] shadow-xl transition-all flex items-center justify-center gap-3 cursor-pointer"
-        >
-          {isLoading ? <Loader2 className="animate-spin" size={20} /> : (lang === 'kh' ? 'រក្សាទុកការផ្លាស់ប្តូរ' : 'Save Changes')}
-        </motion.button>
+        <div className="divide-y divide-zinc-50 border-t border-zinc-50">
+          <DataRow icon={<User size={18}/>} label={t("ឈ្មោះពេញ", "Full Name")} value={userData.fullName} />
+          <DataRow icon={<Mail size={18}/>} label={t("អ៊ីមែល", "Email Address")} value={userData.email} />
+          <DataRow icon={<Phone size={18}/>} label={t("លេខទូរស័ព្ទ", "Phone Number")} value={userData.phone} />
+          <DataRow icon={<Globe size={18}/>} label={t("ប្រទេស", "Country")} value={userData.country} />
+          <DataRow icon={<Building2 size={18}/>} label={t("ទីក្រុង", "City")} value={userData.city} />
+          <DataRow icon={<Hash size={18}/>} label={t("លេខកូដតំបន់", "Zip Code")} value={userData.zipCode} />
+          <DataRow icon={<MapPin size={18}/>} label={t("អាសយដ្ឋាន", "Address")} value={userData.address} fullWidth />
+        </div>
+
+        <div className="mt-8 p-6 bg-zinc-50 rounded-2xl border border-zinc-100">
+          <p className="text-[11px] font-bold text-zinc-400 leading-relaxed">
+            {t("* ប្រសិនបើអ្នកចង់កែប្រែព័ត៌មានទាំងនេះ សូមចូលទៅកាន់ផ្នែកកែប្រែគណនី ឬទាក់ទងមកកាន់ផ្នែកគាំទ្រ។", 
+               "* To update these details, please navigate to the edit section or contact our support team.")}
+          </p>
+        </div>
       </div>
     </div>
   );
 }
 
-function InputGroup({ label, name, value, onChange }: { label: string, name: string, value: string, onChange: (e: any) => void }) {
+// Table Row Component
+function DataRow({ icon, label, value, fullWidth = false }: { icon: React.ReactNode, label: string, value: string, fullWidth?: boolean }) {
   return (
-    <div className="space-y-2">
-      <p className="text-[11px] font-black uppercase tracking-widest text-zinc-400 ml-1">{label}</p>
-      <input 
-        type="text"
-        name={name}
-        value={value}
-        onChange={onChange}
-        placeholder="..."
-        className="w-full px-5 py-4 bg-zinc-50 border border-zinc-100 rounded-xl text-sm font-bold text-zinc-900 outline-none focus:ring-2 ring-indigo-50 focus:bg-white transition-all shadow-inner"
-      />
+    <div className={`flex flex-col md:flex-row md:items-center py-5 gap-2 md:gap-0`}>
+      <div className="flex items-center gap-3 w-full md:w-1/3">
+        <div className="text-zinc-900">{icon}</div>
+        <span className="text-[11px] font-black uppercase tracking-widest text-zinc-400">{label}</span>
+      </div>
+      <div className="w-full md:w-2/3">
+        <p className="text-base font-bold text-zinc-900 truncate">{value || "---"}</p>
+      </div>
     </div>
   );
 }

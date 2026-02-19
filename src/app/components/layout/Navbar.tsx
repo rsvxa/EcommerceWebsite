@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from 'react';
-import { ShoppingCart, Search, Menu, User, LogOut, UserCircle, Globe, Check, Settings, LayoutDashboard, X } from 'lucide-react';
+import { ShoppingCart, Search, Menu, User, UserCircle, Globe, X } from 'lucide-react';
 import { Button } from '@/app/components/ui/button';
 import { Badge } from '@/app/components/ui/badge';
 import { Input } from '@/app/components/ui/input';
@@ -10,16 +10,11 @@ import {
   Sheet,
   SheetContent,
   SheetTrigger,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
 } from '@/app/components/ui/sheet';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/app/components/ui/dropdown-menu';
 import { MegaMenu } from './MegaMenu';
@@ -131,7 +126,6 @@ export function Navbar({ onSearch, onCategorySelect }: NavbarProps) {
               )}
             </Button>
 
-            {/* Profile Button - ចុចហើយលោតទៅ Sheet ភ្លាមៗ */}
             {isAuthenticated ? (
               <Button 
                 variant="ghost" 

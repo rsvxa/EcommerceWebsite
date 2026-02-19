@@ -49,8 +49,53 @@ export function CheckoutModal({ isOpen, onOpenChange, total, cartItems }: any) {
   };
 
   const shippingData: any = {
-    cambodia: [{ id: 'vireak', name: 'Vireak Buntham' }, { id: 'j&t', name: 'J&T Express' }],
-    usa: [{ id: 'fedex', name: 'FedEx' }, { id: 'ups', name: 'UPS Worldwide' }],
+    cambodia: [
+      { id: 'vireak', name: 'Vireak Buntham' },
+      { id: 'jt', name: 'J&T Express' },
+      { id: 'kerry', name: 'Kerry Express' },
+      { id: 'cambodia-post', name: 'Cambodia Post' }
+    ],
+    thailand: [
+      { id: 'flash', name: 'Flash Express' },
+      { id: 'thailand-post', name: 'Thailand Post' },
+      { id: 'grab-express', name: 'Grab Express TH' }
+    ],
+    vietnam: [
+      { id: 'vn-post', name: 'Vietnam Post' },
+      { id: 'viettel-post', name: 'Viettel Post' },
+      { id: 'ghtk', name: 'Giao Hang Tiet Kiem' }
+    ],
+    china: [
+      { id: 'sf-express', name: 'SF Express' },
+      { id: 'zto', name: 'ZTO Express' },
+      { id: 'china-post', name: 'China Post' }
+    ],
+    usa: [
+      { id: 'fedex', name: 'FedEx' },
+      { id: 'ups', name: 'UPS Worldwide' },
+      { id: 'usps', name: 'USPS' },
+      { id: 'dhl-us', name: 'DHL Express USA' }
+    ],
+    united_kingdom: [
+      { id: 'royal-mail', name: 'Royal Mail' },
+      { id: 'dpd-uk', name: 'DPD UK' },
+      { id: 'evri', name: 'Evri' }
+    ],
+    singapore: [
+      { id: 'singpost', name: 'SingPost' },
+      { id: 'ninjavan', name: 'Ninja Van' },
+      { id: 'speedpost', name: 'SpeedPost' }
+    ],
+    france: [
+      { id: 'la-poste', name: 'La Poste' },
+      { id: 'chronopost', name: 'Chronopost' },
+      { id: 'colissimo', name: 'Colissimo' }
+    ],
+    japan: [
+      { id: 'yamato', name: 'Yamato Transport' },
+      { id: 'sagawa', name: 'Sagawa Express' },
+      { id: 'japan-post', name: 'Japan Post' }
+    ]
   };
 
   const sendToTelegram = async (order: any) => {

@@ -6,19 +6,18 @@ import { ProductCard } from './ProductCard';
 import { useLanguage } from '@/lib/store/use-language';
 import { translations } from '@/lib/i18n/translations';
 import { SearchX, ArrowLeftRotate } from 'lucide-react';
-import { Button } from '@/app/components/ui/button';
+import { Button } from '../ui/button';
 
 interface ProductGridProps {
   products: Product[];
 }
 
-// Animation Variants សម្រាប់ Grid Container
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.1, // ធ្វើឱ្យកាតនីមួយៗបង្ហាញមកខុសគ្នាបន្តិច (Stagger effect)
+      staggerChildren: 0.1,
     },
   },
 };

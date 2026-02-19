@@ -42,7 +42,7 @@ export function ProfileSidebar({ activeTab, setActiveTab, onLogout }: ProfileSid
 
   const menuItems = [
     { id: 'profile', label: lang === 'kh' ? 'ព័ត៌មានទូទៅ' : 'Overview', icon: <User size={16} /> },
-    { id: 'orders', label: lang === 'kh' ? 'ប្រវត្តិបញ្ជាទិញ' : 'Order History', icon: <Package size={16} /> },
+    { id: 'orders', label: lang === 'kh' ? 'ការបញ្ជាទិញរបស់ខ្ញុំ' : 'Myorder', icon: <Package size={16} /> },
     { id: 'wishlist', label: lang === 'kh' ? 'បញ្ជីប្រាថ្នា' : 'Wishlist', icon: <Heart size={16} /> },
     { id: 'settings', label: lang === 'kh' ? 'ការកំណត់' : 'Settings', icon: <Settings size={16} /> },
   ];
