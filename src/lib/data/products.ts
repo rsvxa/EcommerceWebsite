@@ -1,9 +1,6 @@
 import type { Product } from '@/types/product';
 
-/**
- * Mock product data for demonstration
- * In a real application, this would come from your API/database
- */
+
 export const mockProducts: Product[] = [
   // CLOTHES
   {
@@ -25,6 +22,63 @@ export const mockProducts: Product[] = [
       { id: 'v6', size: 'L', color: 'Black', colorHex: '#000000', sku: 'TSH-BLK-L', stock: 20 },
     ],
     createdAt: '2025-01-15T10:00:00Z',
+    updatedAt: '2025-02-01T10:00:00Z',
+  },
+  {
+    id: '2',
+    name: 'Elegant Evening Dress',
+    description: 'Stunning evening dress with a flattering silhouette. Perfect for special occasions and formal events.',
+    price: 189.99,
+    images: ['https://images.unsplash.com/photo-1759893362613-8bb8bb057af1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxlbGVnYW50JTIwZHJlc3MlMjBib3V0aXF1ZXxlbnwxfHx8fDE3Njk4MTk3Mjh8MA&ixlib=rb-4.1.0&q=80&w=1080'],
+    category: 'CLOTHES',
+    subCategory: 'DRESSES',
+    stock: 30,
+    featured: true,
+    variants: [
+      { id: 'v7', size: 'XS', color: 'Navy Blue', colorHex: '#000080', sku: 'DRS-NVY-XS', stock: 5 },
+      { id: 'v8', size: 'S', color: 'Navy Blue', colorHex: '#000080', sku: 'DRS-NVY-S', stock: 8 },
+      { id: 'v9', size: 'M', color: 'Navy Blue', colorHex: '#000080', sku: 'DRS-NVY-M', stock: 10 },
+      { id: 'v10', size: 'L', color: 'Navy Blue', colorHex: '#000080', sku: 'DRS-NVY-L', stock: 7 },
+    ],
+    createdAt: '2025-01-20T10:00:00Z',
+    updatedAt: '2025-02-01T10:00:00Z',
+  },
+  {
+    id: '2',
+    name: 'Elegant Evening Dress',
+    description: 'Stunning evening dress with a flattering silhouette. Perfect for special occasions and formal events.',
+    price: 189.99,
+    images: ['https://images.unsplash.com/photo-1759893362613-8bb8bb057af1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxlbGVnYW50JTIwZHJlc3MlMjBib3V0aXF1ZXxlbnwxfHx8fDE3Njk4MTk3Mjh8MA&ixlib=rb-4.1.0&q=80&w=1080'],
+    category: 'CLOTHES',
+    subCategory: 'DRESSES',
+    stock: 30,
+    featured: true,
+    variants: [
+      { id: 'v7', size: 'XS', color: 'Navy Blue', colorHex: '#000080', sku: 'DRS-NVY-XS', stock: 5 },
+      { id: 'v8', size: 'S', color: 'Navy Blue', colorHex: '#000080', sku: 'DRS-NVY-S', stock: 8 },
+      { id: 'v9', size: 'M', color: 'Navy Blue', colorHex: '#000080', sku: 'DRS-NVY-M', stock: 10 },
+      { id: 'v10', size: 'L', color: 'Navy Blue', colorHex: '#000080', sku: 'DRS-NVY-L', stock: 7 },
+    ],
+    createdAt: '2025-01-20T10:00:00Z',
+    updatedAt: '2025-02-01T10:00:00Z',
+  },
+  {
+    id: '2',
+    name: 'Elegant Evening Dress',
+    description: 'Stunning evening dress with a flattering silhouette. Perfect for special occasions and formal events.',
+    price: 189.99,
+    images: ['https://images.unsplash.com/photo-1759893362613-8bb8bb057af1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxlbGVnYW50JTIwZHJlc3MlMjBib3V0aXF1ZXxlbnwxfHx8fDE3Njk4MTk3Mjh8MA&ixlib=rb-4.1.0&q=80&w=1080'],
+    category: 'CLOTHES',
+    subCategory: 'DRESSES',
+    stock: 30,
+    featured: true,
+    variants: [
+      { id: 'v7', size: 'XS', color: 'Navy Blue', colorHex: '#000080', sku: 'DRS-NVY-XS', stock: 5 },
+      { id: 'v8', size: 'S', color: 'Navy Blue', colorHex: '#000080', sku: 'DRS-NVY-S', stock: 8 },
+      { id: 'v9', size: 'M', color: 'Navy Blue', colorHex: '#000080', sku: 'DRS-NVY-M', stock: 10 },
+      { id: 'v10', size: 'L', color: 'Navy Blue', colorHex: '#000080', sku: 'DRS-NVY-L', stock: 7 },
+    ],
+    createdAt: '2025-01-20T10:00:00Z',
     updatedAt: '2025-02-01T10:00:00Z',
   },
   {
@@ -182,6 +236,38 @@ export const mockProducts: Product[] = [
   },
   {
     id: '10',
+    name: 'Diamond Stud Earrings',
+    description: 'Classic diamond stud earrings set in 14k white gold. Perfect for everyday elegance.',
+    price: 399.99,
+    images: ['https://images.unsplash.com/photo-1656109801168-699967cf3ba9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzaWx2ZXIlMjBlYXJyaW5ncyUyMGpld2Vscnl8ZW58MXx8fHwxNzY5ODcyNTMxfDA&ixlib=rb-4.1.0&q=80&w=1080'],
+    category: 'JEWELRY',
+    subCategory: 'EARRINGS',
+    stock: 12,
+    featured: true,
+    variants: [
+      { id: 'v30', size: 'ONESIZE', color: 'White Gold', colorHex: '#F5F5F5', sku: 'ERR-DIA-OS', stock: 12 },
+    ],
+    createdAt: '2025-01-30T10:00:00Z',
+    updatedAt: '2025-02-01T10:00:00Z',
+  },
+  {
+    id: '11',
+    name: 'Diamond Stud Earrings',
+    description: 'Classic diamond stud earrings set in 14k white gold. Perfect for everyday elegance.',
+    price: 399.99,
+    images: ['https://images.unsplash.com/photo-1656109801168-699967cf3ba9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzaWx2ZXIlMjBlYXJyaW5ncyUyMGpld2Vscnl8ZW58MXx8fHwxNzY5ODcyNTMxfDA&ixlib=rb-4.1.0&q=80&w=1080'],
+    category: 'JEWELRY',
+    subCategory: 'EARRINGS',
+    stock: 12,
+    featured: true,
+    variants: [
+      { id: 'v30', size: 'ONESIZE', color: 'White Gold', colorHex: '#F5F5F5', sku: 'ERR-DIA-OS', stock: 12 },
+    ],
+    createdAt: '2025-01-30T10:00:00Z',
+    updatedAt: '2025-02-01T10:00:00Z',
+  },
+  {
+    id: '12',
     name: 'Diamond Stud Earrings',
     description: 'Classic diamond stud earrings set in 14k white gold. Perfect for everyday elegance.',
     price: 399.99,

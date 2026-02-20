@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
-import { ArrowRight, Calendar, Tag, Search, Clock, ChevronRight, Hash } from 'lucide-react';
+import { ArrowRight, Calendar, Tag, Search, Clock, ChevronRight, Hash, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/lib/store/use-language';
 import { translations } from '@/lib/i18n/translations';
@@ -27,7 +27,8 @@ const BLOG_POSTS = [
     title: { en: "How to Style for the New Season", kh: "របៀបតុបតែងខ្លួនសម្រាប់រដូវកាលថ្មី" },
     excerpt: { en: "Discover the ultimate tips for choosing stylish outfits...", kh: "ស្វែងយល់ពីគន្លឹះសំខាន់ៗក្នុងការជ្រើសរើសឈុតសម្លៀកបំពាក់..." },
     image: "https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=2070",
-    date: "Feb 03, 2026"
+    date: "Feb 03, 2026",
+    readTime: "5 min"
   },
   {
     id: 2,
@@ -36,7 +37,8 @@ const BLOG_POSTS = [
     title: { en: "Top Trending Suits for 2026", kh: "ឈុតអាវធំបុរសដែលពេញនិយមបំផុតសម្រាប់ឆ្នាំ ២០២៦" },
     excerpt: { en: "Classic tailoring meets modern style in this year's collection...", kh: "ការកាត់ដេរតាមបែបបុរាណ រួមបញ្ចូលជាមួយស្ទីលទំនើប..." },
     image: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?q=80&w=2070",
-    date: "Jan 28, 2026"
+    date: "Jan 28, 2026",
+    readTime: "7 min"
   },
   {
     id: 3,
@@ -45,51 +47,70 @@ const BLOG_POSTS = [
     title: { en: "The Art of Minimalist Dressing", kh: "សិល្បៈនៃការស្លៀកពាក់បែបសាមញ្ញ (Minimalist)" },
     excerpt: { en: "Less is more: How to pick essential pieces...", kh: "ភាពសាមញ្ញគឺជាភាពស្រស់ស្អាត៖ របៀបជ្រើសរើសសម្លៀកបំពាក់..." },
     image: "https://images.unsplash.com/photo-1434389677669-e08b4cac3105?q=80&w=2070",
-    date: "Jan 20, 2026"
+    date: "Jan 20, 2026",
+    readTime: "4 min"
   }
 ];
 
 export function BlogSection() {
   const [selectedGender, setSelectedGender] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
+  const [activeTag, setActiveTag] = useState("All");
   const { lang } = useLanguage();
-  const t = translations[lang].blog;
+  
+  // ធានាថាមាន fallback បើសិនជា translation មិនទាន់មាន
+  const t = translations[lang]?.blog || {
+    title: lang === 'kh' ? "អត្ថបទថ្មីៗ" : "Latest Stories",
+    viewAll: lang === 'kh' ? "មើលទាំងអស់" : "View All",
+    readMore: lang === 'kh' ? "អានបន្ត" : "Read More",
+    categories: { all: "ទាំងអស់", men: "បុរស", women: "នារី" }
+  };
 
   const categories = [
     { id: "All", label: t.categories.all },
     { id: "Men", label: t.categories.men },
     { id: "Women", label: t.categories.women },
   ];
+
+  // បង្កើតបញ្ជី Tags ទាំងអស់ដែលមានក្នុង Post
+  const allTags = ["All", ...Array.from(new Set(BLOG_POSTS.flatMap(post => post.tags)))];
+
+  // ច្រោះយក Post សម្រាប់ Swiper (តាម Category)
   const filteredPosts = selectedGender === "All" 
     ? BLOG_POSTS 
     : BLOG_POSTS.filter(post => post.category === selectedGender);
 
-  const searchedPosts = BLOG_POSTS.filter(post => 
-    post.title[lang].toLowerCase().includes(searchQuery.toLowerCase()) ||
-    post.category.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // ច្រោះយក Post សម្រាប់ Archive Sheet (តាម Search និង Tag)
+  const searchedPosts = BLOG_POSTS.filter(post => {
+    const matchesSearch = post.title[lang].toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         post.category.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesTag = activeTag === "All" || post.tags.includes(activeTag);
+    return matchesSearch && matchesTag;
+  });
 
   return (
-    <section className="py-24 bg-[#fcfcfc] border-t border-zinc-100 overflow-hidden">
+    <section className="py-24 bg-[#fcfcfc] border-t border-zinc-100 overflow-hidden italic">
       <div className="container mx-auto px-6">
         
         {/* Editorial Header */}
-        <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
-          <div className="space-y-4 max-w-xl text-left">
+        <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-8 text-left">
+          <div className="space-y-4 max-w-xl">
             <motion.div initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
               <span className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-600 mb-2 block">
                 ZWAY Editorial
               </span>
-              <h2 className={`text-4xl md:text-5xl font-black tracking-tighter text-zinc-900 uppercase leading-none ${lang === 'kh' ? 'font-freehand' : ''}`}>
+              <h2 className={`text-4xl md:text-6xl font-black tracking-tighter text-zinc-900 uppercase leading-none ${lang === 'kh' ? 'font-freehand py-2' : ''}`}>
                 {t.title}
               </h2>
             </motion.div>
             <p className="text-zinc-500 text-sm font-medium leading-relaxed">
-              Explore the latest trends, styling guides, and fashion insights from our expert editors.
+              {lang === 'kh' 
+                ? "ស្វែងយល់ពីនិន្នាការចុងក្រោយ បច្ចេកទេសតុបតែងខ្លួន និងការយល់ដឹងពីពិភពម៉ូដពីអ្នកជំនាញរបស់យើង។" 
+                : "Explore the latest trends, styling guides, and fashion insights from our expert editors."}
             </p>
           </div>
 
-          <div className="flex flex-col items-end gap-6">
+          <div className="flex flex-col items-end gap-6 w-full md:w-auto">
             <div className="flex flex-wrap justify-center gap-3 bg-white p-2 rounded-[2rem] shadow-sm border border-zinc-100">
               {categories.map((cat) => (
                 <button
@@ -110,20 +131,19 @@ export function BlogSection() {
               <SheetTrigger asChild>
                 <button className="group flex items-center gap-3 text-[13px] font-black uppercase tracking-[0.2em] text-zinc-400 hover:text-zinc-900 transition-all">
                   {t.viewAll} 
-                  <span className="w-2 h-px group-hover:w-0 transition-all" />
+                  <span className="w-8 h-px bg-zinc-200 group-hover:bg-zinc-900 transition-all" />
                   <ArrowRight size={16} />
                 </button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-full sm:max-w-2xl border-none p-0 bg-white flex flex-col">
+              <SheetContent side="right" className="w-full sm:max-w-2xl border-none p-0 bg-white flex flex-col italic">
                 
-                {/* 1. Archive Header & Search */}
-                <SheetHeader className="p-10 border-b border-zinc-50 bg-zinc-50/30 space-y-6">
+                <SheetHeader className="p-10 border-b border-zinc-50 bg-zinc-50/30 space-y-6 text-left">
                   <div>
                     <SheetTitle className="text-4xl font-black uppercase tracking-tighter italic mb-1">
-                      Editorial Archive
+                      {lang === 'kh' ? "បណ្ណសារវិចិត្រកថា" : "Editorial Archive"}
                     </SheetTitle>
                     <p className="text-zinc-400 text-[10px] font-black uppercase tracking-[0.3em]">
-                      Volume 2026 — Exploring Fashion & Culture
+                      Volume 2026 — {lang === 'kh' ? "រុករកពិភពម៉ូដ និងវប្បធម៌" : "Exploring Fashion & Culture"}
                     </p>
                   </div>
 
@@ -131,25 +151,34 @@ export function BlogSection() {
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-black transition-colors" size={18} />
                     <input 
                       type="text"
-                      placeholder="Search stories, trends, styles..."
+                      placeholder={lang === 'kh' ? "ស្វែងរកអត្ថបទ និន្នាការ ស្ទីល..." : "Search stories, trends, styles..."}
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full bg-white border border-zinc-200 rounded-2xl py-4 pl-12 pr-4 text-sm outline-none focus:border-black focus:ring-1 focus:ring-black transition-all"
+                      className="w-full bg-white border border-zinc-200 rounded-2xl py-4 pl-12 pr-10 text-sm outline-none focus:border-black transition-all"
                     />
+                    {searchQuery && (
+                      <button onClick={() => setSearchQuery("")} className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-black">
+                        <X size={16} />
+                      </button>
+                    )}
                   </div>
                 </SheetHeader>
 
-                {/* 2. Explore Tags */}
                 <div className="px-10 py-6 border-b border-zinc-50 overflow-x-auto no-scrollbar flex gap-4">
-                  {["Style Guide", "Interviews", "Backstage", "Trends"].map((tag) => (
-                    <button key={tag} className="whitespace-nowrap flex items-center gap-2 px-4 py-2 bg-zinc-100 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-black hover:text-white transition-all">
+                  {allTags.map((tag) => (
+                    <button 
+                      key={tag} 
+                      onClick={() => setActiveTag(tag)}
+                      className={`whitespace-nowrap flex items-center gap-2 px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${
+                        activeTag === tag ? "bg-black text-white" : "bg-zinc-100 text-zinc-500 hover:bg-zinc-200"
+                      }`}
+                    >
                       <Hash size={10} /> {tag}
                     </button>
                   ))}
                 </div>
 
-                {/* 3. Article List */}
-                <div className="flex-1 overflow-y-auto p-10 space-y-10 no-scrollbar">
+                <div className="flex-1 overflow-y-auto p-10 space-y-10 no-scrollbar text-left">
                   {searchedPosts.length > 0 ? (
                     searchedPosts.map((post, idx) => (
                       <motion.div 
@@ -165,40 +194,41 @@ export function BlogSection() {
                           </div>
                           <div className="flex-1 space-y-3">
                             <div className="flex items-center gap-3">
-                              <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-lg text-[9px] font-black uppercase tracking-widest">
+                              <span className="px-3 py-1 bg-zinc-900 text-white rounded-lg text-[9px] font-black uppercase tracking-widest">
                                 {post.category}
                               </span>
                               <span className="flex items-center gap-1.5 text-zinc-400 text-[10px] font-bold">
-                                <Clock size={12} /> 5 min read
+                                <Clock size={12} /> {post.readTime}
                               </span>
                             </div>
-                            <h3 className="text-2xl font-black leading-tight tracking-tight group-hover:text-blue-600 transition-colors">
+                            <h3 className={`text-2xl font-black leading-tight tracking-tight group-hover:text-zinc-600 transition-colors ${lang === 'kh' ? 'font-freehand' : ''}`}>
                               {post.title[lang]}
                             </h3>
                             <p className="text-zinc-500 text-sm leading-relaxed line-clamp-2 italic">
                               {post.excerpt[lang]}
                             </p>
                             <div className="flex items-center gap-2 pt-2 text-[11px] font-black uppercase tracking-widest group-hover:gap-4 transition-all">
-                              Read Story <ChevronRight size={14} className="text-blue-600" />
+                              {lang === 'kh' ? "អានអត្ថបទ" : "Read Story"} <ChevronRight size={14} className="text-zinc-900" />
                             </div>
                           </div>
                         </div>
                       </motion.div>
                     ))
                   ) : (
-                    <div className="py-20 text-center text-zinc-400 italic">No stories found for "{searchQuery}"</div>
+                    <div className="py-20 text-center text-zinc-400 italic">
+                      {lang === 'kh' ? `មិនមានលទ្ធផលសម្រាប់ "${searchQuery}"` : `No stories found for "${searchQuery}"`}
+                    </div>
                   )}
                 </div>
 
-                {/* 4. Footer CTA */}
                 <div className="p-10 bg-white border-t border-zinc-100">
                   <div className="bg-zinc-900 p-8 rounded-[2rem] text-white flex flex-col sm:flex-row justify-between items-center gap-6">
-                    <div>
+                    <div className="text-center sm:text-left">
                       <p className="text-[10px] font-black uppercase tracking-widest opacity-60 mb-1">Newsletter</p>
-                      <h4 className="text-xl font-black uppercase tracking-tighter italic text-center sm:text-left">Get Fashion Alerts</h4>
+                      <h4 className="text-xl font-black uppercase tracking-tighter italic">{lang === 'kh' ? "ទទួលបានព័ត៌មានថ្មីៗ" : "Get Fashion Alerts"}</h4>
                     </div>
                     <button className="w-full sm:w-auto bg-white text-black px-8 py-4 rounded-full font-black text-[10px] uppercase tracking-widest hover:scale-105 transition-transform">
-                      Subscribe
+                      {lang === 'kh' ? "ចុះឈ្មោះ" : "Subscribe"}
                     </button>
                   </div>
                 </div>
@@ -208,7 +238,7 @@ export function BlogSection() {
           </div>
         </div>
 
-        {/* Blog Slider (ដូចដើម) */}
+        {/* Blog Slider */}
         <AnimatePresence mode="wait">
           <motion.div
             key={selectedGender}
@@ -230,14 +260,14 @@ export function BlogSection() {
             >
               {filteredPosts.map((post) => (
                 <SwiperSlide key={post.id}>
-                  <div className="group flex flex-col h-full bg-white rounded-[2.5rem] border border-zinc-100 p-4 hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.08)] transition-all duration-500">
+                  <div className="group flex flex-col h-full bg-white rounded-[2.5rem] border border-zinc-100 p-4 hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.08)] transition-all duration-500 text-left">
                     <div className="relative overflow-hidden rounded-[2rem] aspect-[4/5] mb-8">
                       <img 
                         src={post.image} 
                         alt={post.title[lang]}
                         className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 grayscale-[20%] group-hover:grayscale-0"
                       />
-                      <div className="absolute top-6 left-6 flex gap-2">
+                      <div className="absolute top-6 left-6">
                         <div className="bg-white/90 backdrop-blur-md px-4 py-2 rounded-xl font-black text-[10px] tracking-widest uppercase shadow-sm">
                           {post.category}
                         </div>
@@ -251,10 +281,10 @@ export function BlogSection() {
                       <div className="flex items-center gap-4 text-zinc-400 text-[10px] font-black uppercase tracking-widest">
                         <span className="flex items-center gap-1.5"><Calendar size={12} /> {post.date}</span>
                         <span className="w-1 h-1 bg-zinc-200 rounded-full" />
-                        <span className="flex items-center gap-1.5"><Tag size={12} /> 5 Min Read</span>
+                        <span className="flex items-center gap-1.5"><Tag size={12} /> {post.readTime} Read</span>
                       </div>
                       
-                      <h3 className="text-xl font-black tracking-tight text-zinc-900 leading-[1.1]">
+                      <h3 className={`text-xl font-black tracking-tight text-zinc-900 leading-[1.1] ${lang === 'kh' ? 'font-freehand' : ''}`}>
                         {post.title[lang]}
                       </h3>
                       

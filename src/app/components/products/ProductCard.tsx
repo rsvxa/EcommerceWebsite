@@ -2,13 +2,13 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShoppingCart, Heart, Eye, ArrowUpRight } from 'lucide-react';
-import { Button } from '@/app/components/ui/button';
-import { Badge } from '@/app/components/ui/badge';
+import { Button } from '../../../app/components/ui/button';
+import { Badge } from '../../../app/components/ui/badge';
 import {
   Card,
   CardContent,
   CardFooter,
-} from '@/app/components/ui/card';
+} from '../../../app/components/ui/card';
 import type { Product } from '@/types/product';
 import { formatPrice } from '@/lib/utils/format';
 import { useCartStore } from '@/lib/store/cart-store';
@@ -55,7 +55,7 @@ export function ProductCard({ product }: ProductCardProps) {
       <Card className="group relative h-full flex flex-col overflow-hidden border-none bg-transparent shadow-none transition-all duration-500">
         
         {/* Visual Container */}
-        <div className="relative aspect-[3/5] overflow-hidden rounded-[2rem] bg-[#f6f6f6]">
+        <div className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-[#f6f6f6]">
           {/* Image Layer */}
           <motion.img
             src={product.images[0]}
@@ -71,7 +71,7 @@ export function ProductCard({ product }: ProductCardProps) {
           )}
 
           {/* Luxury Badges */}
-          <div className="absolute left-4 top-4 flex flex-col gap-2 z-10">
+          <div className="absolute left-4 top-4 flex flex-col gap-1 z-10">
             {product.featured && (
               <Badge className="bg-zinc-900/80 backdrop-blur-md text-white text-[9px] font-black uppercase tracking-widest border-none px-3 py-1">
                 {t.featured}
@@ -125,7 +125,7 @@ export function ProductCard({ product }: ProductCardProps) {
         </div>
 
         {/* Informational Content */}
-        <CardContent className="px-1 py-6 flex-grow">
+        <CardContent className="px-1 py-4 flex-grow">
           <div className="flex justify-between items-start mb-2">
             <h3 className={`font-black uppercase tracking-tighter text-lg leading-tight text-zinc-900 group-hover:text-black transition-colors ${lang === 'kh' ? 'text-md font-bold' : ''}`}>
               {product.name}
