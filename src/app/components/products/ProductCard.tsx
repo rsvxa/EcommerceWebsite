@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShoppingCart, Heart, Eye, ArrowUpRight } from 'lucide-react';
 import { Button } from '../../../app/components/ui/button';
@@ -9,13 +10,19 @@ import {
   CardContent,
   CardFooter,
 } from '../../../app/components/ui/card';
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+} from "../../../app/components/ui/sheet"; 
+
 import type { Product } from '@/types/product';
 import { formatPrice } from '@/lib/utils/format';
 import { useCartStore } from '@/lib/store/cart-store';
+import { useWishlistStore } from '@/lib/store/use-wishlist-store';
 import { toast } from 'sonner';
 import { useLanguage } from '@/lib/store/use-language';
 import { translations } from '@/lib/i18n/translations';
-import { useState } from 'react';
 
 interface ProductCardProps {
   product: Product;
@@ -25,7 +32,11 @@ export function ProductCard({ product }: ProductCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const { lang } = useLanguage();
   const t = translations[lang].productCard;
+  
   const addItem = useCartStore((state) => state.addItem);
+  const { toggleItem, isInWishlist } = useWishlistStore();
+
+  const isFavorited = isInWishlist(product.id);
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -40,6 +51,16 @@ export function ProductCard({ product }: ProductCardProps) {
     });
   };
 
+  const handleWishlist = (e: React.MouseEvent) => {
+    e.preventDefault();
+    toggleItem(product);
+    if (!isFavorited) {
+      toast.success(lang === 'kh' ? "បានរក្សាទុកក្នុងបំណងប្រាថ្នា" : "Added to Wishlist", {
+        icon: <Heart className="h-4 w-4 fill-current text-red-500" />,
+      });
+    }
+  };
+
   const isLowStock = product.stock > 0 && product.stock < 10;
   const isOutOfStock = product.stock === 0;
 
@@ -50,7 +71,7 @@ export function ProductCard({ product }: ProductCardProps) {
       viewport={{ once: true }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className="h-full"
+      className="h-full italic"
     >
       <Card className="group relative h-full flex flex-col overflow-hidden border-none bg-transparent shadow-none transition-all duration-500">
         
@@ -85,13 +106,131 @@ export function ProductCard({ product }: ProductCardProps) {
           </div>
 
           {/* Right Floating Actions */}
-          <div className="absolute right-4 top-4 flex flex-col gap-2 transform translate-x-12 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-500">
-            <button className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white shadow-xl hover:bg-zinc-900 hover:text-white transition-colors">
-              <Heart className="h-5 w-5" />
+          <div className="absolute right-4 top-4 flex flex-col gap-2 transform translate-x-12 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-500 z-30">
+            <button 
+              onClick={handleWishlist}
+              className={`flex h-11 w-11 items-center justify-center rounded-2xl bg-white shadow-xl transition-all ${isFavorited ? 'text-red-500' : 'hover:bg-zinc-900 hover:text-white'}`}
+            >
+              <Heart className={`h-5 w-5 ${isFavorited ? 'fill-current' : ''}`} />
             </button>
-            <button className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white shadow-xl hover:bg-zinc-900 hover:text-white transition-colors">
-              <Eye className="h-5 w-5" />
-            </button>
+
+            {/* Quick View Sheet */}
+            <Sheet>
+              <SheetTrigger asChild>
+                <button className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white shadow-xl hover:bg-zinc-900 hover:text-white transition-colors">
+                  <Eye className="h-5 w-5" />
+                </button>
+              </SheetTrigger>
+
+              <SheetContent side="right" className="w-full sm:max-w-[45%] p-0 border-none bg-white flex flex-col italic no-scrollbar">
+                <div className="flex-1 overflow-y-auto">
+                  {/* Product Gallery */}
+                  <div className="relative aspect-[4/5] bg-zinc-100">
+                    <img 
+                      src={product.images[0]} 
+                      className="w-full h-full object-cover" 
+                      alt={product.name} 
+                    />
+                    <div className="absolute top-6 left-6">
+                      <Badge className="bg-white/90 backdrop-blur-md text-black font-black uppercase text-[10px] tracking-widest px-4 py-2 border-none">
+                        {lang === 'kh' ? 'ការប្រមូលថ្មី ២០២៦' : 'New Collection 2026'}
+                      </Badge>
+                    </div>
+                  </div>
+
+                  {/* Product Info */}
+                  <div className="p-10 space-y-10 text-left">
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-start gap-4">
+                        <div>
+                          {/* Brand in Quick View */}
+                          <p className="text-blue-600 text-[11px] font-black uppercase tracking-[0.2em] mb-1">
+                            {product.brand}
+                          </p>
+                          <h2 className={`text-4xl font-black uppercase tracking-tighter leading-none mb-2 ${lang === 'kh' ? 'text-3xl' : ''}`}>
+                            {product.name}
+                          </h2>
+                          <p className="text-zinc-400 text-[10px] font-black uppercase tracking-[0.4em]">
+                            Ref. ZW-{product.id}2026
+                          </p>
+                        </div>
+                        <p className="text-3xl font-black tracking-tighter italic shrink-0">
+                          {formatPrice(product.price)}
+                        </p>
+                      </div>
+                      <p className="text-zinc-500 leading-relaxed text-sm">
+                        {product.description}
+                      </p>
+                    </div>
+
+                    {/* Color Selection */}
+                    <div className="space-y-4">
+                      <h4 className="text-[10px] font-black uppercase tracking-widest text-zinc-400">
+                        {lang === 'kh' ? 'ជ្រើសរើសពណ៌' : 'Select Color'} — <span className="text-black">Midnight Noir</span>
+                      </h4>
+                      <div className="flex gap-3">
+                        {product.variants.map((variant, idx) => (
+                          <button
+                            key={idx}
+                            className="group relative h-12 w-12 rounded-full border border-zinc-200 p-1 transition-all hover:border-black"
+                          >
+                            <div 
+                              className="h-full w-full rounded-full"
+                              style={{ backgroundColor: variant.colorHex }}
+                            />
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Size Selection */}
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-center">
+                        <h4 className="text-[10px] font-black uppercase tracking-widest text-zinc-400">
+                          {lang === 'kh' ? 'ជ្រើសរើសទំហំ' : 'Select Size'}
+                        </h4>
+                        <button className="text-[9px] font-black uppercase tracking-widest underline">
+                          {lang === 'kh' ? 'តារាងទំហំ' : 'Size Guide'}
+                        </button>
+                      </div>
+                      <div className="grid grid-cols-4 gap-2">
+                        {['XS', 'S', 'M', 'L'].map((size) => (
+                          <button
+                            key={size}
+                            className="h-14 border border-zinc-100 rounded-xl font-black text-xs hover:bg-black hover:text-white transition-all uppercase"
+                          >
+                            {size}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Product Features */}
+                    <div className="grid grid-cols-2 gap-px bg-zinc-100 border border-zinc-100 rounded-2xl overflow-hidden">
+                      <div className="p-6 bg-white space-y-1">
+                        <p className="text-[9px] font-black uppercase text-zinc-400">{lang === 'kh' ? 'សម្ភារៈ' : 'Material'}</p>
+                        <p className="text-xs font-bold uppercase">{lang === 'kh' ? 'កប្បាសប្រណីត ១០០%' : '100% Premium Cotton'}</p>
+                      </div>
+                      <div className="p-6 bg-white space-y-1">
+                        <p className="text-[9px] font-black uppercase text-zinc-400">{lang === 'kh' ? 'ការដឹកជញ្ជូន' : 'Shipping'}</p>
+                        <p className="text-xs font-bold uppercase">{lang === 'kh' ? 'ដឹកជញ្ជូនរហ័ស' : 'Express Delivery'}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Sticky Footer Action */}
+                <div className="p-8 border-t border-zinc-50 bg-white/80 backdrop-blur-md">
+                  <Button 
+                    onClick={handleAddToCart}
+                    className="w-full h-16 rounded-2xl bg-black text-white font-black uppercase tracking-[0.2em] text-[11px] shadow-2xl hover:scale-[1.02] active:scale-95 transition-all"
+                  >
+                    <ShoppingCart className="mr-3 h-5 w-5" />
+                    {lang === 'kh' ? 'បញ្ជាក់ការជ្រើសរើស' : 'Confirm Selection'} — {formatPrice(product.price)}
+                  </Button>
+                </div>
+              </SheetContent>
+            </Sheet>
           </div>
 
           {/* Smart Cart Trigger */}
@@ -125,9 +264,14 @@ export function ProductCard({ product }: ProductCardProps) {
         </div>
 
         {/* Informational Content */}
-        <CardContent className="px-1 py-4 flex-grow">
+        <CardContent className="px-1 py-4 flex-grow text-left">
+          {/* BRAND LABEL */}
+          <p className="text-blue-600 text-[10px] font-black uppercase tracking-[0.2em] mb-1">
+            {product.brand}
+          </p>
+          
           <div className="flex justify-between items-start mb-2">
-            <h3 className={`font-black uppercase tracking-tighter text-lg leading-tight text-zinc-900 group-hover:text-black transition-colors ${lang === 'kh' ? 'text-md font-bold' : ''}`}>
+            <h3 className={`font-black uppercase tracking-tighter text-lg leading-tight text-zinc-900 group-hover:text-black transition-colors ${lang === 'kh' ? 'text-[16px] font-bold' : ''}`}>
               {product.name}
             </h3>
             <ArrowUpRight className="h-5 w-5 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all text-black" />
@@ -167,9 +311,9 @@ export function ProductCard({ product }: ProductCardProps) {
         <CardFooter className="px-1 py-0 pb-4">
           <div className="flex w-full items-center justify-between">
              <div className="h-[2px] flex-grow bg-zinc-100" />
-             <span className="text-[9px] text-zinc-400 font-black uppercase tracking-widest whitespace-nowrap">
+             <span className="text-[9px] text-zinc-400 font-black uppercase tracking-widest whitespace-nowrap pl-4">
               {lang === 'kh' 
-                ? `${t.inStock} ${product.stock}`
+                ? `មានក្នុងស្តុក: ${product.stock}`
                 : `${product.stock} items left`}
             </span>
           </div>

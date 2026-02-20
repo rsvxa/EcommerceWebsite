@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { 
   User, Bell, Lock, Palette, CreditCard, Shield, 
   Mail, Smartphone, Loader2, MapPin, Phone, Globe,
-  ShoppingBag, Tag, ShieldCheck
+  ShoppingBag, Tag, ShieldCheck, AlertTriangle, Trash2
 } from "lucide-react";
 import { useLanguage } from "@/lib/store/use-language";
 import { Card } from "../../../components/ui/card";
@@ -14,7 +14,6 @@ import { Switch } from "../../../components/ui/switch";
 import { Button } from "../../../components/ui/button";
 import { Separator } from "../../../components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
 import { toast } from "sonner";
 
 export function SettingsPage() {
@@ -80,6 +79,17 @@ export function SettingsPage() {
     }
   };
 
+  const handleDeleteAccount = () => {
+    const confirmDelete = window.confirm(
+      lang === 'kh' 
+        ? "តើអ្នកប្រាកដថាចង់លុបគណនីមែនទេ? រាល់ទិន្នន័យនឹងត្រូវបាត់បង់ជារៀងរហូត!" 
+        : "Are you sure you want to delete your account? All data will be permanently lost!"
+    );
+    if (confirmDelete) {
+      toast.error(lang === 'kh' ? "កំពុងលុបគណនី..." : "Deleting account...");
+    }
+  };
+
   const t = (kh: string, en: string) => (lang === "kh" ? kh : en);
 
   return (
@@ -123,7 +133,6 @@ export function SettingsPage() {
                 <InputGroup label={lang === 'kh' ? "ប្រទេស" : "Country"} name="country" value={profileData.country} onChange={handleChange} />
                 <InputGroup label={lang === 'kh' ? "ទីក្រុង" : "City"} name="city" value={profileData.city} onChange={handleChange} />
                 <InputGroup label={lang === 'kh' ? "លេខកូដតំបន់" : "Zip Code"} name="zipCode" value={profileData.zipCode} onChange={handleChange} />
-
                 <div className="md:col-span-2">
                   <InputGroup label={lang === 'kh' ? "អាសយដ្ឋាន*" : "Address*"} name="address" value={profileData.address} onChange={handleChange} />
                 </div>
@@ -131,40 +140,21 @@ export function SettingsPage() {
 
               <Separator className="opacity-50" />
 
-              <div className="bg-zinc-50 rounded-[35px] p-8 border border-zinc-100 relative overflow-hidden group">
-                <Shield className="absolute top-[-20px] right-[-20px] opacity-[0.04] group-hover:scale-110 transition-transform duration-700" size={180} />
-                <div className="relative">
-                  <div className="flex items-center gap-3 mb-4">
-                    <Shield className="w-5 h-5 text-zinc-900" />
-                    <h3 className=" uppercase text-[13px] tracking-widest text-zinc-900">
-                      {lang === 'kh' ? 'គោលការណ៍ឯកជនភាព និងការគ្រប់គ្រងទិន្នន័យ' : 'Privacy Policy & Data Handling'}
-                    </h3>
-                  </div>
-                  
-                  <p className="text-[13px] text-zinc-500 leading-relaxed italic mb-6">
-                    {lang === 'kh' 
-                      ? 'យើងខ្ញុំយកចិត្តទុកដាក់បំផុតចំពោះការសម្ងាត់នៃទិន្នន័យរបស់អ្នក។ រាល់ព័ត៌មានផ្ទាល់ខ្លួនដែលអ្នកបានផ្តល់ឱ្យ នឹងត្រូវបានប្រើប្រាស់សម្រាប់តែការកែលម្អសេវាកម្ម និងការដឹកជញ្ជូនទំនិញតែប៉ុណ្ណោះ។' 
-                      : 'We take your data privacy seriously. All personal information provided will only be used to improve our services and ensure secure delivery.'}
-                  </p>
-                  
-                  <div className="flex items-center space-x-3 pt-2">
-                    <Switch id="data-share" className="data-[state=checked]:bg-zinc-900" />
-                    <Label htmlFor="data-share" className="text-[12px] text-zinc-400 uppercase tracking-tighter">
-                      {lang === 'kh' 
-                        ? 'អនុញ្ញាតឱ្យ ZWAY ចែករំលែកទិន្នន័យអនាមិកជាមួយដៃគូដើម្បីបទពិសោធន៍កាន់តែប្រសើរ' 
-                        : 'Allow ZWAY to share anonymized data with partners for better experience'}
-                    </Label>
-                  </div>
-                </div>
-              </div>
+              <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+                <button 
+                  onClick={handleDeleteAccount}
+                  className="flex items-center gap-2 text-red-500 hover:text-red-700 transition-colors uppercase text-[11px] font-black tracking-widest italic"
+                >
+                  <Trash2 size={16} />
+                  {lang === 'kh' ? "លុបគណនី" : "Delete Account"}
+                </button>
 
-              <div className="flex justify-end pt-4">
                 <Button 
                   onClick={handleUpdateProfile}
                   disabled={isUpdating}
                   className="bg-zinc-900 hover:bg-zinc-800 text-white rounded-[20px] px-14 py-8 uppercase text-[12px] font-black tracking-[0.2em] shadow-2xl active:scale-95 transition-all italic"
                 >
-                  {isUpdating ? <Loader2 className="w-5 h-5 animate-spin" /> : t("ធ្វើបច្ចុប្បន្នភាពគណនី", "Update Profile")}
+                  {isUpdating ? <Loader2 className="w-5 h-5 animate-spin" /> : t("ធ្វើបច្ចុប្បន្នភាព", "Update Profile")}
                 </Button>
               </div>
             </Card>
@@ -313,6 +303,7 @@ export function SettingsPage() {
               </div>
             </Card>
           </TabsContent>
+
           {/* 4. Appearance & Interface Content */}
           <TabsContent value="appearance">
             <Card className="p-8 border-none shadow-2xl shadow-zinc-100 rounded-[40px] space-y-10 bg-white">
@@ -370,7 +361,6 @@ export function SettingsPage() {
                     <span>{t("មធ្យម", "Default")}</span>
                     <span>{t("ធំ", "Large")}</span>
                   </div>
-                  {/* អ្នកអាចប្រើ Slider component ពី Shadcn UI នៅទីនេះ */}
                   <input 
                     type="range" 
                     min="1" max="3" step="1" defaultValue="2"
@@ -462,6 +452,7 @@ function SwitchRow({ icon, label, description, checked, onChange }: { icon: Reac
     </div>
   );
 }
+
 function DeviceLogItem({ device, location, time, isCurrent }: { device: string, location: string, time: string, isCurrent: boolean }) {
   return (
     <div className="flex items-center justify-between p-5 bg-zinc-50 rounded-[24px] border border-transparent hover:border-zinc-200 transition-all group shadow-sm">

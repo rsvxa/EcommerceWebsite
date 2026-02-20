@@ -5,8 +5,8 @@ import { Plus, ShoppingBag, ArrowRight, ShoppingCart } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/lib/store/use-language';
 import { translations } from '@/lib/i18n/translations';
-import { useCartStore } from '@/lib/store/cart-store'; // ប្រើ useCartStore
-import { toast } from 'sonner'; // ប្រើ toast
+import { useCartStore } from '@/lib/store/cart-store'; 
+import { toast } from 'sonner'; 
 import {
   Sheet,
   SheetContent,
@@ -54,26 +54,16 @@ export function ShopTheLook() {
       id: 204, 
       name: "Long Coat", 
       price: 125.00, 
-      images: ["https://images.unsplash.com/photo-1539109132314-d4a8c62e4042?w=500"], 
+      images: ["https://i.pinimg.com/736x/0f/bd/cc/0fbdccbafbe4113751f3837c1c453bfb.jpg?w=500"], 
       top: "70%", 
       left: "33%",
       stock: 2
     }
   ];
 
-  const LOOKBOOK_IMAGES = [
-    "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=1000",
-    "https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=1000",
-    "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=1000",
-    "https://images.unsplash.com/photo-1475180098004-ca77a66827be?q=80&w=1000"
-  ];
-
-  // មុខងារ Add to Cart
   const handleAddToCart = (product: any) => {
     if (product.stock === 0) return;
-
     addItem(product);
-    
     toast.success(lang === 'kh' ? 'បន្ថែមជោគជ័យ!' : 'Added to Cart', {
       description: lang === 'kh' 
         ? `${product.name} ត្រូវបានដាក់ចូលក្នុងកន្ត្រក។`
@@ -81,8 +71,7 @@ export function ShopTheLook() {
       icon: <ShoppingCart className="h-4 w-4 text-emerald-500" />,
       position: "bottom-center",
     });
-    
-    setActiveId(null); // បិទ Popover បន្ទាប់ពី Add រួច
+    setActiveId(null);
   };
 
   return (
@@ -104,7 +93,6 @@ export function ShopTheLook() {
                 className="w-full h-full object-cover"
               />
               
-              {/* Hotspot Markers */}
               {LOOK_PRODUCTS.map((product) => (
                 <div 
                   key={product.id}
@@ -189,45 +177,69 @@ export function ShopTheLook() {
                   </button>
                 </SheetTrigger>
                 
-                <SheetContent side="right" className="w-full sm:max-w-[450px] border-none p-0 bg-zinc-50 overflow-hidden italic">
-                  <div className="h-full flex flex-col">
-                    <SheetHeader className="p-10 bg-white border-b border-zinc-100">
+                <SheetContent side="right" className="w-full sm:max-w-[40%] border-none p-0 bg-white overflow-hidden italic flex flex-col">
+                    <SheetHeader className="p-10 bg-white border-b border-zinc-100 shrink-0">
                       <SheetTitle className="text-4xl font-black uppercase tracking-tighter italic">
-                        Editorial
+                        Editorial Look
                       </SheetTitle>
                       <p className="text-zinc-400 text-[10px] font-black uppercase tracking-[0.4em]">
-                        Season 2026 — Vol. 01
+                        Shop the pieces below
                       </p>
                     </SheetHeader>
 
-                    <div className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-hide">
-                      {LOOKBOOK_IMAGES.map((img, index) => (
-                        <motion.div 
-                          key={index}
-                          initial={{ opacity: 0, y: 30 }}
-                          whileInView={{ opacity: 1, y: 0 }}
-                          transition={{ delay: index * 0.1 }}
-                          className="relative aspect-[4/5] overflow-hidden rounded-[2rem] shadow-lg group border border-white"
-                        >
-                          <img 
-                            src={img} 
-                            className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-1000 scale-105 group-hover:scale-100" 
-                            alt={`Lookbook ${index}`} 
-                          />
-                        </motion.div>
-                      ))}
+                    {/* Scrollable Content Area */}
+                    <div className="flex-1 overflow-y-auto px-8 py-6 space-y-10 scrollbar-hide bg-zinc-50/50">
+                      
+                      {/* Section 1: Main Editorial Image */}
+                      <div className="space-y-4">
+                        <div className="aspect-[3/4] rounded-[2rem] overflow-hidden shadow-xl">
+                          <img src="https://i.pinimg.com/736x/de/cc/cd/decccd1f0765a2020efc0a491c9a358a.jpg" className="w-full h-full object-cover" alt="Main Look" />
+                        </div>
+                        <p className="text-center text-[11px] font-bold text-zinc-400 uppercase tracking-widest italic">Collection Overview — 2026</p>
+                      </div>
+
+                      {/* Section 2: Products from LOOK_PRODUCTS */}
+                      <div className="space-y-6">
+                        <h3 className="text-xs font-black uppercase tracking-[0.3em] text-zinc-900 border-b pb-4">Selected Pieces</h3>
+                        <div className="grid gap-4">
+                          {LOOK_PRODUCTS.map((product) => (
+                            <motion.div 
+                              key={product.id}
+                              whileHover={{ x: 5 }}
+                              className="flex items-center gap-5 p-4 bg-white rounded-3xl border border-zinc-100 shadow-sm"
+                            >
+                              <div className="w-20 h-24 rounded-2xl overflow-hidden bg-zinc-100 shrink-0">
+                                <img src={product.images[0]} className="w-full h-full object-cover" alt={product.name} />
+                              </div>
+                              <div className="flex-1">
+                                <h4 className="text-[13px] font-black uppercase text-zinc-900 leading-tight">{product.name}</h4>
+                                <p className="text-[11px] font-bold text-zinc-400 mt-1">${product.price.toFixed(2)}</p>
+                                <button 
+                                  onClick={() => handleAddToCart(product)}
+                                  className="mt-3 flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-zinc-900 hover:text-blue-600 transition-colors"
+                                >
+                                  <Plus size={12} /> Add to Cart
+                                </button>
+                              </div>
+                            </motion.div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Section 3: Extra Aesthetic Space */}
+                      <div className="py-10 text-center border-t border-dashed border-zinc-200">
+                         <p className="text-zinc-300 text-[10px] uppercase font-black tracking-[0.5em]">End of Editorial</p>
+                      </div>
                     </div>
 
                     <div className="p-8 bg-white border-t border-zinc-100">
-                      <Button className="w-full h-15 py-7 rounded-2xl bg-zinc-900 text-white font-black uppercase tracking-[0.2em] text-[11px] hover:bg-black">
-                        Shop All Pieces
+                      <Button className="w-full h-15 py-7 rounded-2xl bg-zinc-900 text-white font-black uppercase tracking-[0.2em] text-[11px] hover:bg-black shadow-xl shadow-zinc-200">
+                        View All Collections
                       </Button>
                     </div>
-                  </div>
                 </SheetContent>
               </Sheet>
               
-              {/* Social Proof */}
               <div className="flex flex-col items-center md:items-start gap-2">
                 <div className="flex -space-x-3">
                   {[1, 2, 3, 4].map((i) => (
@@ -240,7 +252,6 @@ export function ShopTheLook() {
               </div>
             </div>
 
-            {/* Feature List */}
             <div className="grid grid-cols-2 gap-8 pt-10 border-t border-zinc-100">
               <div className="space-y-1">
                 <p className="text-[11px] font-black text-zinc-400 uppercase tracking-widest leading-none">Tailored</p>

@@ -8,9 +8,9 @@ import {
   SheetHeader, 
   SheetTitle, 
   SheetDescription,
-} from '@/app/components/ui/sheet';
-import { Separator } from '@/app/components/ui/separator';
-import { Button } from '@/app/components/ui/button';
+} from '../../components/ui/sheet';
+import { Separator } from '../../components/ui/separator';
+import { Button } from '../ui/button';
 import { Truck, ShieldCheck, CreditCard, MapPin, Loader2 } from 'lucide-react';
 import { formatPrice } from '@/lib/utils/format';
 import { OrderInvoice } from '../checkout/OrderInvoice';
@@ -18,6 +18,7 @@ import { toast } from 'sonner';
 import { useCartStore } from "@/lib/store/cart-store";
 import { useLanguage } from '@/lib/store/use-language';
 import { translations } from '@/lib/i18n/translations';
+import { useOrderStore } from '@/lib/store/use-order-store';
 
 const TELEGRAM_BOT_TOKEN = "8174063017:AAEvRhmDVFJ_gX6wCS1D0-8cs0tECZkbnZA";
 const TELEGRAM_CHAT_ID = "8174063017";
@@ -25,6 +26,7 @@ const TELEGRAM_CHAT_ID = "8174063017";
 export function CheckoutModal({ isOpen, onOpenChange, total, cartItems }: any) {
   const { lang } = useLanguage();
   const t = translations[lang].checkout;
+  const { addOrder } = useOrderStore();
 
   const [paymentMethod, setPaymentMethod] = useState('khqr');
   const [country, setCountry] = useState('cambodia');
@@ -138,10 +140,15 @@ ${order.items.map((item: any) => `• ${item.product?.name || item.name} (x${ite
     setIsSubmitting(true);
     
     try {
+      // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1500)); 
       
-      const orderSummary = {
+      const orderSummary: any = {
+        id: Math.random().toString(36).substring(7), // Unique Local ID
         orderId: `ZW-${Math.floor(100000 + Math.random() * 900000)}`,
+        orderNumber: `ZW-${Math.floor(100000 + Math.random() * 900000)}`,
+        date: new Date().toLocaleDateString(lang === 'kh' ? 'km-KH' : 'en-GB'),
+        status: "neworder",
         items: [...cartItems],
         total: total,    
         customer: {
@@ -151,7 +158,13 @@ ${order.items.map((item: any) => `• ${item.product?.name || item.name} (x${ite
         }
       };
 
+      // ១. ផ្ញើទៅ Telegram
       await sendToTelegram(orderSummary);
+
+      // ២. រក្សាទុកក្នុង Order Store (History)
+      addOrder(orderSummary);
+
+      // ៣. បង្ហាញ Invoice
       setFinalOrderData(orderSummary); 
 
       toast.success(t.success);
@@ -274,10 +287,10 @@ ${order.items.map((item: any) => `• ${item.product?.name || item.name} (x${ite
 
                   {paymentMethod === 'visa' && (
                     <motion.div key="visa" className="p-10 bg-zinc-50 rounded-[2.5rem] space-y-6 border border-zinc-100">
-                       <input type="text" placeholder="Card Number" className="w-full p-4 rounded-xl border bg-white outline-none" />
+                       <input type="text" placeholder="Card Number" className="w-full p-4 rounded-xl border bg-white outline-none font-bold" />
                        <div className="grid grid-cols-2 gap-4">
-                          <input type="text" placeholder="MM/YY" className="p-4 rounded-xl border bg-white outline-none" />
-                          <input type="text" placeholder="CVC" className="p-4 rounded-xl border bg-white outline-none" />
+                          <input type="text" placeholder="MM/YY" className="p-4 rounded-xl border bg-white outline-none font-bold" />
+                          <input type="text" placeholder="CVC" className="p-4 rounded-xl border bg-white outline-none font-bold" />
                        </div>
                     </motion.div>
                   )}

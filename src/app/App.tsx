@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Toaster } from '@/app/components/ui/sonner';
 import { Navbar } from './components/layout/Navbar';
@@ -32,6 +32,7 @@ function App() {
   const t = translations[lang];
 
   const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [selectedBrand, setSelectedBrand] = useState<string>(''); // បន្ថែម State ថ្មីសម្រាប់ Brand
   const [selectedSubCategory, setSelectedSubCategory] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 500]);
@@ -40,10 +41,19 @@ function App() {
   const maxPrice = useMemo(() => Math.max(...mockProducts.map((p) => p.price)), []);
 
   const displayedProducts = useMemo(() => {
-    let filtered = mockProducts;
+    let filtered = [...mockProducts];
+
+    // ១. ច្រោះតាម Brand (ប្រសិនបើមានការរើស Brand ពី Logo)
+    if (selectedBrand) {
+      filtered = filtered.filter((p) => p.brand?.toLowerCase() === selectedBrand.toLowerCase());
+    }
+
+    // ២. ច្រោះតាម Category ពិសេស (Featured)
     if (selectedCategory === 'featured') {
       filtered = filtered.filter((p) => p.featured);
-    } else {
+    } 
+    // ៣. ច្រោះតាម Filters ផ្សេងៗ (Category, Price, Search)
+    else {
       filtered = filterProducts(filtered, {
         category: selectedCategory || undefined,
         subCategory: selectedSubCategory || undefined,
@@ -52,11 +62,22 @@ function App() {
         searchQuery: searchQuery || undefined,
       });
     }
+
     return sortProducts(filtered, sortBy as any);
-  }, [selectedCategory, selectedSubCategory, searchQuery, priceRange, sortBy]);
+  }, [selectedCategory, selectedBrand, selectedSubCategory, searchQuery, priceRange, sortBy]);
+
+  // Function សម្រាប់រើស Brand ពី Logo
+  const handleBrandChange = (brand: string) => {
+    setSelectedBrand(brand);
+    setSelectedCategory(''); // លុប Category ចេញពេលរើស Brand
+    setSelectedSubCategory('');
+    setSearchQuery('');
+    document.getElementById('product-anchor')?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   const handleCategoryChange = (category: string) => {
     setSelectedCategory(category);
+    setSelectedBrand(''); // លុប Brand ចេញពេលរើស Category
     setSelectedSubCategory('');
     setSearchQuery('');
     document.getElementById('product-anchor')?.scrollIntoView({ behavior: 'smooth' });
@@ -65,11 +86,13 @@ function App() {
   const handleSearch = (query: string) => {
     setSearchQuery(query);
     setSelectedCategory('');
+    setSelectedBrand('');
     document.getElementById('product-anchor')?.scrollIntoView({ behavior: 'smooth' });
   };
 
   const handleClearFilters = () => {
     setSelectedCategory('');
+    setSelectedBrand('');
     setSelectedSubCategory('');
     setSearchQuery('');
     setPriceRange([0, maxPrice]);
@@ -79,7 +102,6 @@ function App() {
   return (
     <div className="min-h-screen bg-white selection:bg-black selection:text-white">
       <Navbar onSearch={handleSearch} onCategorySelect={handleCategoryChange} />
-      
       
       <HeroBanner />
 
@@ -99,80 +121,88 @@ function App() {
         </div>
       </section><br /><br />
 
-      {/* 3. Featured Story-telling Sections */}
       <FeaturedCollections />
       <SeasonSection />
       <ShopTheLook />
 
       {/* 4. Brand Curation */}
-        <div className="bg-white">
-          <div id="categories-section" className="container mx-auto px-4 py-6 text-center md:text-left">
-            <h2 className="text-3xl font-bold">{t.home.shopByBrand}</h2>
-          </div>
+      <div className="bg-white">
+        <div id="categories-section" className="container mx-auto px-4 py-6 text-center md:text-left">
+          <h2 className="text-3xl font-bold">{t.home.shopByBrand}</h2>
         </div>
+      </div>
 
-        <div className="bg-white py-5 border-b border-gray-100">
-          <div className="container mx-auto px-4">
-            <div className="flex flex-col items-center gap-2">
-              <div className="flex flex-wrap justify-center gap-6">
-                {brandLogos.map((brand) => (
-                  <button
-                    key={brand.value}
-                    onClick={() => handleCategoryChange(brand.value)}
-                    className="group flex min-w-[130px] flex-col items-center justify-center gap-3 rounded-xl border border-gray-100 bg-white p-5 shadow-sm transition-all duration-300 hover:bg-gray-50 hover:shadow-md active:scale-95"
-                  >
-                    <div className="flex h-12 w-12 items-center justify-center">
-                      <img 
-                        src={brand.logo} 
-                        className="max-h-12 max-w-12 object-contain grayscale transition-all duration-300 group-hover:grayscale-0" 
-                        alt={brand.value}
-                      />
-                    </div>
-                  </button>
-                ))}
-                
-                <button 
-                  onClick={() => handleCategoryChange('')} 
-                  className="group flex min-w-[130px] items-center justify-center rounded-xl border border-dashed border-zinc-300 bg-zinc-50 p-5 text-[10px] font-black uppercase tracking-widest hover:bg-zinc-900 hover:text-white transition-all duration-300 active:scale-95"
+      <div className="bg-white py-5 border-b border-gray-100">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col items-center gap-2">
+            <div className="flex flex-wrap justify-center gap-6">
+              {brandLogos.map((brand) => (
+                <button
+                  key={brand.value}
+                  onClick={() => handleBrandChange(brand.value)} // កែមកប្រើ handleBrandChange
+                  className={`group flex min-w-[130px] flex-col items-center justify-center gap-3 rounded-xl border p-5 shadow-sm transition-all duration-300 active:scale-95 ${
+                    selectedBrand === brand.value 
+                    ? 'border-black bg-zinc-50 shadow-md scale-105' 
+                    : 'border-gray-100 bg-white hover:bg-gray-50'
+                  }`}
                 >
-                  {t.home.allProductsBtn}
+                  <div className="flex h-12 w-12 items-center justify-center">
+                    <img 
+                      src={brand.logo} 
+                      className={`max-h-12 max-w-12 object-contain transition-all duration-300 ${
+                        selectedBrand === brand.value ? 'grayscale-0' : 'grayscale group-hover:grayscale-0'
+                      }`} 
+                      alt={brand.value}
+                    />
+                  </div>
                 </button>
-              </div>
+              ))}
+              
+              <button 
+                onClick={handleClearFilters} 
+                className="group flex min-w-[130px] items-center justify-center rounded-xl border border-dashed border-zinc-300 bg-zinc-50 p-5 text-[10px] font-black uppercase tracking-widest hover:bg-zinc-900 hover:text-white transition-all duration-300 active:scale-95"
+              >
+                {t.home.allProductsBtn}
+              </button>
             </div>
           </div>
         </div>
+      </div>
 
-        {/* 5. Main Product Gallery */}
-        <main id="product-anchor" className="container mx-auto px-6 py-24">
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8 border-b border-zinc-100 pb-10">
-            <div className="space-y-4">
-              <h2 className="text-3xl font-black uppercase tracking-tighter text-zinc-900">
-                {selectedCategory === 'featured' 
+      {/* 5. Main Product Gallery */}
+      <main id="product-anchor" className="container mx-auto px-6 py-24">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8 border-b border-zinc-100 pb-10">
+          <div className="space-y-4">
+            <h2 className="text-3xl font-black uppercase tracking-tighter text-zinc-900">
+              {selectedBrand 
+                ? `${t.home.shopByBrand}: ${selectedBrand}`
+                : selectedCategory === 'featured' 
                   ? t.products.featured 
                   : searchQuery 
                     ? `${t.products.searchResults} "${searchQuery}"`
                     : selectedCategory || t.products.allProducts}
-              </h2>
-              
-              <div className="flex items-center gap-4">
-                <span className="h-[1px] w-12 bg-zinc-900" />
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">
-                  {lang === 'kh' 
-                    ? `${t.products.found} ${displayedProducts.length} ${t.products.unit}`
-                    : `${displayedProducts.length} ${t.products.unit} ${t.products.found}`}
-                </p>
-              </div>
-            </div>
+            </h2>
             
-            {searchQuery && (
-              <div className="bg-zinc-50 px-6 py-3 rounded-full border border-zinc-100 flex items-center gap-3">
-                <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">
-                  {lang === 'kh' ? 'លទ្ធផលស្វែងរកសម្រាប់:' : 'Results for:'}
-                </span>
-                <span className="text-sm font-bold italic">"{searchQuery}"</span>
-              </div>
-            )}
+            <div className="flex items-center gap-4">
+              <span className="h-[1px] w-12 bg-zinc-900" />
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">
+                {lang === 'kh' 
+                  ? `${t.products.found} ${displayedProducts.length} ${t.products.unit}`
+                  : `${displayedProducts.length} ${t.products.unit} ${t.products.found}`}
+              </p>
+            </div>
           </div>
+          
+          {(searchQuery || selectedBrand || selectedCategory) && (
+            <button 
+              onClick={handleClearFilters}
+              className="text-[10px] font-black uppercase tracking-widest text-red-500 hover:underline"
+            >
+              {lang === 'kh' ? 'សម្អាតការជ្រើសរើស' : 'Clear All Filters'}
+            </button>
+          )}
+        </div>
+
         <div className="grid gap-16 lg:grid-cols-[260px_1fr]">
           <aside className="relative">
             <div className="sticky top-32">
@@ -193,24 +223,28 @@ function App() {
           <section>
             <AnimatePresence mode="wait">
               <motion.div
-                key={selectedCategory + searchQuery + sortBy}
+                key={selectedCategory + selectedBrand + searchQuery + sortBy}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.4 }}
               >
-                <ProductGrid products={displayedProducts} />
+                {displayedProducts.length > 0 ? (
+                  <ProductGrid products={displayedProducts} />
+                ) : (
+                  <div className="py-20 text-center">
+                    <p className="text-zinc-400 italic">{lang === 'kh' ? 'មិនមានទំនិញដែលអ្នកស្វែងរកទេ' : 'No products found'}</p>
+                  </div>
+                )}
               </motion.div>
             </AnimatePresence>
           </section>
         </div>
       </main>
 
-      {/* 6. Footer Content & Social */}
       <BlogSection />
       <InstagramFeed />
       <Footer />
-      
       <ScrollToTop />
       <Toaster position="bottom-center" expand={false} richColors />
     </div>
