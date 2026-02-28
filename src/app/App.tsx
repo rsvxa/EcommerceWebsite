@@ -2,16 +2,16 @@
 
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Toaster } from '@/app/components/ui/sonner';
+import { Toaster } from '../app/components/ui/sonner';
 import { Navbar } from './components/layout/Navbar';
 import { ProductGrid } from './components/products/ProductGrid';
 import { ProductFilters } from './components/products/ProductFilters';
 import { mockProducts, filterProducts, sortProducts } from '@/lib/data/products';
-import { HeroBanner } from "@/app/components/home/HeroBanner";
-import { BlogSection } from "@/app/components/home/BlogSection";
+import { HeroBanner } from "../app/components/home/HeroBanner";
+import { BlogSection } from "../app/components/home/BlogSection";
 import Footer from "./components/footer/Footer";
 import { InstagramFeed } from './components/home/InstagramFeed';
-import { FeaturedCollections } from './components/home/FeaturedCollections';
+import { TopSelling } from './components/home/FeaturedCollections';
 import { ShopTheLook } from './components/home/ShopTheLook';
 import { ScrollToTop } from './components/ui/ScrollToTop';
 import { SeasonSection } from './components/home/SeasonSection';
@@ -121,7 +121,7 @@ function App() {
         </div>
       </section><br /><br />
 
-      <FeaturedCollections />
+      <TopSelling />
       <SeasonSection />
       <ShopTheLook />
 

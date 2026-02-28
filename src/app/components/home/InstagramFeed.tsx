@@ -84,7 +84,7 @@ export function InstagramFeed() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
-                className={`relative aspect-square group cursor-pointer overflow-hidden bg-gray-200 ${post.size}`}
+                className={`relative aspect-square rounded-2xl group cursor-pointer overflow-hidden bg-gray-200 ${post.size}`}
               >
                 <img 
                   src={post.image} 
@@ -96,7 +96,7 @@ export function InstagramFeed() {
                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-6 text-white">
                   
                   {/* Top: Platform & Share */}
-                  <div className="flex justify-between items-start translate-y-[-20px] group-hover:translate-y-0 transition-transform duration-500">
+                  <div className="flex justify-between items-start translate-y-[-20px] group-hover:translate-y-0 transition-transform duration-500 gap-6">
                     <div className="w-10 h-10 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center text-white border border-white/20">
                       {post.platform === "Instagram" && <Instagram size={18} />}
                       {post.platform === "Facebook" && <Facebook size={18} />}

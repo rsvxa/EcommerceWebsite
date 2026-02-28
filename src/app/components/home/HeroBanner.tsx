@@ -114,7 +114,7 @@ export function HeroBanner() {
                         <span className="relative z-10 text-[15px] font-black uppercase tracking-[0.2em]">
                           {t.shopNow}
                         </span>
-                        <div className="relative z-10 w-8 h-8 rounded-full bg-black/5 flex items-center justify-center group-hover:bg-white/20 transition-colors">
+                        <div className="relative z-10 w-8 h-8 flex items-center justify-center  transition-colors">
                           <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
                         </div>
                       </button>

@@ -24,14 +24,17 @@ export function OrderInvoice({ isOpen, onOpenChange, orderData }: any) {
   if (!mounted) return null;
 
   const items = orderData?.items || [];
-  const total = orderData?.total || 0;
+  const subtotal = orderData?.subtotal || 0; 
+  const tax = orderData?.tax || 0;           
+  const shipping = orderData?.shipping || 0; 
+  const finalTotal = orderData?.total || 0;   
+  
   const customer = orderData?.customer || {};
   const orderId = orderData?.orderId || `ZW-${Math.floor(100000 + Math.random() * 900000)}`;
-  const date = new Date().toLocaleDateString(lang === 'kh' ? 'km-KH' : 'en-GB');
+  const date = orderData?.date || new Date().toLocaleDateString(lang === 'kh' ? 'km-KH' : 'en-GB');
 
   const handlePrint = () => window.print();
 
-  // ទិន្នន័យគំរូសម្រាប់ Tracking
   const trackingSteps = [
     { status: lang === 'kh' ? 'បានបញ្ជាទិញ' : 'Order Placed', time: '09:30 AM', done: true },
     { status: lang === 'kh' ? 'កំពុងរៀបចំទំនិញ' : 'Preparing', time: '10:45 AM', done: true },
@@ -84,7 +87,7 @@ export function OrderInvoice({ isOpen, onOpenChange, orderData }: any) {
                     {customer.address}, {customer.province}
                   </p>
                   <p className="text-[10px] font-black text-blue-600 uppercase mt-1 tracking-tighter">
-                    {t.via} {customer.shippingCarrier || "J&T Express"}
+                    {t.via} {customer.shippingCarrier || "N/A"}
                   </p>
                 </div>
               </div>
@@ -101,8 +104,6 @@ export function OrderInvoice({ isOpen, onOpenChange, orderData }: any) {
                   {items.map((item: any, idx: number) => {
                     const unitPrice = item.product?.price || item.price || 0;
                     const quantity = item.quantity || 0;
-                    const subtotal = unitPrice * quantity;
-
                     return (
                       <div key={idx} className="grid grid-cols-12 py-4 border-b border-zinc-50 items-center">
                         <div className="col-span-6">
@@ -112,7 +113,7 @@ export function OrderInvoice({ isOpen, onOpenChange, orderData }: any) {
                           {quantity} × {formatPrice(unitPrice)}
                         </div>
                         <div className="col-span-3 text-right font-black text-zinc-900 text-sm">
-                          {formatPrice(subtotal)}
+                          {formatPrice(unitPrice * quantity)}
                         </div>
                       </div>
                     );
@@ -120,15 +121,32 @@ export function OrderInvoice({ isOpen, onOpenChange, orderData }: any) {
                 </div>
               </div>
 
-              {/* Totals */}
-              <div className="flex flex-col items-end pt-4 space-y-3 italic">
-                <div className="flex justify-between w-full md:w-64 text-zinc-400 font-black text-[10px] uppercase px-2">
+              {/* Summary Totals */}
+              <div className="flex flex-col items-end pt-4 space-y-2 italic border-t border-zinc-100">
+                {/* Subtotal */}
+                <div className="flex justify-between w-full md:w-64 text-zinc-500 font-bold text-[10px] uppercase px-2">
                   <span>{t.subtotal}</span>
-                  <span>{formatPrice(total)}</span>
+                  <span>{formatPrice(subtotal)}</span>
                 </div>
-                <div className="flex justify-between w-full md:w-80 bg-zinc-900 text-white p-6 rounded-[24px] shadow-2xl shadow-zinc-200 transition-transform hover:scale-105">
+                
+                {/* Shipping Fee */}
+                <div className="flex justify-between w-full md:w-64 text-zinc-500 font-bold text-[10px] uppercase px-2">
+                  <span>{lang === 'kh' ? 'ថ្លៃដឹកជញ្ជូន' : 'Shipping Fee'}</span>
+                  <span>+{formatPrice(shipping)}</span>
+                </div>
+
+                {/* Tax */}
+                {tax > 0 && (
+                  <div className="flex justify-between w-full md:w-64 text-red-400 font-bold text-[10px] uppercase px-2">
+                    <span>{lang === 'kh' ? 'ពន្ធដារ' : 'Estimated Tax'}</span>
+                    <span>+{formatPrice(tax)}</span>
+                  </div>
+                )}
+
+                {/* Grand Total */}
+                <div className="flex justify-between w-full md:w-80 bg-zinc-900 text-white p-6 rounded-[24px] shadow-2xl mt-4 transition-transform hover:scale-105">
                   <span className="text-[10px] font-black uppercase tracking-[0.2em]">{t.grandTotal}</span>
-                  <span className="text-2xl font-black">{formatPrice(total)}</span>
+                  <span className="text-2xl font-black">{formatPrice(finalTotal)}</span>
                 </div>
               </div>
 
@@ -136,7 +154,7 @@ export function OrderInvoice({ isOpen, onOpenChange, orderData }: any) {
               <div className="flex flex-col md:flex-row gap-4 no-print pt-4 relative z-20">
                 <button 
                   onClick={() => setShowTracking(true)}
-                  className="flex-1 flex items-center justify-center gap-3 h-16 bg-blue-600 text-white rounded-[20px] text-[10px] font-black uppercase tracking-widest hover:bg-blue-700 transition-all active:scale-95 shadow-xl shadow-blue-100 italic"
+                  className="flex-1 flex items-center justify-center gap-3 h-16 bg-blue-600 text-white rounded-[20px] text-[10px] font-black uppercase tracking-widest hover:bg-blue-700 transition-all shadow-xl italic"
                 >
                   <Truck size={20} /> {t.trackOrder}
                 </button>
@@ -150,23 +168,19 @@ export function OrderInvoice({ isOpen, onOpenChange, orderData }: any) {
                 </div>
               </div>
 
-              {/* --- Tracking Sheet (ផ្ទាំងស្ថានភាពឥវ៉ាន់) --- */}
+              {/* Tracking Overlay */}
               <AnimatePresence>
                 {showTracking && (
                   <motion.div 
-                    initial={{ y: "100%" }}
-                    animate={{ y: 0 }}
-                    exit={{ y: "100%" }}
+                    initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
                     transition={{ type: "spring", damping: 25, stiffness: 200 }}
                     className="absolute inset-x-0 bottom-0 z-[50] bg-white border-t shadow-[0_-20px_50px_rgba(0,0,0,0.1)] rounded-t-[40px] p-8 md:p-10"
                   >
                     <div className="flex justify-between items-center mb-8">
                       <div className="flex items-center gap-3">
-                        <div className="p-3 bg-blue-50 text-blue-600 rounded-2xl">
-                          <Box size={24} />
-                        </div>
+                        <div className="p-3 bg-blue-50 text-blue-600 rounded-2xl"><Box size={24} /></div>
                         <div>
-                          <h3 className="text-lg font-black uppercase italic italic leading-none">{t.trackOrder}</h3>
+                          <h3 className="text-lg font-black uppercase italic leading-none">{t.trackOrder}</h3>
                           <p className="text-[10px] font-bold text-zinc-400 uppercase mt-1">ID: {orderId}</p>
                         </div>
                       </div>
@@ -185,26 +199,16 @@ export function OrderInvoice({ isOpen, onOpenChange, orderData }: any) {
                             <p className={`text-sm font-black uppercase ${step.done ? 'text-zinc-800' : 'text-zinc-400'}`}>{step.status}</p>
                             <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-tighter">{step.time}</p>
                           </div>
-                          {i === 2 && step.done && (
-                             <div className="flex items-center gap-1 bg-blue-50 px-3 py-1 rounded-full border border-blue-100">
-                               <MapPin size={10} className="text-blue-600" />
-                               <span className="text-[9px] font-black text-blue-600 uppercase">Phnom Penh</span>
-                             </div>
-                          )}
                         </div>
                       ))}
                     </div>
 
-                    <button 
-                      onClick={() => setShowTracking(false)}
-                      className="w-full mt-10 py-5 bg-zinc-900 text-white rounded-[22px] text-[10px] font-black uppercase tracking-[0.2em] shadow-xl transition-all active:scale-95"
-                    >
+                    <button onClick={() => setShowTracking(false)} className="w-full mt-10 py-5 bg-zinc-900 text-white rounded-[22px] text-[10px] font-black uppercase tracking-[0.2em] shadow-xl">
                       {lang === 'kh' ? 'យល់ព្រម' : 'Got it'}
                     </button>
                   </motion.div>
                 )}
               </AnimatePresence>
-
             </div>
 
             <div className="bg-zinc-50 py-4 text-center text-[9px] text-zinc-300 font-black uppercase tracking-[0.3em] italic">

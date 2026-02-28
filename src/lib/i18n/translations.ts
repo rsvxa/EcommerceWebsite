@@ -430,10 +430,10 @@ export const translations = {
       heroTitle: "ZWAY Fashion Store",
       heroDesc: "Discover our curated collection of premium clothing, jewelry, shoes, hats, and bags. Elevate your style with timeless pieces.",
       shopByBrand: "Shop by Brand",
-      allProductsBtn: "All Products...",
+      allProductsBtn: "More Products",
     },
     products: {
-      allProducts: "All Products",
+      allProducts: "More Products",
       featured: "Featured Products",
       searchResults: "Search Results for",
       found: "product(s) found",

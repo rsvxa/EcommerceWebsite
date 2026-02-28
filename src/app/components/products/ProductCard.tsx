@@ -32,6 +32,7 @@ export function ProductCard({ product }: ProductCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const { lang } = useLanguage();
   const t = translations[lang].productCard;
+  const [isLookbookOpen, setIsLookbookOpen] = useState(false);
   
   const addItem = useCartStore((state) => state.addItem);
   const { toggleItem, isInWishlist } = useWishlistStore();
@@ -115,7 +116,7 @@ export function ProductCard({ product }: ProductCardProps) {
             </button>
 
             {/* Quick View Sheet */}
-            <Sheet>
+            <Sheet open={isLookbookOpen} onOpenChange={setIsLookbookOpen}>
               <SheetTrigger asChild>
                 <button className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white shadow-xl hover:bg-zinc-900 hover:text-white transition-colors">
                   <Eye className="h-5 w-5" />
@@ -221,13 +222,24 @@ export function ProductCard({ product }: ProductCardProps) {
 
                 {/* Sticky Footer Action */}
                 <div className="p-8 border-t border-zinc-50 bg-white/80 backdrop-blur-md">
-                  <Button 
-                    onClick={handleAddToCart}
-                    className="w-full h-16 rounded-2xl bg-black text-white font-black uppercase tracking-[0.2em] text-[11px] shadow-2xl hover:scale-[1.02] active:scale-95 transition-all"
-                  >
-                    <ShoppingCart className="mr-3 h-5 w-5" />
-                    {lang === 'kh' ? 'បញ្ជាក់ការជ្រើសរើស' : 'Confirm Selection'} — {formatPrice(product.price)}
-                  </Button>
+                  <div className="pb-10">
+                    <Button 
+                      onClick={handleAddToCart}
+                      className="w-full h-16 rounded-2xl bg-black text-white font-black uppercase tracking-[0.2em] text-[11px] shadow-2xl hover:scale-[1.02] active:scale-95 transition-all"
+                    >
+                      <ShoppingCart className="mr-3 h-5 w-5" />
+                      {lang === 'kh' ? 'បញ្ជាក់ការជ្រើសរើស' : 'Confirm Selection'} — {formatPrice(product.price)}
+                    </Button>
+                  </div>
+                  <div className="pb-10">
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setIsLookbookOpen(false)}
+                      className="w-full h-14 rounded-xl font-black uppercase tracking-widest text-black text-[11px] border-zinc-200 hover:bg-zinc-100 transition-all"
+                    >
+                      {lang === 'kh' ? 'ត្រឡប់ក្រោយ' : 'Back home'}
+                    </Button>
+                  </div>
                 </div>
               </SheetContent>
             </Sheet>

@@ -18,6 +18,7 @@ import { Button } from "../ui/button";
 
 export function ShopTheLook() {
   const [activeId, setActiveId] = useState<number | null>(null);
+  const [isSheetOpen, setIsSheetOpen] = useState(false); // បន្ថែម State សម្រាប់គ្រប់គ្រងការបើក/បិទ Sheet
   const { lang } = useLanguage();
   const t = translations[lang].shopLook;
   const addItem = useCartStore((state) => state.addItem); 
@@ -63,13 +64,12 @@ export function ShopTheLook() {
 
   const handleAddToCart = (product: any) => {
     if (product.stock === 0) return;
-    addItem(product);
+    addItem({
+      ...product,
+      quantity: 1
+    });
     toast.success(lang === 'kh' ? 'បន្ថែមជោគជ័យ!' : 'Added to Cart', {
-      description: lang === 'kh' 
-        ? `${product.name} ត្រូវបានដាក់ចូលក្នុងកន្ត្រក។`
-        : `${product.name} has been added to your cart.`,
       icon: <ShoppingCart className="h-4 w-4 text-emerald-500" />,
-      position: "bottom-center",
     });
     setActiveId(null);
   };
@@ -146,30 +146,22 @@ export function ShopTheLook() {
           {/* Right Side: Editorial Content */}
           <div className="w-full md:w-1/2 space-y-10 text-center md:text-left">
             <div className="space-y-6">
-              <motion.div
-                initial={{ opacity: 0, x: 30 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-              >
+              <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
                 <span className="text-sm font-black uppercase tracking-[0.5em] text-gray-400">
                   {t.tagline}
                 </span>
-                <h2 className="text-6xl md:text-7xl font-black uppercase tracking-tighter leading-[0.85] mt-4 text-zinc-900">
+                <h2 className={`text-6xl md:text-7xl font-black uppercase tracking-tighter leading-[0.85] mt-4 text-zinc-900 ${lang === 'kh' ? 'font-freehand py-2' : ''}`}>
                   {t.title}
                 </h2>
               </motion.div>
-              
-              <motion.p 
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 0.6 }}
-                className="text-gray-500 text-xl leading-relaxed max-w-md mx-auto md:mx-0 font-medium"
-              >
+              <motion.p initial={{ opacity: 0 }} whileInView={{ opacity: 0.6 }} className="text-gray-500 text-xl leading-relaxed max-w-md mx-auto md:mx-0 font-medium">
                 "{t.desc}"
               </motion.p>
             </div>
 
             <div className="flex flex-col sm:flex-row items-center gap-8">
-              <Sheet>
+              {/* គ្រប់គ្រង Sheet តាមរយៈ open និង onOpenChange */}
+              <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
                 <SheetTrigger asChild>
                   <button className="group flex items-center justify-center gap-6 bg-zinc-900 text-white px-10 py-6 rounded-2xl font-black uppercase text-[12px] tracking-[0.2em] hover:bg-black transition-all shadow-2xl">
                     <span>{t.btnFull}</span>
@@ -187,10 +179,7 @@ export function ShopTheLook() {
                       </p>
                     </SheetHeader>
 
-                    {/* Scrollable Content Area */}
-                    <div className="flex-1 overflow-y-auto px-8 py-6 space-y-10 scrollbar-hide bg-zinc-50/50">
-                      
-                      {/* Section 1: Main Editorial Image */}
+                    <div className="flex-1 overflow-y-auto px-8 py-6 space-y-10 no-scrollbar bg-zinc-50/50">
                       <div className="space-y-4">
                         <div className="aspect-[3/4] rounded-[2rem] overflow-hidden shadow-xl">
                           <img src="https://i.pinimg.com/736x/de/cc/cd/decccd1f0765a2020efc0a491c9a358a.jpg" className="w-full h-full object-cover" alt="Main Look" />
@@ -198,7 +187,6 @@ export function ShopTheLook() {
                         <p className="text-center text-[11px] font-bold text-zinc-400 uppercase tracking-widest italic">Collection Overview — 2026</p>
                       </div>
 
-                      {/* Section 2: Products from LOOK_PRODUCTS */}
                       <div className="space-y-6">
                         <h3 className="text-xs font-black uppercase tracking-[0.3em] text-zinc-900 border-b pb-4">Selected Pieces</h3>
                         <div className="grid gap-4">
@@ -226,16 +214,15 @@ export function ShopTheLook() {
                         </div>
                       </div>
 
-                      {/* Section 3: Extra Aesthetic Space */}
-                      <div className="py-10 text-center border-t border-dashed border-zinc-200">
-                         <p className="text-zinc-300 text-[10px] uppercase font-black tracking-[0.5em]">End of Editorial</p>
+                      <div className="pb-10">
+                        <Button 
+                          variant="outline" 
+                          onClick={() => setIsSheetOpen(false)} 
+                          className="w-full h-14 rounded-xl font-black uppercase tracking-widest text-black text-[11px] border-zinc-200 hover:bg-zinc-100 transition-all"
+                        >
+                          {lang === 'kh' ? 'ត្រឡប់ក្រោយ' : 'Back home'}
+                        </Button>
                       </div>
-                    </div>
-
-                    <div className="p-8 bg-white border-t border-zinc-100">
-                      <Button className="w-full h-15 py-7 rounded-2xl bg-zinc-900 text-white font-black uppercase tracking-[0.2em] text-[11px] hover:bg-black shadow-xl shadow-zinc-200">
-                        View All Collections
-                      </Button>
                     </div>
                 </SheetContent>
               </Sheet>
@@ -263,7 +250,6 @@ export function ShopTheLook() {
               </div>
             </div>
           </div>
-
         </div>
       </div>
     </section>

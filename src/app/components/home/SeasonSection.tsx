@@ -79,6 +79,8 @@ export function SeasonSection() {
   const { lang } = useLanguage();
   const t = translations[lang].seasonal;
   const addItem = useCartStore((state) => state.addItem);
+  const [isShopSheetOpen, setIsShopSheetOpen] = useState(false); 
+  const [isLookbookOpen, setIsLookbookOpen] = useState(false);
 
   const currentSeason = useMemo(() => {
     const config = SEASON_CONFIG.find(s => s.id === activeSeason) || SEASON_CONFIG[0];
@@ -104,7 +106,7 @@ export function SeasonSection() {
   return (
     <section className="py-24 bg-white overflow-hidden italic">
       <div className="flex flex-col items-center text-center mb-16 select-none pointer-events-none">
-        <h2 className="text-4xl font-black uppercase tracking-[0.5em] text-zinc-100 opacity-60">
+        <h2 className="text-4xl font-black uppercase tracking-[0.5em] text-black opacity-60">
           {currentSeason.bgText}
         </h2>
       </div>
@@ -180,14 +182,14 @@ export function SeasonSection() {
               </div>
               
               <div className="flex flex-col sm:flex-row gap-5">
-                <Sheet>
+                <Sheet open={isShopSheetOpen} onOpenChange={setIsShopSheetOpen}>
                   <SheetTrigger asChild>
                     <button className="flex items-center justify-center gap-4 bg-black text-white px-10 py-5 rounded-2xl font-black uppercase text-[12px] tracking-[0.2em] hover:bg-zinc-800 transition-all shadow-lg group">
                       <span>{t.shopSelection}</span>
                       <ArrowUpRight size={20} className="group-hover:rotate-45 transition-transform" />
                     </button>
                   </SheetTrigger>
-                  <SheetContent side="right" className="w-full sm:max-w-[450px] border-none bg-zinc-50 p-0 shadow-2xl italic">
+                  <SheetContent side="right" className="w-full sm:max-w-[40%] border-none bg-zinc-50 p-0 shadow-2xl italic">
                     <div className="h-full flex flex-col">
                       <SheetHeader className="p-8 bg-white border-b border-zinc-100">
                         <div className="flex items-center gap-3 mb-2 text-zinc-400">
@@ -218,7 +220,7 @@ export function SeasonSection() {
                                   className="w-fit rounded-xl bg-zinc-950 h-8 text-[9px] font-black uppercase tracking-widest hover:bg-zinc-800 disabled:opacity-50"
                                 >
                                   {product.stock === 0 ? (lang === 'kh' ? 'អស់ពីស្តុក' : 'Sold Out') : (
-                                    <><Plus size={12} className="mr-1" /> {lang === 'kh' ? 'បន្ថែម' : 'Add to Cart'}</>
+                                    <><Plus size={12} className="mr-1" /> {lang === 'kh' ? 'បន្ថែមទៅកន្ត្រក' : 'Add to Cart'}</>
                                   )}
                                 </Button>
                               </div>
@@ -227,20 +229,29 @@ export function SeasonSection() {
                         </div>
                       </ScrollArea>
                     </div>
+                    <div className="pb-10">
+                      <Button 
+                        variant="outline" 
+                        onClick={() => setIsShopSheetOpen(false)} 
+                        className="w-full h-14 rounded-xl font-black uppercase tracking-widest text-black text-[11px] border-zinc-200 hover:bg-zinc-100 transition-all"
+                      >
+                        {lang === 'kh' ? 'ត្រឡប់ក្រោយ' : 'Back to Gallery'}
+                      </Button>
+                    </div>
                   </SheetContent>
                 </Sheet>
 
-                <Sheet>
+                <Sheet open={isLookbookOpen} onOpenChange={setIsLookbookOpen}>
                   <SheetTrigger asChild>
                     <button className="flex items-center justify-center gap-4 bg-white border-2 border-black text-black px-10 py-5 rounded-2xl font-black uppercase text-[12px] tracking-widest hover:bg-zinc-50 transition-all">
                       {t.viewLookbook} <ImageIcon size={18} />
                     </button>
                   </SheetTrigger>
-                  <SheetContent side="right" className="w-full sm:max-w-[450px] border-none p-0 bg-zinc-950 text-white overflow-hidden italic">
+                  <SheetContent side="right" className="w-full sm:max-w-[40%] border-none p-0 text-white overflow-hidden italic">
                     <ScrollArea className="h-full">
                       <div className="p-10 space-y-10">
                         <div className="space-y-2">
-                          <SheetTitle className="text-5xl font-black uppercase tracking-tighter text-white italic">Lookbook</SheetTitle>
+                          <SheetTitle className="text-5xl font-black uppercase tracking-tighter text-black italic">Lookbook</SheetTitle>
                           <p className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.4em]">Editorial Style Guide — 2026</p>
                         </div>
                         <div className="space-y-6">
@@ -256,6 +267,15 @@ export function SeasonSection() {
                         </div>
                       </div>
                     </ScrollArea>
+                    <div className="pb-10">
+                      <Button 
+                        variant="outline" 
+                        onClick={() => setIsLookbookOpen(false)}
+                        className="w-full h-14 rounded-xl font-black uppercase tracking-widest text-black text-[11px] border-zinc-200 hover:bg-zinc-100 transition-all"
+                      >
+                        {lang === 'kh' ? 'ត្រឡប់ក្រោយ' : 'Back home'}
+                      </Button>
+                    </div>
                   </SheetContent>
                 </Sheet>
               </div>

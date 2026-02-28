@@ -252,23 +252,6 @@ export function SettingsPage() {
                   </p>
                 </div>
               </div>
-
-              {/* ប្តូរលេខសម្ងាត់ */}
-              <div className="space-y-6">
-                <h3 className="text-[12px] font-black uppercase tracking-[0.2em] text-zinc-400 ml-2">
-                  {t("ប្តូរលេខសម្ងាត់", "Update Password")}
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <InputGroupSimple label={t("លេខសម្ងាត់ចាស់", "Current Password")} type="password" />
-                  <InputGroupSimple label={t("លេខសម្ងាត់ថ្មី", "New Password")} type="password" />
-                </div>
-                <Button className="w-full bg-zinc-900 text-white py-7 rounded-2xl font-black uppercase tracking-widest italic shadow-xl hover:bg-zinc-800 transition-all active:scale-[0.98]">
-                  {t("រក្សាទុកលេខសម្ងាត់ថ្មី", "Save New Password")}
-                </Button>
-              </div>
-
-              <Separator className="opacity-50" />
-
               {/* Security Log / Device Activity */}
               <div className="space-y-6">
                 <div className="flex justify-between items-end px-2">
@@ -322,53 +305,7 @@ export function SettingsPage() {
 
               {/* 1. Language Selection */}
               <div className="space-y-4">
-                <h3 className="text-[12px] font-black uppercase tracking-[0.2em] text-zinc-400 ml-2">
-                  {t("ភាសាប្រើប្រាស់", "System Language")}
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <button 
-                    onClick={() => setLanguage("kh")}
-                    className={`flex items-center justify-between p-5 rounded-3xl border-2 transition-all ${lang === 'kh' ? 'border-zinc-900 bg-zinc-50' : 'border-zinc-50 bg-white hover:border-zinc-200'}`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className="text-2xl">🇰🇭</span>
-                      <span className="font-black uppercase text-[11px] tracking-widest">ភាសាខ្មែរ</span>
-                    </div>
-                    {lang === 'kh' && <div className="w-2 h-2 bg-zinc-900 rounded-full" />}
-                  </button>
-
-                  <button 
-                    onClick={() => setLanguage("en")}
-                    className={`flex items-center justify-between p-5 rounded-3xl border-2 transition-all ${lang === 'en' ? 'border-zinc-900 bg-zinc-50' : 'border-zinc-50 bg-white hover:border-zinc-200'}`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className="text-2xl">🇺🇸</span>
-                      <span className="font-black uppercase text-[11px] tracking-widest">English (US)</span>
-                    </div>
-                    {lang === 'en' && <div className="w-2 h-2 bg-zinc-900 rounded-full" />}
-                  </button>
-                </div>
               </div>
-
-              {/* 2. UI Density / Scale */}
-              <div className="space-y-4">
-                <h3 className="text-[12px] font-black uppercase tracking-[0.2em] text-zinc-400 ml-2">
-                  {t("ទំហំផ្ទៃកម្មវិធី", "Interface Scale")}
-                </h3>
-                <div className="p-6 bg-zinc-50 rounded-[30px] space-y-6">
-                  <div className="flex justify-between text-[10px] font-black uppercase text-zinc-400 tracking-tighter">
-                    <span>{t("តូច", "Small")}</span>
-                    <span>{t("មធ្យម", "Default")}</span>
-                    <span>{t("ធំ", "Large")}</span>
-                  </div>
-                  <input 
-                    type="range" 
-                    min="1" max="3" step="1" defaultValue="2"
-                    className="w-full h-1.5 bg-zinc-200 rounded-lg appearance-none cursor-pointer accent-zinc-900"
-                  />
-                </div>
-              </div>
-
               {/* 3. Motion & Animations */}
               <div className="pt-4">
                 <SwitchRow 

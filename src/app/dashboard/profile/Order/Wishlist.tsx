@@ -132,7 +132,9 @@ export function Wishlist() {
                 : "Start adding items you love to your personal wishlist archive."}
             </p>
             <Button className="rounded-full px-10 h-14 bg-black text-white font-black uppercase text-[10px] tracking-[0.2em]">
-              Start Shopping
+              {lang === 'kh' 
+                ? "មើលទំនិញ" 
+                : "Start Shopping"}
             </Button>
           </Card>
         )}

@@ -25,6 +25,8 @@ export function ProfileOverview() {
   useEffect(() => {
     const savedName = localStorage.getItem('zway_user_name') || "N/A";
     const savedEmail = localStorage.getItem('zway_user_email') || "N/A"; 
+    const saveCountry = localStorage.getItem('zway_user_country') || "N/A"; 
+    const savedAddress = localStorage.getItem('zway_user_address') || "N/A"; 
     const checkoutData = JSON.parse(localStorage.getItem('zway_checkout_info') || '{}');
     const savedImage = localStorage.getItem('zway_user_avatar');
 
@@ -32,10 +34,10 @@ export function ProfileOverview() {
       fullName: savedName,
       email: savedEmail,
       phone: checkoutData.phone || "N/A",
-      country: checkoutData.country || "N/A",
+      country: saveCountry || "N/A",
       city: checkoutData.city || "N/A",
       zipCode: checkoutData.zipCode || "N/A",
-      address: checkoutData.address || "N/A"
+      address: savedAddress || "N/A"
     });
 
     if (savedImage) setProfileImage(savedImage);
