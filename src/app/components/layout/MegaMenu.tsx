@@ -31,7 +31,6 @@ const categoryIcons: Record<string, React.ReactNode> = {
   BAGS: <ShoppingBag className="h-5 w-5" />,
 };
 
-// បន្ថែមរូបភាពតំណាងឱ្យ Category នីមួយៗដើម្បីបង្កើនសោភ័ណភាព
 const categoryImages: Record<string, string> = {
   CLOTHES: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?q=80&w=400",
   JEWELRY: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?q=80&w=400",

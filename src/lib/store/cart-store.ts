@@ -1,71 +1,98 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { CartStore, CartItem, Product, ProductVariant } from '@/types/product';
 
-/**
- * Zustand store for shopping cart management
- * Features:
- * - Persisted to localStorage
- * - Add/remove items
- * - Update quantities
- * - Calculate totals
- */
+// កំណត់ Type ឱ្យត្រូវជាមួយទិន្នន័យ MySQL របស់អ្នក
+export interface Product {
+  id: number;
+  name: string;
+  price: number;
+  image: string;
+  brand?: string;
+  category?: string;
+}
+
+export interface CartItem {
+  product: Product;
+  quantity: number;
+  selectedColor?: string;
+  selectedSize?: string;
+}
+
+interface CartStore {
+  items: CartItem[];
+  addItem: (product: Product, color?: string, size?: string) => void;
+  removeItem: (productId: number, color?: string, size?: string) => void;
+  updateQuantity: (productId: number, quantity: number, color?: string, size?: string) => void;
+  clearCart: () => void;
+  getTotalItems: () => number;
+  getTotalPrice: () => number;
+}
+
 export const useCartStore = create<CartStore>()(
   persist(
     (set, get) => ({
       items: [],
 
-      addItem: (product: Product, variant?: ProductVariant) => {
-        set((state) => {
-          const existingItemIndex = state.items.findIndex(
-            (item) =>
-              item.product.id === product.id &&
-              item.selectedVariant?.id === variant?.id
-          );
+     addItem: (product, color, size) => {
+  set((state) => {
+    // ឆែកមើល បើ color ជា Object ត្រូវហៅយកតែ property .color មកប្រើ
+    const colorName = typeof color === 'object' 
+      ? (color as any).color 
+      : (color || 'Standard');
 
-          if (existingItemIndex > -1) {
-            // Item already exists, increment quantity
-            const newItems = [...state.items];
-            newItems[existingItemIndex].quantity += 1;
-            return { items: newItems };
-          } else {
-            // Add new item
-            return {
-              items: [
-                ...state.items,
-                {
-                  product,
-                  quantity: 1,
-                  selectedVariant: variant,
-                },
-              ],
-            };
-          }
-        });
-      },
+    const existingItemIndex = state.items.findIndex(
+      (item) =>
+        item.product.id === product.id &&
+        item.selectedColor === colorName && 
+        item.selectedSize === size
+    );
 
-      removeItem: (productId: string, variantId?: string) => {
+    if (existingItemIndex > -1) {
+      const newItems = [...state.items];
+      newItems[existingItemIndex].quantity += 1;
+      return { items: newItems };
+    } else {
+      return {
+        items: [
+          ...state.items,
+          {
+            product,
+            quantity: 1,
+            selectedColor: colorName, // រក្សាទុកជា String ជានិច្ច
+            selectedSize: size || 'M',
+          },
+        ],
+      };
+    }
+  });
+},
+
+      // លុបទំនិញចេញពីរទេះ
+      removeItem: (productId, color, size) => {
         set((state) => ({
           items: state.items.filter(
             (item) =>
               !(
                 item.product.id === productId &&
-                item.selectedVariant?.id === variantId
+                item.selectedColor === color &&
+                item.selectedSize === size
               )
           ),
         }));
       },
 
-      updateQuantity: (productId: string, quantity: number, variantId?: string) => {
+      // កែសម្រួលចំនួនទំនិញ (បូក/ដក)
+      updateQuantity: (productId, quantity, color, size) => {
         set((state) => {
           if (quantity <= 0) {
-            // Remove item if quantity is 0 or less
+            // បើចំនួនតិចជាង ១ គឺលុបចេញតែម្តង
             return {
               items: state.items.filter(
                 (item) =>
                   !(
                     item.product.id === productId &&
-                    item.selectedVariant?.id === variantId
+                    item.selectedColor === color &&
+                    item.selectedSize === size
                   )
               ),
             };
@@ -74,7 +101,8 @@ export const useCartStore = create<CartStore>()(
           const newItems = state.items.map((item) => {
             if (
               item.product.id === productId &&
-              item.selectedVariant?.id === variantId
+              item.selectedColor === color &&
+              item.selectedSize === size
             ) {
               return { ...item, quantity };
             }
@@ -85,14 +113,17 @@ export const useCartStore = create<CartStore>()(
         });
       },
 
+      // សម្អាតរទេះទាំងមូល
       clearCart: () => {
         set({ items: [] });
       },
 
+      // គណនាចំនួនទំនិញសរុប (Units)
       getTotalItems: () => {
         return get().items.reduce((total, item) => total + item.quantity, 0);
       },
 
+      // គណនាតម្លៃសរុប
       getTotalPrice: () => {
         return get().items.reduce(
           (total, item) => total + item.product.price * item.quantity,
@@ -101,7 +132,7 @@ export const useCartStore = create<CartStore>()(
       },
     }),
     {
-      name: 'cart-storage', // localStorage key
+      name: 'cart-storage', // រក្សាទុកក្នុង localStorage
     }
   )
 );

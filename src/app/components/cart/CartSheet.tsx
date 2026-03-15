@@ -2,25 +2,27 @@
 
 import React, { useState } from 'react';
 import { ShoppingBag } from 'lucide-react';
-import { Button } from '@/app/components/ui/button';
+import { Button } from '../ui/button';
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
   SheetDescription,
-} from '@/app/components/ui/sheet';
-import { Separator } from '@/app/components/ui/separator';
-import { ScrollArea } from '@/app/components/ui/scroll-area';
+} from '../ui/sheet';
+import { Separator } from '../ui/separator';
+import { ScrollArea } from '../ui/scroll-area';
 import { CartItem } from './CartItem';
 import { useCartStore } from '@/lib/store/cart-store';
 import { formatPrice } from '@/lib/utils/format';
 import { toast } from 'sonner';
 import { CheckoutModal } from './CheckoutModal';
-// --- បន្ថែម Import ភាសា ---
 import { useLanguage } from '@/lib/store/use-language';
 import { translations } from '@/lib/i18n/translations';
+import { useAuthStore } from '@/lib/store/auth-store'; 
+import { useNavigate } from 'react-router-dom';
 
+import { AuthDialog } from '../auth/AuthDialog';
 interface CartSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -29,18 +31,32 @@ interface CartSheetProps {
 export function CartSheet({ open, onOpenChange }: CartSheetProps) {
   const { lang } = useLanguage();
   const t = translations[lang].cart;
+  const navigate = useNavigate();
+
+  const { user } = useAuthStore(); 
 
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [isAuthOpen, setIsAuthOpen] = useState(false);
+  
   const { items, getTotalPrice, clearCart } = useCartStore();
   const totalPrice = getTotalPrice();
+  
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
 
   const handleClearCart = () => {
+    if (items.length === 0) return;
     clearCart();
-    toast.success(t.cleared);
+    toast.success(t.cleared || "រទេះត្រូវបានសម្អាត");
   };
 
   const handleProceedToCheckout = () => {
+    if (!user) {
+      toast.info(lang === 'kh' ? "សូមចូលប្រើគណនីរបស់អ្នក!" : "Please login to your account!");
+      
+      setIsAuthOpen(true);
+      return;
+    }
+
     onOpenChange(false);
     setTimeout(() => {
       setIsCheckoutOpen(true);
@@ -50,11 +66,11 @@ export function CartSheet({ open, onOpenChange }: CartSheetProps) {
   return (
     <>
       <Sheet open={open} onOpenChange={onOpenChange}>
-        <SheetContent className="flex w-full flex-col sm:max-w-2xl p-8 md:p-12 overflow-y-auto border-l-0 shadow-2xl">
+        <SheetContent className="flex w-full flex-col sm:max-w-2xl p-8 md:p-12 overflow-y-auto border-l-0 shadow-2xl bg-white">
           <SheetHeader className="pb-8">
             <SheetTitle className="flex items-center gap-3 font-black uppercase tracking-tighter text-3xl">
               <ShoppingBag className="h-8 w-8" />
-              {t.title} ({itemCount})
+              {t.title} <span className="text-zinc-400">({itemCount})</span>
             </SheetTitle>
             <SheetDescription className="text-sm mt-2 text-zinc-500">
               {t.desc}
@@ -81,17 +97,18 @@ export function CartSheet({ open, onOpenChange }: CartSheetProps) {
             <>
               <ScrollArea className="flex-1 -mx-2 px-2">
                 <div className="space-y-8 py-4">
-                  {items.map((item, index) => (
-                    <div key={`${item.product.id}-${index}`} className="group">
+                  {items.map((item) => (
+                    <div 
+                      key={`${item.product.id}-${item.selectedColor}-${item.selectedSize}`} 
+                      className="group"
+                    >
                       <CartItem item={item} />
                     </div>
                   ))}
                 </div>
               </ScrollArea>
 
-              <div className="pt-10 space-y-8 bg-white">
-                <Separator className="opacity-50" />
-                
+              <div className="pt-10 space-y-8 bg-white border-t border-zinc-100 mt-auto">
                 <div className="space-y-4 px-2">
                   <div className="flex justify-between items-center text-sm">
                     <span className="text-zinc-400 font-bold uppercase tracking-widest text-[10px]">{t.subtotal}</span>
@@ -107,7 +124,9 @@ export function CartSheet({ open, onOpenChange }: CartSheetProps) {
                   <div className="flex justify-between items-end">
                     <div className="space-y-1">
                       <p className="text-[10px] font-black uppercase text-zinc-400 tracking-widest">{t.totalAmount}</p>
-                      <p className="text-4xl font-black tracking-tighter">{formatPrice(totalPrice)}</p>
+                      <p className="text-4xl font-black tracking-tighter text-zinc-900">
+                        {formatPrice(totalPrice)}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -115,8 +134,9 @@ export function CartSheet({ open, onOpenChange }: CartSheetProps) {
                 <div className="flex flex-col gap-4">
                   <button 
                     onClick={handleProceedToCheckout}
-                    className="w-full bg-black text-white h-16 rounded-2xl font-bold uppercase tracking-[0.2em] text-[11px] hover:bg-zinc-800 transition-all shadow-xl active:scale-[0.98]"
+                    className="w-full h-16 rounded-2xl font-bold uppercase tracking-[0.2em] text-[11px] transition-all shadow-xl active:scale-[0.98] flex items-center justify-center gap-2 bg-black text-white hover:bg-zinc-800"
                   >
+                    {!user}
                     {t.checkout}
                   </button>
                   
@@ -124,14 +144,14 @@ export function CartSheet({ open, onOpenChange }: CartSheetProps) {
                     <Button 
                       variant="outline" 
                       onClick={() => onOpenChange(false)} 
-                      className="h-14 rounded-xl font-bold uppercase tracking-widest text-[9px] border-zinc-200"
+                      className="h-14 rounded-xl font-bold uppercase tracking-widest text-[9px] border-zinc-200 hover:bg-zinc-50"
                     >
                       {t.continue}
                     </Button>
                     <Button
                       variant="ghost"
                       onClick={handleClearCart}
-                      className="h-14 rounded-xl font-bold uppercase tracking-widest text-[9px] text-red-500 hover:bg-red-50"
+                      className="h-14 rounded-xl font-bold uppercase tracking-widest text-[9px] text-red-500 hover:bg-red-50 hover:text-red-600"
                     >
                       {t.clearAll}
                     </Button>
@@ -148,6 +168,11 @@ export function CartSheet({ open, onOpenChange }: CartSheetProps) {
         onOpenChange={setIsCheckoutOpen} 
         total={totalPrice} 
         cartItems={items} 
+      />
+
+      <AuthDialog 
+        open={isAuthOpen} 
+        onOpenChange={setIsAuthOpen} 
       />
     </>
   );

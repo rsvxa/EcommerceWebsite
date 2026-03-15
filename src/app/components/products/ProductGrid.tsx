@@ -137,16 +137,13 @@ export function ProductGrid({ products }: ProductGridProps) {
                 </ScrollArea>
                 
                 {/* Fixed Footer with glass effect */}
-                <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6 bg-white/80 backdrop-blur-md border-t border-zinc-50">
-                   <SheetClose asChild>
-                     <Button className="w-full mb-4 md:hidden rounded-xl bg-zinc-900 py-6 font-black uppercase tracking-widest">
-                        {lang === 'kh' ? 'ត្រឡប់ក្រោយ' : 'Close'}
-                     </Button>
-                   </SheetClose>
-                  <p className="text-[8px] md:text-[9px] font-black text-center text-zinc-400 uppercase italic tracking-widest">
-                    ZWAY Fashion • Luxury Experience
-                  </p>
-                </div>
+                  <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-white via-white to-transparent">
+                    <SheetClose asChild>
+                      <Button className="w-full h-16 rounded-2xl bg-black text-white font-black uppercase tracking-widest text-xs shadow-2xl hover:scale-[1.01] active:scale-95 transition-all">
+                        {lang === 'kh' ? 'ចាកចេញ' : 'Back'}
+                      </Button>
+                    </SheetClose>
+                  </div>
               </SheetContent>
             </Sheet>
           )}

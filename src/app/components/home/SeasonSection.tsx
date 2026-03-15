@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowUpRight, Wind, Sun, Leaf, Snowflake, 
-  Sparkles, Plus, ImageIcon, ShoppingBag, ShoppingCart 
+  Sparkles, Plus, ImageIcon, ShoppingBag, ShoppingCart, Loader2 
 } from 'lucide-react';
 import { useLanguage } from '@/lib/store/use-language';
 import { translations } from '@/lib/i18n/translations';
@@ -18,12 +18,11 @@ import {
   SheetTrigger,
 } from "../ui/sheet";
 import { Button } from "../ui/button";
-import { mockProducts } from '@/lib/data/products'; 
 
 const SEASON_CONFIG = [
   {
     id: "Spring",
-    subCategory: "SHIRTS",
+    subCategory: "Shirt",
     icon: <Wind className="text-emerald-500" size={24} />,
     accent: "bg-emerald-50 text-emerald-600",
     bgText: "SPRING",
@@ -38,7 +37,7 @@ const SEASON_CONFIG = [
   },
   {
     id: "Summer",
-    subCategory: "TSHIRTS",
+    subCategory: "T-shirt",
     icon: <Sun className="text-orange-500" size={24} />,
     accent: "bg-orange-50 text-orange-600",
     bgText: "SUMMER",
@@ -50,7 +49,7 @@ const SEASON_CONFIG = [
   },
   {
     id: "Autumn",
-    subCategory: "SUITS",
+    subCategory: "Suite",
     icon: <Leaf className="text-amber-700" size={24} />,
     accent: "bg-amber-50 text-amber-700",
     bgText: "AUTUMN",
@@ -62,7 +61,7 @@ const SEASON_CONFIG = [
   },
   {
     id: "Winter",
-    subCategory: "HOODIES",
+    subCategory: "Hoodie",
     icon: <Snowflake className="text-blue-500" size={24} />,
     accent: "bg-blue-50 text-blue-600",
     bgText: "WINTER",
@@ -76,23 +75,49 @@ const SEASON_CONFIG = [
 
 export function SeasonSection() {
   const [activeSeason, setActiveSeason] = useState("Spring");
+  const [products, setProducts] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const { lang } = useLanguage();
   const t = translations[lang].seasonal;
   const addItem = useCartStore((state) => state.addItem);
   const [isShopSheetOpen, setIsShopSheetOpen] = useState(false); 
   const [isLookbookOpen, setIsLookbookOpen] = useState(false);
 
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setIsLoading(true);
+        const response = await fetch('http://localhost:5000/api/products');
+        const data = await response.json();
+        setProducts(data);
+      } catch (error) {
+        console.error("Failed to fetch products:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchProducts();
+  }, []);
+
   const currentSeason = useMemo(() => {
     const config = SEASON_CONFIG.find(s => s.id === activeSeason) || SEASON_CONFIG[0];
-    const filteredProducts = mockProducts.filter(p => p.subCategory === config.subCategory);
+    const filteredProducts = products.filter(p => p.type === config.subCategory);
     return { ...config, products: filteredProducts };
-  }, [activeSeason]);
+  }, [activeSeason, products]);
 
   const handleAddToCart = (e: React.MouseEvent, product: any) => {
     e.preventDefault();
     e.stopPropagation();
-    if (product.stock === 0) return;
-    addItem(product);
+    if (product.stocks === 0) return;
+    const cartItem = {
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.image,
+      stock: product.stocks
+    };
+
+    addItem(cartItem);
     
     toast.success(lang === 'kh' ? 'បន្ថែមជោគជ័យ!' : 'Added to Cart', {
       description: lang === 'kh' 
@@ -149,7 +174,6 @@ export function SeasonSection() {
             transition={{ duration: 0.7, ease: [0.19, 1, 0.22, 1] }}
             className="flex flex-col lg:flex-row gap-16 items-center"
           >
-            {/* Image Preview */}
             <div className="w-full lg:w-1/2 relative group">
               <div className="overflow-hidden rounded-[40px] shadow-2xl aspect-[3/4] md:h-[650px] w-full border border-zinc-100">
                 <motion.img 
@@ -170,7 +194,6 @@ export function SeasonSection() {
               </div>
             </div>
 
-            {/* Information */}
             <div className="w-full lg:w-1/2 space-y-10 text-left">
               <div className="space-y-4">
                 <h3 className={`text-5xl md:text-7xl font-black leading-[0.9] tracking-tighter uppercase ${lang === 'kh' ? 'font-freehand py-2' : ''}`}>
@@ -200,43 +223,51 @@ export function SeasonSection() {
                           {lang === 'kh' ? `ហាងទំនិញ ${t.seasons[activeSeason as keyof typeof t.seasons]}` : `${activeSeason} Store`}
                         </SheetTitle>
                         <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest">
-                          {currentSeason.products.length} {lang === 'kh' ? 'ផលិតផលត្រូវបានរកឃើញ' : 'Masterpieces Found'}
+                          {isLoading ? "Loading..." : `${currentSeason.products.length} ${lang === 'kh' ? 'ផលិតផលត្រូវបានរកឃើញ' : 'Masterpieces Found'}`}
                         </p>
                       </SheetHeader>
 
                       <ScrollArea className="flex-1 p-6">
-                        <div className="space-y-4">
-                          {currentSeason.products.map((product) => (
-                            <div key={product.id} className="flex gap-5 p-4 bg-white rounded-[24px] border border-zinc-100 group/item transition-all hover:shadow-md">
-                              <div className="w-20 h-24 rounded-xl bg-zinc-50 overflow-hidden shrink-0">
-                                <img src={product.images[0]} className="w-full h-full object-cover group-hover/item:scale-110 transition-transform duration-500" alt={product.name} />
+                        {isLoading ? (
+                          <div className="flex justify-center py-20"><Loader2 className="animate-spin" /></div>
+                        ) : (
+                          <div className="space-y-4">
+                            {currentSeason.products.map((product) => (
+                              <div key={product.id} className="flex gap-5 p-4 bg-white rounded-[24px] border border-zinc-100 group/item transition-all hover:shadow-md">
+                                <div className="w-20 h-24 rounded-xl bg-zinc-50 overflow-hidden shrink-0">
+                                  <img src={product.image} className="w-full h-full object-cover group-hover/item:scale-110 transition-transform duration-500" alt={product.name} />
+                                </div>
+                                <div className="flex flex-col justify-center flex-1">
+                                  <h4 className="font-black uppercase text-[12px] tracking-tight mb-1">{product.name}</h4>
+                                  <p className="text-zinc-400 font-black text-[12px] mb-3">${product.price}</p>
+                                  <Button 
+                                    disabled={product.stocks === 0}
+                                    onClick={(e) => handleAddToCart(e, product)}
+                                    className="w-fit rounded-xl bg-zinc-950 h-8 text-[9px] font-black uppercase tracking-widest hover:bg-zinc-800 disabled:opacity-50"
+                                  >
+                                    {product.stocks === 0 ? (lang === 'kh' ? 'អស់ពីស្តុក' : 'Sold Out') : (
+                                      <><Plus size={12} className="mr-1" /> {lang === 'kh' ? 'បន្ថែមទៅកន្ត្រក' : 'Add to Cart'}</>
+                                    )}
+                                  </Button>
+                                </div>
                               </div>
-                              <div className="flex flex-col justify-center flex-1">
-                                <h4 className="font-black uppercase text-[12px] tracking-tight mb-1">{product.name}</h4>
-                                <p className="text-zinc-400 font-black text-[12px] mb-3">${product.price}</p>
-                                <Button 
-                                  disabled={product.stock === 0}
-                                  onClick={(e) => handleAddToCart(e, product)}
-                                  className="w-fit rounded-xl bg-zinc-950 h-8 text-[9px] font-black uppercase tracking-widest hover:bg-zinc-800 disabled:opacity-50"
-                                >
-                                  {product.stock === 0 ? (lang === 'kh' ? 'អស់ពីស្តុក' : 'Sold Out') : (
-                                    <><Plus size={12} className="mr-1" /> {lang === 'kh' ? 'បន្ថែមទៅកន្ត្រក' : 'Add to Cart'}</>
-                                  )}
-                                </Button>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
+                            ))}
+                            {currentSeason.products.length === 0 && (
+                              <p className="text-center py-10 text-zinc-400 text-xs">No products in this season.</p>
+                            )}
+                          </div>
+                        )}
                       </ScrollArea>
-                    </div>
-                    <div className="pb-10">
-                      <Button 
-                        variant="outline" 
-                        onClick={() => setIsShopSheetOpen(false)} 
-                        className="w-full h-14 rounded-xl font-black uppercase tracking-widest text-black text-[11px] border-zinc-200 hover:bg-zinc-100 transition-all"
-                      >
-                        {lang === 'kh' ? 'ត្រឡប់ក្រោយ' : 'Back to Gallery'}
-                      </Button>
+                      
+                      <div className="p-6 bg-white border-t border-zinc-100">
+                        <Button 
+                          variant="outline" 
+                          onClick={() => setIsShopSheetOpen(false)} 
+                          className="w-full h-14 rounded-xl font-black uppercase tracking-widest text-black text-[11px] border-zinc-200 hover:bg-zinc-100 transition-all"
+                        >
+                          {lang === 'kh' ? 'ត្រឡប់ក្រោយ' : 'Back to Gallery'}
+                        </Button>
+                      </div>
                     </div>
                   </SheetContent>
                 </Sheet>
@@ -247,7 +278,7 @@ export function SeasonSection() {
                       {t.viewLookbook} <ImageIcon size={18} />
                     </button>
                   </SheetTrigger>
-                  <SheetContent side="right" className="w-full sm:max-w-[40%] border-none p-0 text-white overflow-hidden italic">
+                  <SheetContent side="right" className="w-full sm:max-w-[40%] border-none p-0 bg-white overflow-hidden italic">
                     <ScrollArea className="h-full">
                       <div className="p-10 space-y-10">
                         <div className="space-y-2">
@@ -261,26 +292,25 @@ export function SeasonSection() {
                               initial={{ opacity: 0, y: 20 }} 
                               whileInView={{ opacity: 1, y: 0 }} 
                               src={img} 
-                              className="w-full rounded-[2rem] shadow-2xl border border-white/5 grayscale hover:grayscale-0 transition-all duration-700" 
+                              className="w-full rounded-[2rem] shadow-2xl border border-zinc-100 grayscale hover:grayscale-0 transition-all duration-700" 
                             />
                           ))}
                         </div>
+                        <div className="pb-10">
+                          <Button 
+                            variant="outline" 
+                            onClick={() => setIsLookbookOpen(false)}
+                            className="w-full h-14 rounded-xl font-black uppercase tracking-widest text-black text-[11px] border-zinc-200 hover:bg-zinc-100 transition-all"
+                          >
+                            {lang === 'kh' ? 'ត្រឡប់ក្រោយ' : 'Close Lookbook'}
+                          </Button>
+                        </div>
                       </div>
                     </ScrollArea>
-                    <div className="pb-10">
-                      <Button 
-                        variant="outline" 
-                        onClick={() => setIsLookbookOpen(false)}
-                        className="w-full h-14 rounded-xl font-black uppercase tracking-widest text-black text-[11px] border-zinc-200 hover:bg-zinc-100 transition-all"
-                      >
-                        {lang === 'kh' ? 'ត្រឡប់ក្រោយ' : 'Back home'}
-                      </Button>
-                    </div>
                   </SheetContent>
                 </Sheet>
               </div>
 
-              {/* Stats Footer */}
               <div className="pt-12 border-t border-zinc-100 flex items-center gap-12">
                 <div className="space-y-1">
                   <p className="text-[11px] font-black uppercase text-zinc-400 tracking-widest">{t.availability}</p>
@@ -301,5 +331,5 @@ export function SeasonSection() {
 }
 
 function ScrollArea({ children, className }: { children: React.ReactNode, className?: string }) {
-  return <div className={`overflow-y-auto overflow-x-hidden scrollbar-hide ${className}`}>{children}</div>;
+  return <div className={`overflow-y-auto overflow-x-hidden scrollbar-hide h-full ${className}`}>{children}</div>;
 }

@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Toaster } from '../app/components/ui/sonner';
 import { Navbar } from './components/layout/Navbar';
 import { ProductGrid } from './components/products/ProductGrid';
 import { ProductFilters } from './components/products/ProductFilters';
-import { mockProducts, filterProducts, sortProducts } from '@/lib/data/products';
+import { filterProducts, sortProducts } from '@/lib/data/products'; 
 import { HeroBanner } from "../app/components/home/HeroBanner";
 import { BlogSection } from "../app/components/home/BlogSection";
 import Footer from "./components/footer/Footer";
@@ -24,36 +24,62 @@ const brandLogos = [
   { logo: 'https://upload.wikimedia.org/wikipedia/commons/2/20/Adidas_Logo.svg', value: 'Adidas' },
   { logo: 'https://upload.wikimedia.org/wikipedia/commons/a/a8/Dior_Logo.svg', value: 'Dior' },
   { logo: 'https://upload.wikimedia.org/wikipedia/commons/b/b8/Prada-Logo.svg', value: 'Prada' },
-  { logo: 'https://upload.wikimedia.org/wikipedia/commons/7/76/Louis_Vuitton_logo_and_wordmark.svg', value: 'Louis Vuitton' },
+  { logo: 'https://upload.wikimedia.org/wikipedia/commons/7/76/Louis_Vuitton_logo_and_wordmark.svg', value: 'LV' },
 ];
 
 function App() {
   const { lang } = useLanguage();
   const t = translations[lang];
 
+  // --- States សម្រាប់ទិន្នន័យពិត ---
+  const [dbProducts, setDbProducts] = useState<any[]>([]); // រក្សាទុកទិន្នន័យពី MySQL
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // --- States សម្រាប់ Filtering ---
   const [selectedCategory, setSelectedCategory] = useState<string>('');
-  const [selectedBrand, setSelectedBrand] = useState<string>(''); // បន្ថែម State ថ្មីសម្រាប់ Brand
+  const [selectedBrand, setSelectedBrand] = useState<string>('');
   const [selectedSubCategory, setSelectedSubCategory] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 500]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 2000]);
   const [sortBy, setSortBy] = useState<string>('newest');
 
-  const maxPrice = useMemo(() => Math.max(...mockProducts.map((p) => p.price)), []);
+  useEffect(() => {
+  const fetchAllProducts = async () => {
+    try {
+      setIsLoading(true);
+      // ប្តូរមកដាក់ URL ពេញជាមួយ Port 5000
+      const response = await fetch('http://localhost:5000/api/products'); 
+      const data = await response.json();
+      setDbProducts(data);
+    } catch (error) {
+      console.error("Failed to fetch products:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
+  fetchAllProducts();
+}, []);
+
+  // ២. កំណត់តម្លៃខ្ពស់បំផុតនៃតម្លៃទំនិញ (Max Price)
+  const maxPrice = useMemo(() => {
+    if (dbProducts.length === 0) return 500;
+    return Math.max(...dbProducts.map((p) => p.price));
+  }, [dbProducts]);
+
+  // ៣. Logic សម្រាប់ Filter និង Sort ទិន្នន័យដែលទាញបានពី DB
   const displayedProducts = useMemo(() => {
-    let filtered = [...mockProducts];
+    let filtered = [...dbProducts];
 
-    // ១. ច្រោះតាម Brand (ប្រសិនបើមានការរើស Brand ពី Logo)
     if (selectedBrand) {
       filtered = filtered.filter((p) => p.brand?.toLowerCase() === selectedBrand.toLowerCase());
     }
 
-    // ២. ច្រោះតាម Category ពិសេស (Featured)
     if (selectedCategory === 'featured') {
-      filtered = filtered.filter((p) => p.featured);
+      filtered = filtered.filter((p) => p.featured || p.is_featured); // បន្ថែម is_featured ក្រែងលោក្នុង DB ប្រើឈ្មោះនេះ
     } 
-    // ៣. ច្រោះតាម Filters ផ្សេងៗ (Category, Price, Search)
     else {
+      // ប្រើ logic filter ដូចមុន តែប្តូរមកប្រើ dbProducts វិញ
       filtered = filterProducts(filtered, {
         category: selectedCategory || undefined,
         subCategory: selectedSubCategory || undefined,
@@ -64,30 +90,29 @@ function App() {
     }
 
     return sortProducts(filtered, sortBy as any);
-  }, [selectedCategory, selectedBrand, selectedSubCategory, searchQuery, priceRange, sortBy]);
+  }, [dbProducts, selectedCategory, selectedBrand, selectedSubCategory, searchQuery, priceRange, sortBy]);
 
-  // Function សម្រាប់រើស Brand ពី Logo
   const handleBrandChange = (brand: string) => {
     setSelectedBrand(brand);
-    setSelectedCategory(''); // លុប Category ចេញពេលរើស Brand
+    setSelectedCategory('');
     setSelectedSubCategory('');
     setSearchQuery('');
-    document.getElementById('product-anchor')?.scrollIntoView({ behavior: 'smooth' });
+    scrollToProducts();
   };
 
   const handleCategoryChange = (category: string) => {
     setSelectedCategory(category);
-    setSelectedBrand(''); // លុប Brand ចេញពេលរើស Category
+    setSelectedBrand('');
     setSelectedSubCategory('');
     setSearchQuery('');
-    document.getElementById('product-anchor')?.scrollIntoView({ behavior: 'smooth' });
+    scrollToProducts();
   };
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
     setSelectedCategory('');
     setSelectedBrand('');
-    document.getElementById('product-anchor')?.scrollIntoView({ behavior: 'smooth' });
+    scrollToProducts();
   };
 
   const handleClearFilters = () => {
@@ -99,34 +124,47 @@ function App() {
     setSortBy('newest');
   };
 
+  const scrollToProducts = () => {
+    const element = document.getElementById('product-anchor');
+    if (element) {
+      window.scrollTo({
+        top: element.offsetTop - 100,
+        behavior: 'smooth'
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white selection:bg-black selection:text-white">
       <Navbar onSearch={handleSearch} onCategorySelect={handleCategoryChange} />
       
       <HeroBanner />
 
-      {/* 2. Brand Identity Section */}
-      <section className="bg-zinc-900 text-white py-6 relative overflow-hidden">
+      <section className="bg-zinc-900 text-white py-20 relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]" />
         <div className="container mx-auto px-6 text-center relative z-10">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-            <span className="text-[10px] font-black uppercase tracking-[0.5em] text-zinc-500 mb-4 block">Manifesto</span>
-            <h1 className="text-5xl md:text-7xl font-black mb-6 tracking-tighter uppercase leading-none">
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }} 
+            whileInView={{ opacity: 1, y: 0 }} 
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+          >
+            <span className="text-[10px] font-black uppercase tracking-[0.5em] text-zinc-500 mb-6 block">The Manifesto</span>
+            <h1 className="text-5xl md:text-8xl font-black mb-8 tracking-tighter uppercase leading-[0.9]">
               {t.home.heroTitle}
             </h1>
-            <p className="max-w-2xl mx-auto text-zinc-400 text-sm md:text-lg font-medium leading-relaxed italic">
-              {t.home.heroDesc}
+            <p className="max-w-3xl mx-auto text-zinc-400 text-base md:text-xl font-medium leading-relaxed italic opacity-80">
+              "{t.home.heroDesc}"
             </p>
           </motion.div>
         </div>
-      </section><br /><br />
+      </section>
 
       <TopSelling />
       <SeasonSection />
       <ShopTheLook />
 
-      {/* 4. Brand Curation */}
-      <div className="bg-white">
+       <div className="bg-white">
         <div id="categories-section" className="container mx-auto px-4 py-6 text-center md:text-left">
           <h2 className="text-3xl font-bold">{t.home.shopByBrand}</h2>
         </div>
@@ -139,7 +177,7 @@ function App() {
               {brandLogos.map((brand) => (
                 <button
                   key={brand.value}
-                  onClick={() => handleBrandChange(brand.value)} // កែមកប្រើ handleBrandChange
+                  onClick={() => handleBrandChange(brand.value)}
                   className={`group flex min-w-[130px] flex-col items-center justify-center gap-3 rounded-xl border p-5 shadow-sm transition-all duration-300 active:scale-95 ${
                     selectedBrand === brand.value 
                     ? 'border-black bg-zinc-50 shadow-md scale-105' 
@@ -169,42 +207,29 @@ function App() {
         </div>
       </div>
 
-      {/* 5. Main Product Gallery */}
-      <main id="product-anchor" className="container mx-auto px-6 py-24">
+      <main id="product-anchor" className="container mx-auto px-6 py-24 scroll-mt-20">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8 border-b border-zinc-100 pb-10">
           <div className="space-y-4">
-            <h2 className="text-3xl font-black uppercase tracking-tighter text-zinc-900">
-              {selectedBrand 
-                ? `${t.home.shopByBrand}: ${selectedBrand}`
-                : selectedCategory === 'featured' 
-                  ? t.products.featured 
-                  : searchQuery 
-                    ? `${t.products.searchResults} "${searchQuery}"`
-                    : selectedCategory || t.products.allProducts}
+            <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-zinc-900 leading-none">
+              {selectedBrand || (selectedCategory === 'featured' ? t.products.featured : searchQuery ? `Results for: ${searchQuery}` : selectedCategory || t.products.allProducts)}
             </h2>
-            
             <div className="flex items-center gap-4">
               <span className="h-[1px] w-12 bg-zinc-900" />
               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">
-                {lang === 'kh' 
-                  ? `${t.products.found} ${displayedProducts.length} ${t.products.unit}`
-                  : `${displayedProducts.length} ${t.products.unit} ${t.products.found}`}
+                {lang === 'kh' ? `${t.products.found} ${displayedProducts.length} ${t.products.unit}` : `${displayedProducts.length} ${t.products.unit} ${t.products.found}`}
               </p>
             </div>
           </div>
-          
           {(searchQuery || selectedBrand || selectedCategory) && (
-            <button 
-              onClick={handleClearFilters}
-              className="text-[10px] font-black uppercase tracking-widest text-red-500 hover:underline"
-            >
-              {lang === 'kh' ? 'សម្អាតការជ្រើសរើស' : 'Clear All Filters'}
+            <button onClick={handleClearFilters} className="group flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-red-500">
+              <span className="w-4 h-[1px] bg-red-500 group-hover:w-6 transition-all" />
+              {lang === 'kh' ? 'សម្អាតការជ្រើសរើស' : 'Reset Selection'}
             </button>
           )}
         </div>
 
         <div className="grid gap-16 lg:grid-cols-[260px_1fr]">
-          <aside className="relative">
+          <aside>
             <div className="sticky top-32">
               <ProductFilters
                 selectedCategory={selectedCategory}
@@ -220,23 +245,30 @@ function App() {
             </div>
           </aside>
 
-          <section>
+          <section className="min-h-[600px]">
             <AnimatePresence mode="wait">
-              <motion.div
-                key={selectedCategory + selectedBrand + searchQuery + sortBy}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.4 }}
-              >
-                {displayedProducts.length > 0 ? (
-                  <ProductGrid products={displayedProducts} />
-                ) : (
-                  <div className="py-20 text-center">
-                    <p className="text-zinc-400 italic">{lang === 'kh' ? 'មិនមានទំនិញដែលអ្នកស្វែងរកទេ' : 'No products found'}</p>
-                  </div>
-                )}
-              </motion.div>
+              {isLoading ? (
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center justify-center py-40 space-y-4">
+                  <div className="w-8 h-8 border-4 border-zinc-200 border-t-black rounded-full animate-spin" />
+                  <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400 italic">Accessing Database...</p>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key={selectedCategory + selectedBrand + searchQuery + sortBy}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  {displayedProducts.length > 0 ? (
+                    <ProductGrid products={displayedProducts} isLoading={false} />
+                  ) : (
+                    <div className="py-40 text-center border-2 border-dashed border-zinc-100 rounded-3xl">
+                      <p className="text-zinc-400 italic text-sm">{lang === 'kh' ? 'មិនមានទំនិញដែលអ្នកស្វែងរកទេ' : 'No pieces found in this collection.'}</p>
+                    </div>
+                  )}
+                </motion.div>
+              )}
             </AnimatePresence>
           </section>
         </div>

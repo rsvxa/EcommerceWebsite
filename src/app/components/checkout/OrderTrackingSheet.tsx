@@ -16,20 +16,17 @@ export function OrderTrackingSheet({ isOpen, onClose, orderData }: any) {
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Overlay */}
           <motion.div 
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             onClick={onClose}
             className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[2000000]"
           />
           
-          {/* Sheet Content */}
           <motion.div 
             initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
             className="fixed right-0 top-0 h-full w-full max-w-md bg-white shadow-[-20px_0_50px_rgba(0,0,0,0.1)] z-[2000001] flex flex-col italic"
           >
-            {/* Header */}
             <div className="p-8 border-b border-zinc-100 flex justify-between items-center bg-zinc-50/50">
               <div>
                 <h2 className="text-xl font-black uppercase tracking-tighter">ស្ថានភាពដឹកជញ្ជូន</h2>
@@ -40,7 +37,6 @@ export function OrderTrackingSheet({ isOpen, onClose, orderData }: any) {
               </button>
             </div>
 
-            {/* Carrier Card */}
             <div className="p-8">
               <div className="bg-blue-600 rounded-[32px] p-6 text-white flex items-center justify-between shadow-xl shadow-blue-100">
                 <div className="space-y-1">
@@ -50,9 +46,7 @@ export function OrderTrackingSheet({ isOpen, onClose, orderData }: any) {
                 <Truck size={32} className="opacity-40" />
               </div>
 
-              {/* Timeline Items */}
               <div className="mt-12 space-y-10 relative">
-                {/* Vertical Line */}
                 <div className="absolute left-[27px] top-2 bottom-2 w-0.5 bg-zinc-100" />
 
                 {steps.map((step, idx) => (
@@ -74,7 +68,6 @@ export function OrderTrackingSheet({ isOpen, onClose, orderData }: any) {
                 ))}
               </div>
 
-              {/* Last Location */}
               <div className="mt-12 p-6 bg-zinc-50 rounded-3xl border border-zinc-100 flex items-start gap-4">
                 <div className="p-3 bg-white rounded-xl shadow-sm text-blue-600">
                   <MapPin size={18} />
@@ -86,7 +79,6 @@ export function OrderTrackingSheet({ isOpen, onClose, orderData }: any) {
               </div>
             </div>
 
-            {/* Footer Button */}
             <div className="mt-auto p-8 border-t border-zinc-50">
               <button onClick={onClose} className="w-full py-5 bg-zinc-100 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 hover:bg-zinc-200 transition-all">
                 បិទផ្ទាំងនេះ

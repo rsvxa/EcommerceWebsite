@@ -64,15 +64,10 @@ const BLOG_POSTS = [
 export function BlogSection() {
   const [selectedGender, setSelectedGender] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
-  const [activePost, setActivePost] = useState<any>(null); // សម្រាប់ទុក Post ដែលកំពុងមើល
+  const [activePost, setActivePost] = useState<any>(null); 
   const { lang } = useLanguage();
   const t = translations[lang].blog;
 
-  const categories = [
-    { id: "All", label: t.categories.all },
-    { id: "Men", label: t.categories.men },
-    { id: "Women", label: t.categories.women },
-  ];
 
   const filteredPosts = selectedGender === "All" 
     ? BLOG_POSTS 
@@ -87,7 +82,6 @@ export function BlogSection() {
     <section className="py-24 bg-[#fcfcfc] border-t border-zinc-100 overflow-hidden">
       <div className="container mx-auto px-6">
         
-        {/* Editorial Header */}
         <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
           <div className="space-y-4 max-w-xl text-left">
             <motion.div initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
@@ -105,19 +99,7 @@ export function BlogSection() {
 
           <div className="flex flex-col items-end gap-6">
             <div className="flex flex-wrap justify-center gap-3 bg-white p-2 rounded-[2rem] shadow-sm border border-zinc-100">
-              {categories.map((cat) => (
-                <button
-                  key={cat.id}
-                  onClick={() => setSelectedGender(cat.id)}
-                  className={`px-8 py-3 rounded-full text-[10px] font-black uppercase tracking-widest transition-all duration-500 ${
-                    selectedGender === cat.id 
-                    ? "bg-black text-white shadow-xl scale-105" 
-                    : "text-gray-400 hover:text-black"
-                  }`}
-                >
-                  {cat.label}
-                </button>
-              ))}
+             
             </div>
             
             <Sheet>
@@ -205,7 +187,6 @@ export function BlogSection() {
           </div>
         </div>
 
-        {/* Blog Slider */}
         <AnimatePresence mode="wait">
           <motion.div
             key={selectedGender}
@@ -276,11 +257,9 @@ export function BlogSection() {
         </AnimatePresence>
       </div>
 
-      {/* --- ផ្ទាំង Sheet សម្រាប់បង្ហាញខ្លឹមសារលម្អិត --- */}
       <Sheet open={!!activePost} onOpenChange={() => setActivePost(null)}>
         <SheetContent side="bottom" className="h-[90vh] rounded-t-[3rem] border-none p-0 overflow-hidden bg-white">
           <div className="h-full flex flex-col">
-            {/* Header with Close Button */}
             <div className="p-6 flex justify-between items-center border-b border-zinc-50">
                 <span className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-400">Editorial Details</span>
                 <button onClick={() => setActivePost(null)} className="p-3 bg-zinc-100 rounded-full hover:bg-black hover:text-white transition-all">
@@ -291,7 +270,6 @@ export function BlogSection() {
             <div className="flex-1 overflow-y-auto no-scrollbar">
               {activePost && (
                 <div className="max-w-4xl mx-auto p-8 md:p-16 space-y-12">
-                  {/* Hero Image in Details */}
                   <div className="relative aspect-video rounded-[3rem] overflow-hidden shadow-2xl">
                     <img src={activePost.image} className="w-full h-full object-cover" alt="" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-10">
@@ -307,7 +285,6 @@ export function BlogSection() {
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-                    {/* Sidebar Info */}
                     <div className="space-y-8">
                         <div className="p-8 bg-zinc-50 rounded-[2rem] space-y-6">
                             <h4 className="font-black uppercase text-xs tracking-widest border-b border-zinc-200 pb-4">Article Info</h4>
@@ -336,7 +313,6 @@ export function BlogSection() {
                         </div>
                     </div>
 
-                    {/* Content Detail */}
                     <div className="md:col-span-2 space-y-8">
                         <div className="flex items-center gap-3 text-blue-600">
                             <Info size={20} />

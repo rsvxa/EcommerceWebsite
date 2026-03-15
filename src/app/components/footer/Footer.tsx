@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { Facebook, Instagram, Twitter, Mail, MapPin, Phone, ArrowUpRight, ShoppingBag, ArrowRight, ShieldCheck, FileText } from 'lucide-react';
+import { Facebook, Instagram, Twitter, Mail, MapPin, Phone, ArrowUpRight, ShoppingBag, ArrowRight, ShieldCheck, FileText, Truck, RefreshCcw, HelpCircle, User, Star, BookOpen, Info } from 'lucide-react';
 import { useLanguage } from '@/lib/store/use-language';
 import { translations } from '@/lib/i18n/translations';
 import {
@@ -27,7 +27,6 @@ export default function Footer() {
       <div className="container mx-auto px-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-16 mb-20">
           
-          {/* 1. Brand Identity */}
           <div className="lg:col-span-4 space-y-8">
             <div className="flex items-center gap-3 group cursor-pointer">
               <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center">
@@ -40,66 +39,170 @@ export default function Footer() {
             </p>
             <div className="flex gap-3">
               {socialLinks.map((social, i) => (
-                <a key={i} href={social.href} className={`w-10 h-10 rounded-full border border-zinc-800 flex items-center justify-center text-zinc-400 transition-all duration-300 hover:text-white hover:border-transparent ${social.color}`}>
+                <a key={i} href={social.href} target="_blank" className={`w-10 h-10 rounded-full border border-zinc-800 flex items-center justify-center text-zinc-400 transition-all duration-300 hover:text-white hover:border-transparent ${social.color}`}>
                   {social.icon}
                 </a>
               ))}
             </div>
           </div>
 
-          {/* 2. Quick Links */}
           <div className="lg:col-span-2 space-y-8">
             <h3 className="text-[13px] font-black uppercase tracking-[0.3em] text-zinc-500">{t.quickLinks}</h3>
             <ul className="space-y-4">
-              {[t.newArrivals, t.popular, t.blog, t.aboutUs].map((link) => (
-                <li key={link} className="group flex items-center gap-2 text-zinc-400 hover:text-white text-sm font-bold transition-colors cursor-pointer">
-                  <ArrowRight size={16} className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all"/>
-                  {link}
-                </li>
-              ))}
+              <li>
+                <PolicyDialog 
+                  triggerLabel={t.newArrivals} 
+                  title={t.newArrivals}
+                  icon={<Star size={32} className="text-yellow-400" />}
+                  lang={lang}
+                  content={[
+                    { kh: 'ស្ទីលថ្មីប្រចាំសប្តាហ៍', en: 'Weekly New Styles', descKh: 'យើងខ្ញុំធ្វើបច្ចុប្បន្នភាពទំនិញថ្មីៗរៀងរាល់ថ្ងៃច័ន្ទ។ រាល់ម៉ូដសម្លៀកបំពាក់ត្រូវបានសម្រាំងយ៉ាងសម្រិតសម្រាំងបំផុតសម្រាប់យុវវ័យសម័យថ្មី។', descEn: 'We update new arrivals every Monday. Every piece is carefully curated for modern youth fashion trends.' },
+                    { kh: 'ការផ្តល់ជូនពិសេស', en: 'Exclusive Offers', descKh: 'សម្រាប់ទំនិញមកដល់ថ្មី អ្នកនឹងទទួលបានការបញ្ចុះតម្លៃ ៥% ភ្លាមៗក្នុងរយៈពេល ៤៨ម៉ោងដំបូង។', descEn: 'For new arrivals, enjoy an instant 5% discount within the first 48 hours.' }
+                  ]}
+                  isListStyle={true}
+                />
+              </li>
+              <li>
+                <PolicyDialog 
+                  triggerLabel={t.popular} 
+                  title={t.popular}
+                  icon={<ShoppingBag size={32} className="text-orange-400" />}
+                  lang={lang}
+                  content={[
+                    { kh: 'ទំនិញលក់ដាច់បំផុត', en: 'Best Sellers', descKh: 'នេះគឺជាបញ្ជីទំនិញដែលទទួលបានការគាំទ្រខ្លាំងបំផុតពីអតិថិជន ZWAY របស់យើងក្នុងខែនេះ។', descEn: 'This is the list of products most supported by our ZWAY customers this month.' },
+                    { kh: 'គុណភាពខ្ពស់', en: 'High Quality', descKh: 'ទំនិញពេញនិយមមិនត្រឹមតែស្អាតទេ តែវាជាប្រភេទក្រណាត់ដែលធន់ និងមានផាសុកភាពបំផុត។', descEn: 'Popular items aren’t just stylish; they are made from the most durable and comfortable fabrics.' }
+                  ]}
+                  isListStyle={true}
+                />
+              </li>
+              <li>
+                <PolicyDialog 
+                  triggerLabel={t.blog} 
+                  title={t.blog}
+                  icon={<BookOpen size={32} className="text-blue-400" />}
+                  lang={lang}
+                  content={[
+                    { kh: 'តិចនិកតុបតែងខ្លួន', en: 'Styling Tips', descKh: 'រៀនពីរបៀបផ្គូរផ្គងពណ៌សម្លៀកបំពាក់ឱ្យស័ក្តិសមទៅតាមកម្មវិធីផ្សេងៗ មិនថាដំណើរកម្សាន្ត ឬការងារការិយាល័យ។', descEn: 'Learn how to match clothing colors for different occasions, whether for travel or office work.' },
+                    { kh: 'ព័ត៌មានហ្វេសសិន', en: 'Fashion News', descKh: 'តាមដានព័ត៌មាន និងការវិវត្តនៃពិភពហ្វេសសិនទាំងក្នុង និងក្រៅប្រទេសជាមួយ ZWAY។', descEn: 'Stay updated with global and local fashion trends with ZWAY.' }
+                  ]}
+                  isListStyle={true}
+                />
+              </li>
+              <li>
+                <PolicyDialog 
+                  triggerLabel={t.aboutUs} 
+                  title={t.aboutUs}
+                  icon={<Info size={32} className="text-zinc-400" />}
+                  lang={lang}
+                  content={[
+                    { kh: 'ដំណើរដើមទុន', en: 'Our Story', descKh: 'ZWAY បង្កើតឡើងក្នុងឆ្នាំ ២០២០ ក្នុងគោលបំណងផ្តល់នូវសម្លៀកបំពាក់ដែលមានតម្លៃសមរម្យ និងគុណភាពខ្ពស់សម្រាប់ប្រជាជនកម្ពុជា។', descEn: 'ZWAY was founded in 2020 with the mission to provide affordable, high-quality clothing for Cambodians.' },
+                    { kh: 'ចក្ខុវិស័យ', en: 'Vision', descKh: 'ក្លាយជាហ្វេសសិនស្ទ័រឈានមុខគេ ដែលផ្តល់នូវទំនុកចិត្ត និងភាពស្រស់ស្អាតដល់អតិថិជនគ្រប់រូប។', descEn: 'To become a leading fashion store that provides confidence and beauty to every customer.' }
+                  ]}
+                  isListStyle={true}
+                />
+              </li>
             </ul>
           </div>
 
-          {/* 3. Customer Care */}
           <div className="lg:col-span-2 space-y-8">
             <h3 className="text-[13px] font-black uppercase tracking-[0.3em] text-zinc-500">{t.customerCare}</h3>
             <ul className="space-y-4">
-              {[t.shipping, t.returns, t.faqs, t.support].map((link) => (
-                <li key={link} className="text-zinc-400 hover:text-white text-sm font-bold transition-colors cursor-pointer flex items-center justify-between group">
-                  {link}
-                  <ArrowUpRight size={14} className="opacity-0 group-hover:opacity-100 transition-all" />
-                </li>
-              ))}
+              <li>
+                <PolicyDialog 
+                  triggerLabel={t.shipping} 
+                  title={t.shipping}
+                  icon={<Truck size={32} className="text-emerald-400" />}
+                  lang={lang}
+                  content={[
+                    { kh: 'រយៈពេលដឹកជញ្ជូន', en: 'Delivery Time', descKh: 'ក្នុងភ្នំពេញ៖ ១ ទៅ ២ ថ្ងៃ។ ខេត្តក្រុងផ្សេងៗ៖ ២ ទៅ ៣ ថ្ងៃ។', descEn: 'Phnom Penh: 1-2 days. Provinces: 2-3 days.' },
+                    { kh: 'តម្លៃសេវាដឹក', en: 'Shipping Rates', descKh: 'ឥតគិតថ្លៃសម្រាប់ការបញ្ជាទិញលើសពី ២០ដុល្លារ។ តម្លៃទូទៅចន្លោះពី ១ដុល្លារ ទៅ ២ដុល្លារ។', descEn: 'Free shipping for orders over $20. Standard rates between $1 to $2.' }
+                  ]}
+                  isListStyle={true}
+                />
+              </li>
+              <li>
+                <PolicyDialog 
+                  triggerLabel={t.returns} 
+                  title={t.returns}
+                  icon={<RefreshCcw size={32} className="text-red-400" />}
+                  lang={lang}
+                  content={[
+                    { kh: 'លក្ខខណ្ឌប្តូរទំនិញ', en: 'Exchange Conditions', descKh: 'ទំនិញត្រូវតែស្ថិតក្នុងសភាពដើម មានស្លាកសញ្ញា និងមិនទាន់បានបោកគក់។ អាចប្តូរបានក្នុងរយៈពេល ៧ថ្ងៃ។', descEn: 'Items must be in original condition, with tags, and unwashed. Exchangeable within 7 days.' },
+                    { kh: 'ការបង្វិលសាច់ប្រាក់', en: 'Refund Policy', descKh: 'យើងខ្ញុំមិនមានគោលការណ៍បង្វិលសាច់ប្រាក់វិញទេ ប៉ុន្តែលោកអ្នកអាចប្តូរជាទំនិញផ្សេងដែលមានតម្លៃប្រហាក់ប្រហែល។', descEn: 'We do not have a refund policy, but you can exchange for other items of similar value.' }
+                  ]}
+                  isListStyle={true}
+                />
+              </li>
+              <li>
+                <PolicyDialog 
+                  triggerLabel={t.faqs} 
+                  title={t.faqs}
+                  icon={<HelpCircle size={32} className="text-purple-400" />}
+                  lang={lang}
+                  content={[
+                    { kh: 'តើត្រូវបង់ប្រាក់យ៉ាងដូចម្តេច?', en: 'How to pay?', descKh: 'លោកអ្នកអាចបង់ប្រាក់តាមរយៈ ABA, ACLEDA ឬសាច់ប្រាក់ផ្ទាល់ពេលទំនិញទៅដល់ (COD)។', descEn: 'You can pay via ABA, ACLEDA, or Cash on Delivery (COD).' },
+                    { kh: 'តើហាងមានទីតាំងនៅឯណា?', en: 'Where is the store?', descKh: 'យើងខ្ញុំមានសាខានៅរាជធានីភ្នំពេញ ដែលមានអាសយដ្ឋានដូចបានបង្ហាញក្នុងផ្នែកទំនាក់ទំនង។', descEn: 'We have branches in Phnom Penh, as shown in the contact section.' }
+                  ]}
+                  isListStyle={true}
+                />
+              </li>
+              <li>
+                <PolicyDialog 
+                  triggerLabel={t.support} 
+                  title={t.support}
+                  icon={<Phone size={32} className="text-blue-500" />}
+                  lang={lang}
+                  content={[
+                    { kh: 'ម៉ោងធ្វើការ', en: 'Working Hours', descKh: 'រៀងរាល់ថ្ងៃ ចាប់ពីម៉ោង ៨:០០ ព្រឹក ដល់ ៩:០០ យប់។', descEn: 'Every day from 8:00 AM to 9:00 PM.' },
+                    { kh: 'ទំនាក់ទំនងបន្ទាន់', en: 'Emergency Contact', descKh: 'សម្រាប់បញ្ហាបន្ទាន់ សូមតេមកកាន់លេខ +855 969 127 603 ឬ Telegram: @zway_fashion។', descEn: 'For urgent issues, call +855 969 127 603 or Telegram: @zway_fashion.' }
+                  ]}
+                  isListStyle={true}
+                />
+              </li>
             </ul>
           </div>
 
-          {/* 4. Contact Details */}
           <div className="lg:col-span-4 space-y-8">
             <h3 className="text-[13px] font-black uppercase tracking-[0.3em] text-zinc-500">{t.contactUs}</h3>
+            
             <div className="bg-zinc-900/50 p-8 rounded-[2rem] border border-zinc-800/50 space-y-6">
-              <div className="flex items-start gap-4">
-                <div className="p-3 bg-zinc-800 rounded-2xl text-zinc-400">
+              
+              <a 
+                href="https://maps.google.com/?q=ZWAY+FASHION+CAMBODIA" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex items-start gap-4 group cursor-pointer"
+              >
+                <div className="p-3 bg-zinc-800 rounded-2xl text-zinc-400 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
                   <MapPin size={20} />
                 </div>
                 <div className="space-y-1">
                   <p className="text-[10px] font-black text-zinc-500 uppercase">{lang === 'kh' ? 'ទីតាំង' : 'Location'}</p>
-                  <p className="text-sm font-bold text-zinc-300 leading-snug">{t.address}</p>
+                  <p className="text-sm font-bold text-zinc-300 leading-snug group-hover:text-white transition-colors">
+                    {t.address}
+                  </p>
                 </div>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="p-3 bg-zinc-800 rounded-2xl text-zinc-400">
+              </a>
+
+              <a 
+                href="tel:+855969127603" 
+                className="flex items-center gap-4 group cursor-pointer"
+              >
+                <div className="p-3 bg-zinc-800 rounded-2xl text-zinc-400 group-hover:bg-green-600 group-hover:text-white transition-all duration-300">
                   <Phone size={20} />
                 </div>
                 <div className="space-y-1">
                   <p className="text-[10px] font-black text-zinc-500 uppercase">{lang === 'kh' ? 'ទូរសព្ទ' : 'Call center'}</p>
-                  <p className="text-sm font-bold text-zinc-300">+855 969 127 603</p>
+                  <p className="text-sm font-bold text-zinc-300 group-hover:text-white transition-colors">
+                    +855 969 127 603
+                  </p>
                 </div>
-              </div>
+              </a>
+
             </div>
           </div>
         </div>
 
-        {/* Bottom Bar */}
         <div className="pt-8 border-t border-zinc-800 flex flex-col md:flex-row justify-between items-center gap-6">
           <p className="text-zinc-500 text-[10px] font-bold uppercase tracking-widest">
             © 2026 ZWAY Fashion Store. {t.rights}

@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from 'react';
-import { ShoppingCart, Search, Menu, User, UserCircle, Globe, X, ChevronLeft, LogOut, LayoutDashboard, Settings, ShoppingBag, Heart } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { ShoppingCart, Search, Menu, User, UserCircle, Globe, X, ChevronLeft, LogOut, LayoutDashboard, Settings, ShoppingBag, Heart, Loader2 } from 'lucide-react';
 import { Button } from '@/app/components/ui/button';
 import { Badge } from '@/app/components/ui/badge';
 import { Input } from '@/app/components/ui/input';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import {
   Sheet,
   SheetContent,
@@ -46,11 +47,40 @@ export function Navbar({ onSearch, onCategorySelect }: NavbarProps) {
   const [activeTab, setActiveTab] = useState<'profile' | 'settings' | 'orders' | 'wishlist'>('profile');
   const [showMobileDashboard, setShowMobileDashboard] = useState(false);
 
+  // State សម្រាប់ទុក Avatar ក្នុង Navbar
+  const [navAvatar, setNavAvatar] = useState<string | null>(null);
+
   const { lang, setLang } = useLanguage();
   const t = translations[lang].nav;
 
   const totalItems = useCartStore((state) => state.getTotalItems());
   const { user, isAuthenticated, logout } = useAuthStore();
+
+  // ហៅទិន្នន័យរូបភាព Profile មកបង្ហាញលើ Navbar
+  const fetchNavProfile = async () => {
+    const userEmail = localStorage.getItem('zway_user_email');
+    if (!userEmail || !isAuthenticated) return;
+
+    try {
+      const response = await fetch(`http://localhost:5000/api/customer?email=${encodeURIComponent(userEmail)}`);
+      if (response.ok) {
+        const data = await response.json();
+        setNavAvatar(data.image || null);
+      }
+    } catch (error) {
+      console.error("Navbar Sync Error:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchNavProfile();
+    }
+    
+    const syncProfile = () => fetchNavProfile();
+    window.addEventListener('avatarUpdated', syncProfile);
+    return () => window.removeEventListener('avatarUpdated', syncProfile);
+  }, [isAuthenticated]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,6 +91,7 @@ export function Navbar({ onSearch, onCategorySelect }: NavbarProps) {
     logout();
     setIsProfileOpen(false);
     setIsMobileMenuOpen(false);
+    setNavAvatar(null);
     toast.success(lang === 'kh' ? 'បានចាកចេញដោយជោគជ័យ' : 'Logged out successfully');
   };
 
@@ -126,15 +157,27 @@ export function Navbar({ onSearch, onCategorySelect }: NavbarProps) {
               )}
             </Button>
 
-            {/* Profile Icon for Desktop only */}
+            {/* Profile Icon for Desktop (Show Image) */}
             {isAuthenticated ? (
               <Button 
                 variant="ghost" 
                 size="icon" 
                 onClick={() => setIsProfileOpen(true)}
-                className="hidden lg:flex hover:bg-zinc-100 rounded-full"
+                className="hidden lg:flex hover:ring-2 hover:ring-zinc-100 rounded-full h-9 w-9 p-0 overflow-hidden border border-zinc-200"
               >
-                <UserCircle className="h-6 w-6" />
+                {navAvatar ? (
+                  <motion.img 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    src={navAvatar} 
+                    alt="Profile" 
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <div className="h-full w-full bg-zinc-900 flex items-center justify-center text-white">
+                    <User size={18} />
+                  </div>
+                )}
               </Button>
             ) : (
               <Button variant="ghost" size="icon" className="hidden lg:flex" onClick={() => setIsAuthDialogOpen(true)}>
@@ -145,7 +188,7 @@ export function Navbar({ onSearch, onCategorySelect }: NavbarProps) {
             {/* Mobile Menu Trigger */}
             <Sheet open={isMobileMenuOpen} onOpenChange={(open) => {
               setIsMobileMenuOpen(open);
-              if (!open) setShowMobileDashboard(false); // Reset dashboard view when closing
+              if (!open) setShowMobileDashboard(false);
             }}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className="lg:hidden">
@@ -154,14 +197,9 @@ export function Navbar({ onSearch, onCategorySelect }: NavbarProps) {
               </SheetTrigger>
               <SheetContent side="left" className="w-[300px] p-0 flex flex-col">
                 <div className="flex-1 flex flex-col overflow-hidden">
-                  
-                  {/* Header of Mobile Menu */}
                   <div className="p-6 border-b border-zinc-100 flex items-center justify-between">
                     {showMobileDashboard ? (
-                      <button 
-                        onClick={() => setShowMobileDashboard(false)}
-                        className="flex items-center gap-2 text-zinc-500 hover:text-black transition-colors"
-                      >
+                      <button onClick={() => setShowMobileDashboard(false)} className="flex items-center gap-2 text-zinc-500">
                         <ChevronLeft size={20} />
                         <span className="text-xs font-black uppercase tracking-widest">{lang === 'kh' ? 'ត្រឡប់ក្រោយ' : 'Back'}</span>
                       </button>
@@ -172,15 +210,18 @@ export function Navbar({ onSearch, onCategorySelect }: NavbarProps) {
 
                   <div className="flex-1 overflow-y-auto">
                     {!showMobileDashboard ? (
-                      /* Main Menu Content */
                       <div className="p-4 space-y-2">
                         {isAuthenticated ? (
                           <div 
                             onClick={() => setShowMobileDashboard(true)}
-                            className="flex items-center gap-4 p-4 rounded-2xl bg-zinc-50 border border-zinc-100 mb-6 cursor-pointer hover:bg-zinc-100"
+                            className="flex items-center gap-4 p-4 rounded-2xl bg-zinc-50 border border-zinc-100 mb-6 cursor-pointer"
                           >
-                            <div className="h-10 w-10 rounded-full bg-black flex items-center justify-center text-white font-bold uppercase">
-                              {user?.name?.charAt(0) || 'U'}
+                            <div className="h-12 w-12 rounded-xl bg-black overflow-hidden flex items-center justify-center border border-zinc-200 shadow-sm">
+                              {navAvatar ? (
+                                <img src={navAvatar} alt="Profile" className="h-full w-full object-cover" />
+                              ) : (
+                                <User className="text-white" size={24} />
+                              )}
                             </div>
                             <div className="flex-1">
                               <p className="text-sm font-black uppercase">{user?.name || 'User'}</p>
@@ -210,44 +251,28 @@ export function Navbar({ onSearch, onCategorySelect }: NavbarProps) {
                               onCategorySelect?.(cat.value);
                               setIsMobileMenuOpen(false);
                             }}
-                            className="w-full text-left px-4 py-3 rounded-xl hover:bg-zinc-50 font-bold uppercase text-xs tracking-widest transition-colors"
+                            className="w-full text-left px-4 py-3 rounded-xl hover:bg-zinc-50 font-bold uppercase text-xs tracking-widest"
                           >
                             {cat.name}
                           </button>
                         ))}
                       </div>
                     ) : (
-                      /* Profile Dashboard Content (Mobile View) */
                       <div className="p-4 space-y-2 animate-in slide-in-from-right duration-300">
-                        <button 
-                          onClick={() => { setActiveTab('profile'); setIsProfileOpen(true); setIsMobileMenuOpen(false); }}
-                          className="w-full flex items-center gap-3 px-4 py-4 rounded-xl hover:bg-zinc-50 font-black uppercase text-[11px] tracking-widest"
-                        >
+                        <button onClick={() => { setActiveTab('profile'); setIsProfileOpen(true); setIsMobileMenuOpen(false); }} className="w-full flex items-center gap-3 px-4 py-4 rounded-xl hover:bg-zinc-50 font-black uppercase text-[11px] tracking-widest">
                           <LayoutDashboard size={18} /> {lang === 'kh' ? 'ទិដ្ឋភាពទូទៅ' : 'Overview'}
                         </button>
-                        <button 
-                          onClick={() => { setActiveTab('orders'); setIsProfileOpen(true); setIsMobileMenuOpen(false); }}
-                          className="w-full flex items-center gap-3 px-4 py-4 rounded-xl hover:bg-zinc-50 font-black uppercase text-[11px] tracking-widest"
-                        >
+                        <button onClick={() => { setActiveTab('orders'); setIsProfileOpen(true); setIsMobileMenuOpen(false); }} className="w-full flex items-center gap-3 px-4 py-4 rounded-xl hover:bg-zinc-50 font-black uppercase text-[11px] tracking-widest">
                           <ShoppingBag size={18} /> {lang === 'kh' ? 'ប្រវត្តិបញ្ជាទិញ' : 'Orders'}
                         </button>
-                        <button 
-                          onClick={() => { setActiveTab('wishlist'); setIsProfileOpen(true); setIsMobileMenuOpen(false); }}
-                          className="w-full flex items-center gap-3 px-4 py-4 rounded-xl hover:bg-zinc-50 font-black uppercase text-[11px] tracking-widest"
-                        >
+                        <button onClick={() => { setActiveTab('wishlist'); setIsProfileOpen(true); setIsMobileMenuOpen(false); }} className="w-full flex items-center gap-3 px-4 py-4 rounded-xl hover:bg-zinc-50 font-black uppercase text-[11px] tracking-widest">
                           <Heart size={18} /> {lang === 'kh' ? 'បញ្ជីប្រាថ្នា' : 'Wishlist'}
                         </button>
-                        <button 
-                          onClick={() => { setActiveTab('settings'); setIsProfileOpen(true); setIsMobileMenuOpen(false); }}
-                          className="w-full flex items-center gap-3 px-4 py-4 rounded-xl hover:bg-zinc-50 font-black uppercase text-[11px] tracking-widest"
-                        >
+                        <button onClick={() => { setActiveTab('settings'); setIsProfileOpen(true); setIsMobileMenuOpen(false); }} className="w-full flex items-center gap-3 px-4 py-4 rounded-xl hover:bg-zinc-50 font-black uppercase text-[11px] tracking-widest">
                           <Settings size={18} /> {lang === 'kh' ? 'ការកំណត់' : 'Settings'}
                         </button>
                         <div className="pt-4 mt-4 border-t border-zinc-100">
-                          <button 
-                            onClick={handleLogout}
-                            className="w-full flex items-center gap-3 px-4 py-4 rounded-xl text-red-500 hover:bg-red-50 font-black uppercase text-[11px] tracking-widest"
-                          >
+                          <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-4 rounded-xl text-red-500 hover:bg-red-50 font-black uppercase text-[11px] tracking-widest">
                             <LogOut size={18} /> {lang === 'kh' ? 'ចាកចេញ' : 'Logout'}
                           </button>
                         </div>
@@ -261,33 +286,23 @@ export function Navbar({ onSearch, onCategorySelect }: NavbarProps) {
         </div>
       </div>
 
-      {/* Profile & Settings Sheet (Desktop & Mobile Content) */}
+      {/* Dashboard Sheet */}
       <Sheet open={isProfileOpen} onOpenChange={setIsProfileOpen}>
         <SheetContent className="w-full sm:max-w-[80%] md:max-w-[70%] lg:max-w-[60%] p-0 flex flex-col h-screen">
-          
-          <div className="flex-none flex items-center justify-between px-8 py-6 border-b border-zinc-100 bg-white z-10">
+          <div className="flex-none flex items-center justify-between px-8 py-6 border-b border-zinc-100 bg-white">
             <h2 className="text-xl font-black uppercase tracking-tighter italic text-zinc-900">
               {lang === 'kh' ? 'ផ្ទាំងព័ត៌មាន ZWAY' : 'ZWAY Dashboard'}
             </h2>
-            <Button 
-              variant="ghost" 
-              onClick={() => setIsProfileOpen(false)}
-              className="group flex items-center rounded-full bg-zinc-100 hover:bg-black gap-2 text-[13px] font-black uppercase tracking-[0.2em] text-black hover:text-white transition-all"
-            >
-              <X size={20} className="group-hover:rotate-90 transition-transform" />
+            <Button variant="ghost" onClick={() => setIsProfileOpen(false)} className="rounded-full bg-zinc-100 hover:bg-black gap-2 font-black uppercase tracking-widest text-black hover:text-white transition-all">
+              <X size={20} />
             </Button>
           </div>
 
           <div className="flex-1 flex overflow-hidden">
             <aside className="hidden md:block border-r border-zinc-50 p-6 bg-white overflow-y-auto w-[220px]">
-              <ProfileSidebar 
-                activeTab={activeTab} 
-                setActiveTab={setActiveTab} 
-                onLogout={handleLogout} 
-              />
+              <ProfileSidebar activeTab={activeTab} setActiveTab={setActiveTab} onLogout={handleLogout} />
             </aside>
-
-            <main className="flex-1 overflow-y-auto bg-[#F9FAFB] p-4 md:p-8 custom-scrollbar">
+            <main className="flex-1 overflow-y-auto bg-[#F9FAFB] p-4 md:p-8">
               <div className="max-w-5xl mx-auto">
                 <div className="animate-in fade-in slide-in-from-right-8 duration-700">
                   {activeTab === 'profile' && <ProfileOverview />}

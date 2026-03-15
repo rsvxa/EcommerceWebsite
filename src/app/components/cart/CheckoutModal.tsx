@@ -11,7 +11,7 @@ import {
 } from '../../components/ui/sheet';
 import { Separator } from '../../components/ui/separator';
 import { Button } from '../ui/button';
-import { Truck, ShieldCheck, CreditCard, MapPin, Loader2 } from 'lucide-react';
+import { ShieldCheck, Loader2 } from 'lucide-react';
 import { formatPrice } from '@/lib/utils/format';
 import { OrderInvoice } from '../checkout/OrderInvoice';
 import { toast } from 'sonner';
@@ -19,6 +19,7 @@ import { useCartStore } from "@/lib/store/cart-store";
 import { useLanguage } from '@/lib/store/use-language';
 import { translations } from '@/lib/i18n/translations';
 import { useOrderStore } from '@/lib/store/use-order-store';
+import { useAuthStore } from '@/lib/store/auth-store';
 
 const TELEGRAM_BOT_TOKEN = "8174063017:AAEvRhmDVFJ_gX6wCS1D0-8cs0tECZkbnZA";
 const TELEGRAM_CHAT_ID = "8174063017";
@@ -27,6 +28,7 @@ export function CheckoutModal({ isOpen, onOpenChange, total, cartItems }: any) {
   const { lang } = useLanguage();
   const t = translations[lang].checkout;
   const { addOrder } = useOrderStore();
+  const { user } = useAuthStore();
 
   const [paymentMethod, setPaymentMethod] = useState('khqr');
   const [country, setCountry] = useState('cambodia');
@@ -85,22 +87,22 @@ export function CheckoutModal({ isOpen, onOpenChange, total, cartItems }: any) {
 
   const sendToTelegram = async (order: any) => {
     const message = `
-📦 **ការបញ្ជាទិញថ្មី!**
+📦 **ការបញ្ជាទិញថ្មី! (Verified User)**
 ━━━━━━━━━━━━━━━━━━
 🆔 **Order ID:** \`${order.orderId}\`
-👤 **ឈ្មោះ:** ${order.customer.fullName}
-📞 **ទូរសព្ទ:** ${order.customer.phone}
-📍 **ប្រទេស:** ${country.toUpperCase()}
-🚚 **ដឹកជញ្ជូន:** ${order.customer.shippingCarrier}
-💳 **បង់ប្រាក់:** ${order.customer.paymentMethod}
+👤 **ឈ្មោះ:** ${order.customerName}
+📧 **Email:** ${order.email}
+📞 **ទូរសព្ទ:** ${order.phoneNumber}
+📍 **ទីតាំង:** ${order.province}, ${order.country.toUpperCase()}
+🚚 **ដឹកជញ្ជូន:** ${order.shippingCarrier}
+💳 **បង់ប្រាក់:** ${order.paymentMethod}
 ━━━━━━━━━━━━━━━━━━
 🛒 **ទំនិញ:**
-${order.items.map((item: any) => `• ${item.product?.name || item.name} (x${item.quantity})`).join('\n')}
+${order.items.map((item: any) => `• ${item.name} (x${item.quantity}) - ${formatPrice(item.price)}`).join('\n')}
 
-💵 **Subtotal:** ${formatPrice(total)}
-🚚 **Shipping:** ${formatPrice(shippingFee)}
-🏛️ **Tax (${currentTaxRate * 100}%):** ${formatPrice(taxAmount)}
-💰 **សរុបចុងក្រោយ: ${formatPrice(order.total)}**
+💵 **Subtotal:** ${formatPrice(order.subtotal)}
+🚚 **Shipping:** ${formatPrice(order.shippingFee)}
+💰 **សរុបចុងក្រោយ: ${formatPrice(order.totalAmount)}**
 ━━━━━━━━━━━━━━━━━━
     `;
 
@@ -114,45 +116,97 @@ ${order.items.map((item: any) => `• ${item.product?.name || item.name} (x${ite
           parse_mode: 'Markdown',
         }),
       });
-    } catch (e) { console.error(e); }
+    } catch (e) { console.error("Telegram Error:", e); }
   };
 
   const handleConfirmOrder = async () => {
+    if (!user || !user.email) {
+      return toast.error("សូមចូលប្រើប្រាស់គណនី (Login) ជាមុនសិន ទើបអាចធ្វើការបញ្ជាទិញបាន!");
+    }
     if (!formData.fullName.trim()) return toast.error(t.errorName);
     if (!formData.phone.trim()) return toast.error(t.errorPhone);
     if (!shippingCarrier) return toast.error(t.errorCarrier);
     if (!formData.province.trim() || !formData.address.trim()) return toast.error(t.errorLocation);
 
     setIsSubmitting(true);
+    
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500)); 
-      const orderSummary: any = {
-        id: Math.random().toString(36).substring(7),
-        orderId: `ZW-${Math.floor(100000 + Math.random() * 900000)}`,
+      const orderId = `ZW-${Math.floor(100000 + Math.random() * 900000)}`;
+      const carrierName = shippingData[country]?.find((c: any) => c.id === shippingCarrier)?.name || shippingCarrier;
+
+      const mappedItems = cartItems.map((item: any) => ({
+        productId: item.product.id,
+        name: item.product.name,
+        quantity: Number(item.quantity),
+        price: Number(item.product.price),
+        image: item.product.image,
+        color: item.selectedColor || null,
+        size: item.selectedSize || null
+      }));
+
+      const orderData = {
+        email: user.email.toLowerCase(),
+        orderId: orderId,
+        customerName: formData.fullName,
+        phoneNumber: formData.phone,
+        country: country,
+        province: formData.province,
+        district: formData.district,
+        commune: formData.commune,
+        address: formData.address,
+        shippingCarrier: carrierName,
+        paymentMethod: paymentMethod.toUpperCase(),
+        items: mappedItems,
+        subtotal: Number(total),
+        tax: Number(taxAmount),
+        shippingFee: Number(shippingFee),
+        totalAmount: Number(finalTotal),
+        status: 'pending'
+      };
+
+      const response = await fetch('http://localhost:5000/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(orderData),
+      });
+
+      if (!response.ok) {
+        const errorJson = await response.json();
+        throw new Error(errorJson.error || "បរាជ័យក្នុងការរក្សាទុកទិន្នន័យ");
+      }
+
+      const result = await response.json();
+
+      const orderSummary = {
+        ...orderData,
+        id: result.id, 
         date: new Date().toLocaleDateString(lang === 'kh' ? 'km-KH' : 'en-GB'),
-        status: "neworder",
-        items: [...cartItems],
-        total: finalTotal, 
-        subtotal: total,
-        tax: taxAmount,
-        shipping: shippingFee,
         customer: {
           ...formData,
           paymentMethod: paymentMethod.toUpperCase(),
-          shippingCarrier: shippingData[country]?.find((c: any) => c.id === shippingCarrier)?.name || shippingCarrier
-        }
+          shippingCarrier: carrierName
+        },
+        total: finalTotal,
       };
 
-      await sendToTelegram(orderSummary);
+      await sendToTelegram(orderData);
       addOrder(orderSummary);
       setFinalOrderData(orderSummary); 
+      
       toast.success(t.success);
       onOpenChange(false); 
+
       setTimeout(() => {
         setIsInvoiceOpen(true);
         clearCart(); 
       }, 400);
-    } catch (error) { toast.error("Error occurred!"); } finally { setIsSubmitting(false); }
+
+    } catch (error: any) {
+      console.error("Order Process Error:", error);
+      toast.error(error.message || "មានបញ្ហាបច្ចេកទេស! សូមព្យាយាមម្ដងទៀត។");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -224,7 +278,7 @@ ${order.items.map((item: any) => `• ${item.product?.name || item.name} (x${ite
             <div className="space-y-10 flex flex-col items-center italic">
               <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400 text-center w-full">{t.paymentMethod}</h3>
               <div className="inline-flex p-1.5 bg-zinc-100/50 rounded-full border border-zinc-100">
-                {['khqr', 'visa', 'cod'].map((method) => {
+                {['khqr', 'visa'].map((method) => {
                   if (method === 'khqr' && country !== 'cambodia') return null;
                   return (
                     <button key={method} type="button" onClick={() => setPaymentMethod(method)} className={`px-8 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all ${paymentMethod === method ? 'bg-black text-white shadow-xl' : 'text-zinc-400 hover:text-black'}`}>
@@ -253,13 +307,13 @@ ${order.items.map((item: any) => `• ${item.product?.name || item.name} (x${ite
                   {paymentMethod === 'visa' && (
                     <motion.div key="visa" className="p-10 bg-zinc-50 rounded-[2.5rem] space-y-6 border border-zinc-100">
                       <input type="text" placeholder="Card Number" className="w-full p-4 rounded-xl border bg-white outline-none font-bold" />
-                      <div className="grid grid-cols-2 gap-4"><input type="text" placeholder="MM/YY" className="p-4 rounded-xl border bg-white outline-none font-bold" /><input type="text" placeholder="CVC" className="p-4 rounded-xl border bg-white outline-none font-bold" /></div>
-                    </motion.div>
-                  )}
-                  {paymentMethod === 'cod' && (
-                    <motion.div key="cod" className="p-12 bg-zinc-50 rounded-[2.5rem] border border-zinc-100 text-center">
-                      <Truck className="mx-auto mb-4 text-zinc-400" size={48} />
-                      <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Cash on Delivery</p>
+                      <div className="grid grid-cols-2 gap-4">
+                        <input type="text" placeholder="MM/YY" className="p-4 rounded-xl border bg-white outline-none font-bold" />
+                        <input type="text" placeholder="CVC" className="p-4 rounded-xl border bg-white outline-none font-bold" />
+                      </div>
+                      <Button onClick={handleConfirmOrder} disabled={isSubmitting} className="w-full bg-black text-white h-14 rounded-2xl font-bold uppercase tracking-[0.3em] text-[10px] shadow-2xl hover:bg-zinc-800 transition-all">
+                        {isSubmitting ? <Loader2 className="animate-spin" /> : t.confirmBtn}
+                      </Button>
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -289,15 +343,13 @@ ${order.items.map((item: any) => `• ${item.product?.name || item.name} (x${ite
                   <p className="text-[10px] font-black uppercase text-gray-400 tracking-widest">{t.totalPayable}</p>
                   <p className="text-4xl font-black tracking-tighter">{formatPrice(finalTotal)}</p>
                 </div>
-                <div className="flex items-center gap-2 opacity-40 text-green-600 mb-1"><ShieldCheck size={18} /><span className="text-[10px] font-bold uppercase">{t.secure}</span></div>
+                <div className="flex items-center gap-2 opacity-40 text-green-600 mb-1">
+                  <ShieldCheck size={18} />
+                  <span className="text-[10px] font-bold uppercase">{t.secure}</span>
+                </div>
               </div>
             </div>
-
-            {(paymentMethod !== 'khqr' || country !== 'cambodia') && (
-              <Button onClick={handleConfirmOrder} disabled={isSubmitting} className="w-full bg-black text-white h-14 rounded-2xl font-bold uppercase tracking-[0.3em] text-[10px] shadow-2xl hover:bg-zinc-800 transition-all">
-                {isSubmitting ? <Loader2 className="animate-spin" /> : t.confirmBtn}
-              </Button>
-            )}
+            
             <button onClick={() => onOpenChange(false)} className="w-full h-14 text-[10px] bg-gray-100 rounded-2xl font-black uppercase tracking-[0.2em] text-zinc-400 hover:text-black transition-colors italic flex items-center justify-center gap-2">
               <span>←</span> {lang === 'kh' ? 'ត្រឡប់ក្រោយ' : 'Back to Cart'}
             </button>

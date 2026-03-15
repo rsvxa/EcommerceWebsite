@@ -57,7 +57,6 @@ export function HeroBanner() {
           <SwiperSlide key={index}>
             {({ isActive }) => (
               <div className="relative w-full h-full flex items-center overflow-hidden">
-                {/* Background Image with Parallax Zoom */}
                 <motion.div 
                   initial={{ scale: 1.2 }}
                   animate={isActive ? { scale: 1 } : { scale: 1.2 }}
@@ -127,12 +126,9 @@ export function HeroBanner() {
         ))}
       </Swiper>
 
-      {/* Custom Navigation & UI Elements */}
       <div className="absolute bottom-12 left-0 w-full z-30 px-8 md:px-16 flex justify-between items-center pointer-events-none">
-        {/* Pagination Dots */}
         <div className="hero-pagination !relative !w-auto flex gap-3 pointer-events-auto"></div>
 
-        {/* Navigation Arrows */}
         <div className="flex gap-4 pointer-events-auto">
           <button className="hero-prev w-14 h-14 rounded-full border border-white/20 flex items-center justify-center text-white hover:bg-white hover:text-zinc-950 transition-all duration-500 backdrop-blur-sm">
             <ChevronLeft size={24} />
@@ -143,7 +139,6 @@ export function HeroBanner() {
         </div>
       </div>
 
-      {/* Decorative Side Text */}
       <div className="absolute top-1/2 -right-24 -rotate-90 hidden lg:block z-30">
         <span className="text-white/10 text-[80px] font-black uppercase tracking-[0.2em] whitespace-nowrap select-none">
           ESTD 2026 • ZWAY FASHION

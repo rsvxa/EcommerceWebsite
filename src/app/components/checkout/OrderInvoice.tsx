@@ -74,7 +74,6 @@ export function OrderInvoice({ isOpen, onOpenChange, orderData }: any) {
             </div>
 
             <div className="p-8 md:p-10 space-y-8 relative">
-              {/* Customer Info */}
               <div className="grid grid-cols-2 gap-6 pb-6 border-b border-zinc-100 italic">
                 <div className="space-y-1">
                   <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">{t.billTo}</p>
@@ -92,7 +91,6 @@ export function OrderInvoice({ isOpen, onOpenChange, orderData }: any) {
                 </div>
               </div>
 
-              {/* Items Table */}
               <div className="space-y-4">
                 <div className="grid grid-cols-12 pb-4 border-b-2 border-zinc-900 px-2 text-[10px] font-black uppercase tracking-widest italic">
                   <div className="col-span-6">{t.description}</div>
@@ -121,21 +119,17 @@ export function OrderInvoice({ isOpen, onOpenChange, orderData }: any) {
                 </div>
               </div>
 
-              {/* Summary Totals */}
               <div className="flex flex-col items-end pt-4 space-y-2 italic border-t border-zinc-100">
-                {/* Subtotal */}
                 <div className="flex justify-between w-full md:w-64 text-zinc-500 font-bold text-[10px] uppercase px-2">
                   <span>{t.subtotal}</span>
                   <span>{formatPrice(subtotal)}</span>
                 </div>
                 
-                {/* Shipping Fee */}
                 <div className="flex justify-between w-full md:w-64 text-zinc-500 font-bold text-[10px] uppercase px-2">
                   <span>{lang === 'kh' ? 'ថ្លៃដឹកជញ្ជូន' : 'Shipping Fee'}</span>
                   <span>+{formatPrice(shipping)}</span>
                 </div>
 
-                {/* Tax */}
                 {tax > 0 && (
                   <div className="flex justify-between w-full md:w-64 text-red-400 font-bold text-[10px] uppercase px-2">
                     <span>{lang === 'kh' ? 'ពន្ធដារ' : 'Estimated Tax'}</span>
@@ -143,14 +137,12 @@ export function OrderInvoice({ isOpen, onOpenChange, orderData }: any) {
                   </div>
                 )}
 
-                {/* Grand Total */}
                 <div className="flex justify-between w-full md:w-80 bg-zinc-900 text-white p-6 rounded-[24px] shadow-2xl mt-4 transition-transform hover:scale-105">
                   <span className="text-[10px] font-black uppercase tracking-[0.2em]">{t.grandTotal}</span>
                   <span className="text-2xl font-black">{formatPrice(finalTotal)}</span>
                 </div>
               </div>
 
-              {/* Actions */}
               <div className="flex flex-col md:flex-row gap-4 no-print pt-4 relative z-20">
                 <button 
                   onClick={() => setShowTracking(true)}
@@ -168,7 +160,6 @@ export function OrderInvoice({ isOpen, onOpenChange, orderData }: any) {
                 </div>
               </div>
 
-              {/* Tracking Overlay */}
               <AnimatePresence>
                 {showTracking && (
                   <motion.div 
